@@ -1,0 +1,44 @@
+import 'package:auto/categories/domain/entities/category_entity.dart';
+import '../../../brands/domain/entities/brand_entity.dart';
+
+class SellerEntity {
+  final int? id;
+  final String? fullName;
+  final String? email;
+  final String? phone;
+  const SellerEntity({this.id, this.fullName, this.email, this.phone});
+}
+
+class ProductEntity {
+  final int? id;
+  final String? name;
+  final String? slug;
+  final String? cta;
+  final String? warranty;
+  final String? state;
+  final String? description;
+  final double? price;
+  final double? discount;
+  final CategoryEntity? category;
+  final List<String>? features;
+  final BrandEntity? brand;
+  final List<String>? medias;
+  final SellerEntity? seller;
+
+  const ProductEntity({
+    this.id,
+    this.name,
+    this.slug,
+    this.cta,
+    this.warranty,
+    this.state,
+    this.description,
+    this.price,
+    this.discount,
+    this.category,
+    this.features,
+    this.brand,
+    this.medias,
+    this.seller,
+  });
+}
