@@ -1,159 +1,62 @@
 import 'package:auto/categories/presentation/bloc/remote/remote_category_bloc.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:lottie/lottie.dart';
 
 import 'CategoryCard.dart';
 
 Widget CategorySection() {
   return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      const Text(
-        "Commandez on vous livre",
-        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        textAlign: TextAlign.center,
+      const Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+        child: Text(
+          "Catégories",
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
       ),
-      const SizedBox(height: 20),
-      BlocBuilder<RemoteCategoryBloc, RemoteCategoryState>(
-        builder: (context, state) {
-          if (state is RemoteCategoryLoading) {
-            return Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: GridView.builder(
-                shrinkWrap: true,
-                // Permet au GridView de se redimensionner à son contenu
-                physics: NeverScrollableScrollPhysics(),
-                // Empêche le GridView de scroller indépendamment
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 15,
-                  mainAxisSpacing: 15,
-                  childAspectRatio: 1.25,
-                ),
-                itemCount: 4,
-                itemBuilder: (context, index) {
-                  return Container(
-                    width: 150,
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: Colors.black87,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        CachedNetworkImage(
-                          height: 60,
-                          imageUrl: 'https://auto-cdn.uvatis.com/logo.png',
-                          progressIndicatorBuilder:
-                              (context, url, downloadProgress) => Lottie.asset(
-                                'assets/animations/lottie/loading-image.json',
-                              ),
-                          errorWidget:
-                              (context, url, error) => Lottie.asset(
-                                'assets/animations/lottie/loading-image.json',
-                              ),
-                        ),
-                        const SizedBox(height: 10),
-                        Text(
-                          'Chargement',
-                          softWrap: true,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            );
-          }
-          if (state is RemoteCategoryDone) {
-            return Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: GridView.builder(
-                shrinkWrap: true,
-                // Permet au GridView de se redimensionner à son contenu
-                physics: NeverScrollableScrollPhysics(),
-                // Empêche le GridView de scroller indépendamment
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 15,
-                  mainAxisSpacing: 15,
-                  childAspectRatio: 1.25,
-                ),
+      SizedBox(
+        height: 110,
+        child: BlocBuilder<RemoteCategoryBloc, RemoteCategoryState>(
+          builder: (context, state) {
+            if (state is RemoteCategoryLoading) {
+              return ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                itemCount: 5,
+                itemBuilder: (context, index) => _buildLoadingCard(),
+              );
+            }
+            if (state is RemoteCategoryDone) {
+              return ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 12),
                 itemCount: state.categories!.length,
                 itemBuilder: (context, index) {
                   final category = state.categories![index];
                   return CategoryCard(category: category);
                 },
-              ),
-            );
-          }
-          if (state is RemoteCategoryError) {
-            return Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: GridView.builder(
-                shrinkWrap: true,
-                // Permet au GridView de se redimensionner à son contenu
-                physics: NeverScrollableScrollPhysics(),
-                // Empêche le GridView de scroller indépendamment
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 15,
-                  mainAxisSpacing: 15,
-                  childAspectRatio: 1.25,
-                ),
-                itemCount: 4,
-                itemBuilder: (context, index) {
-                  return Container(
-                    width: 150,
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: Colors.black87,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        CachedNetworkImage(
-                          height: 60,
-                          imageUrl: 'https://auto-cdn.uvatis.com/logo.png',
-                          progressIndicatorBuilder:
-                              (context, url, downloadProgress) => Lottie.asset(
-                                'assets/animations/lottie/error-network.json',
-                              ),
-                          errorWidget:
-                              (context, url, error) => Lottie.asset(
-                                'assets/animations/lottie/error-network.json',
-                              ),
-                        ),
-                        const SizedBox(height: 10),
-                        Text(
-                          'Erreur survenue',
-                          softWrap: true,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            );
-          }
-
-          return Text('');
-        },
+              );
+            }
+            return const SizedBox();
+          },
+        ),
       ),
-      const SizedBox(height: 20),
+      const SizedBox(height: 10),
     ],
+  );
+}
+
+Widget _buildLoadingCard() {
+  return Container(
+    width: 80,
+    margin: const EdgeInsets.symmetric(horizontal: 8),
+    child: Column(
+      children: [
+        CircleAvatar(radius: 30, backgroundColor: Colors.grey.shade200),
+        const SizedBox(height: 8),
+        Container(width: 40, height: 10, color: Colors.grey.shade200),
+      ],
+    ),
   );
 }

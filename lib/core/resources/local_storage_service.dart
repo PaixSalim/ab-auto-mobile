@@ -7,11 +7,6 @@ class LocalStorageService {
     _prefs = await SharedPreferences.getInstance();
   }
 
-  static bool get isFirstLaunch => _prefs.getBool('is_first_launch') ?? true;
-
-  static Future<void> setFirstLaunchDone() async {
-    await _prefs.setBool('is_first_launch', false);
-  }
 
   // Auth
   static String? get token => _prefs.getString('auth_token');

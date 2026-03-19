@@ -15,113 +15,124 @@ class PromotionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<RemoteProductsBloc>();
-    Size size = MediaQuery.of(context).size;
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      elevation: 3,
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
+    return GestureDetector(
+      onTap: () {
+        final allProducts = bloc.state.allProducts;
+        if (allProducts == null || allProducts.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Chargement des produits...")),
+          );
+          return;
+        }
+
+        try {
+          final product = allProducts.firstWhere(
+            (p) => p.id == promotion.id,
+          );
+          goTo(
+            context,
+            ProductDetailPage(product: product),
+            AnimationType.gauche,
+          );
+        } catch (e) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Détails du produit non disponibles")),
+          );
+        }
+      },
+      child: Card(
+        color: Colors.white,
+        elevation: 2,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Align(
-              alignment: Alignment.topLeft,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  '-${promotion.discountPercent!}%',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 8),
-
-            // Image du produit
-            Center(
-              child: GestureDetector(
-                onTap: () {
-                  final product =
-                      bloc.state.displayedProducts!.where((p) {
-                        return p.id == promotion.id;
-                      }).first;
-                  goTo(
-                    context,
-                    ProductDetailPage(product: product),
-                    AnimationType.gauche,
-                  );
-                },
-                child: CachedNetworkImage(
-                  height: size.height / 3,
-                  fit: BoxFit.cover,
-                  imageUrl: promotion.url!,
-                  progressIndicatorBuilder:
-                      (context, url, downloadProgress) => Lottie.asset(
+            // Image and Discount
+            Expanded(
+              flex: 5,
+              child: Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
+                    child: CachedNetworkImage(
+                      width: double.infinity,
+                      height: double.infinity,
+                      fit: BoxFit.cover,
+                      imageUrl: promotion.url!,
+                      progressIndicatorBuilder: (context, url, progress) => Lottie.asset(
                         'assets/animations/lottie/loading-image.json',
                       ),
-                  errorWidget:
-                      (context, url, error) => Lottie.asset(
-                        'assets/animations/lottie/error-network.json',
+                      errorWidget: (context, url, error) => const Icon(Icons.error),
+                    ),
+                  ),
+                  Positioned(
+                    top: 8,
+                    left: 8,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                ),
+                      child: Text(
+                        "-${promotion.discountPercent!}%",
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-
-            // Nom du produit
-            Text(
-              promotion.name!,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            ),
-
-            // Prix
-            Row(
-              children: [
-                Text(
-                  '${getProductPrice(promotion.originalPrice!, 0)} Fcfa',
-                  style: const TextStyle(
-                    decoration: TextDecoration.lineThrough,
-                    color: Colors.grey,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  '${getProductPrice(promotion.promoPrice!, 0)} Fcfa',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 8),
-
-            // Bouton
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  final product =
-                      bloc.state.displayedProducts!.where((p) {
-                        return p.id == promotion.id;
-                      }).first;
-                  goTo(
-                    context,
-                    ProductDetailPage(product: product),
-                    AnimationType.gauche,
-                  );
-                },
-                icon: const Icon(Icons.shopping_cart),
-                label: const Text("En profiter"),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).primaryColor,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
+            
+            // Info
+            Expanded(
+              flex: 4,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          promotion.name!,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "${getProductPrice(promotion.originalPrice!, 0)} Fcfa",
+                          style: const TextStyle(
+                            decoration: TextDecoration.lineThrough,
+                            color: Colors.grey,
+                            fontSize: 10,
+                          ),
+                        ),
+                        Text(
+                          "${getProductPrice(promotion.promoPrice!, 0)} Fcfa",
+                          style: TextStyle(
+                            color: Theme.of(context).primaryColor,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ),

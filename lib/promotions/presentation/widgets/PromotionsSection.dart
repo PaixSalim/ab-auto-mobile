@@ -130,10 +130,10 @@ class _PromotionsSectionState extends State<PromotionsSection> {
                               physics: const NeverScrollableScrollPhysics(),
                               gridDelegate:
                                   const SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 1,
+                                    crossAxisCount: 2,
                                     crossAxisSpacing: 10,
                                     mainAxisSpacing: 10,
-                                    childAspectRatio: 0.75,
+                                    childAspectRatio: 0.65,
                                   ),
                               itemCount: filteredPromotions.length,
                               itemBuilder: (context, index) {

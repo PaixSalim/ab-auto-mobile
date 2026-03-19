@@ -2,18 +2,17 @@
 
 part of 'chat_remote_datasource_dio.dart';
 
+// dart format off
+
 // **************************************************************************
 // RetrofitGenerator
 // **************************************************************************
 
-// ignore_for_file: unnecessary_brace_in_string_interps,no_leading_underscores_for_local_identifiers,unused_element,unnecessary_string_interpolations
+// ignore_for_file: unnecessary_brace_in_string_interps,no_leading_underscores_for_local_identifiers,unused_element,unnecessary_string_interpolations,unused_element_parameter,avoid_unused_constructor_parameters,unreachable_from_main
 
 class _ChatRemoteDatasourceDio implements ChatRemoteDatasourceDio {
-  _ChatRemoteDatasourceDio(
-    this._dio, {
-    this.baseUrl,
-    this.errorLogger,
-  }) {
+  _ChatRemoteDatasourceDio(this._dio, {this.baseUrl, this.errorLogger}) {
+    baseUrl ??= 'http://192.168.11.100:3333/api/v1';
   }
 
   final Dio _dio;
@@ -24,34 +23,29 @@ class _ChatRemoteDatasourceDio implements ChatRemoteDatasourceDio {
 
   @override
   Future<HttpResponse<ChatMessageModel>> sendPrompt(
-      PromptRequestModel body) async {
+    PromptRequestModel body,
+  ) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     final _data = <String, dynamic>{};
     _data.addAll(body.toJson());
-    final _options = _setStreamType<HttpResponse<ChatMessageModel>>(Options(
-      method: 'POST',
-      headers: _headers,
-      extra: _extra,
-    )
-        .compose(
-          _dio.options,
-          '/generate/chat',
-          queryParameters: queryParameters,
-          data: _data,
-        )
-        .copyWith(
-            baseUrl: _combineBaseUrls(
-          _dio.options.baseUrl,
-          baseUrl,
-        )));
+    final _options = _setStreamType<HttpResponse<ChatMessageModel>>(
+      Options(method: 'POST', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/generate/chat',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
     late ChatMessageModel _value;
     try {
       _value = ChatMessageModel.fromJson(_result.data!);
     } on Object catch (e, s) {
-      errorLogger?.logError(e, s, _options);
+      errorLogger?.logError(e, s, _options, response: _result);
       rethrow;
     }
     final httpResponse = HttpResponse(_value, _result);
@@ -71,10 +65,7 @@ class _ChatRemoteDatasourceDio implements ChatRemoteDatasourceDio {
     return requestOptions;
   }
 
-  String _combineBaseUrls(
-    String dioBaseUrl,
-    String? baseUrl,
-  ) {
+  String _combineBaseUrls(String dioBaseUrl, String? baseUrl) {
     if (baseUrl == null || baseUrl.trim().isEmpty) {
       return dioBaseUrl;
     }
@@ -88,3 +79,5 @@ class _ChatRemoteDatasourceDio implements ChatRemoteDatasourceDio {
     return Uri.parse(dioBaseUrl).resolveUri(url).toString();
   }
 }
+
+// dart format on

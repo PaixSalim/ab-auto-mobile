@@ -1,8 +1,6 @@
 import 'package:auto/products/presentation/bloc/remote/remote_product_bloc.dart';
 import 'package:auto/products/presentation/bloc/remote/remote_product_state.dart';
-import 'package:auto/products/presentation/widgets/FilterDrawer.dart';
-import 'package:auto/products/presentation/widgets/ProductCard.dart';
-import 'package:auto/products/presentation/widgets/SearchAndFilterSection.dart';
+import 'package:auto/products/presentation/widgets/ProductGridCard.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -23,52 +21,42 @@ class ProductCatalogPageState extends State<ProductCatalogPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      appBar: AppBar(
-        title: Text(
-          "Catalogue des produits",
-          style: TextStyle(fontWeight: FontWeight.w400),
-        ),
-        leading: IconButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          icon: Icon(Icons.arrow_back_ios),
-        ),
-      ),
-      drawer: FilterDrawer(),
-      body: Column(
-        children: [
-          SearchAndFilterSection(openDrawer: openDrawer),
-          Expanded(
-            child: BlocBuilder<RemoteProductsBloc, RemoteProductState>(
-              builder: (context, state) {
-                if (state is RemoteProductsDone) {
-                  return state.displayedProducts!.isNotEmpty
-                      ? ListView.builder(
-                        itemCount: state.displayedProducts!.length,
-                        itemBuilder: (context, index) {
-                          return ProductCard(
-                            product: state.displayedProducts![index],
-                          );
-                        },
-                      )
-                      : Text('Aucun produit ne correspond à ce filtre');
-                }
-                if (state is RemoteProductsLoading) {
-                  return CupertinoActivityIndicator();
-                }
-                if (state is RemoteProductsError) {
-                  return Text('Veuillez bien vouloir rédemarrer l\'app svp');
-                }
+    return Column(
+      children: [
+        Expanded(
+          child: BlocBuilder<RemoteProductsBloc, RemoteProductState>(
+            builder: (context, state) {
+              if (state is RemoteProductsDone) {
+                return state.displayedProducts!.isNotEmpty
+                    ? GridView.builder(
+                      padding: const EdgeInsets.all(12),
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 10,
+                        mainAxisSpacing: 10,
+                        childAspectRatio: 0.65, // Adjust this ratio as needed
+                      ),
+                      itemCount: state.displayedProducts!.length,
+                      itemBuilder: (context, index) {
+                        return ProductGridCard(
+                          product: state.displayedProducts![index],
+                        );
+                      },
+                    )
+                    : Center(child: const Text('Aucun produit ne correspond à ce filtre'));
+              }
+              if (state is RemoteProductsLoading) {
+                return Center(child: CupertinoActivityIndicator());
+              }
+              if (state is RemoteProductsError) {
+                return Center(child: Text('Veuillez bien vouloir rédemarrer l\'app svp'));
+              }
 
-                return SizedBox();
-              },
-            ),
+              return SizedBox();
+            },
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

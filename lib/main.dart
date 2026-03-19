@@ -7,13 +7,12 @@ import 'package:auto/chatbot/presentation/bloc/remote/chat_bloc.dart';
 import 'package:auto/chatbot/presentation/widgets/SupportAssistant.dart';
 import 'package:auto/comments/presentation/bloc/comment_bloc.dart';
 import 'package:auto/config/navigation/main_navigation.dart';
-import 'package:auto/config/onboarding/introduction_screen.dart';
+
 import 'package:auto/config/theme/app.theme.dart';
 import 'package:auto/products/presentation/bloc/remote/order/remote_order_bloc.dart';
 import 'package:auto/products/presentation/bloc/remote/remote_product_bloc.dart';
 import 'package:auto/products/presentation/bloc/remote/remote_product_event.dart';
-import 'package:auto/products/presentation/widgets/partners/PartnerSection.dart';
-import 'package:auto/products/presentation/widgets/search.index.bar.dart';
+
 import 'package:auto/promotions/presentation/bloc/remote/remote_promoted_product_bloc.dart';
 import 'package:auto/promotions/presentation/widgets/PromotionsSection.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +20,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'app_database.dart';
 import 'categories/presentation/widgets/CategorySection.dart';
+import 'package:auto/products/domain/entities/product_entity.dart';
+import 'package:auto/products/presentation/bloc/remote/remote_product_state.dart';
+import 'package:auto/products/presentation/widgets/ProductGridCard.dart';
+import 'package:flutter/cupertino.dart';
 import 'core/resources/local_storage_service.dart';
 import 'injection_container.dart';
 
@@ -39,7 +42,7 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
-    final bool isFirstLaunch = LocalStorageService.isFirstLaunch;
+
     return MultiBlocProvider(
       providers: [
         BlocProvider<RemoteProductsBloc>(
@@ -70,7 +73,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'AB Auto',
         theme: theme(),
-        home: isFirstLaunch ? OnBoardingPage() : MainNavigation(),
+        home: const MainNavigation(),
       ),
     );
   }
@@ -81,66 +84,61 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        title: Padding(
-          padding: const EdgeInsets.all(1),
-          child: HomeSearchbar(),
-        ),
-        actions: [
-          BlocBuilder<AuthBloc, AuthState>(
-            builder: (context, state) {
-              if (state is AuthAuthenticated) {
-                return PopupMenuButton<String>(
-                  icon: const Icon(Icons.account_circle),
-                  onSelected: (value) {
-                    if (value == 'logout') {
-                      context.read<AuthBloc>().add(const LogoutRequested());
-                    }
-                  },
-                  itemBuilder: (_) => [
-                    PopupMenuItem(
-                      enabled: false,
-                      child: Text(
-                        state.user.fullName,
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    const PopupMenuDivider(),
-                    const PopupMenuItem(
-                      value: 'logout',
-                      child: Row(
-                        children: [
-                          Icon(Icons.logout, size: 18),
-                          SizedBox(width: 8),
-                          Text('Se déconnecter'),
-                        ],
-                      ),
+    return Stack(
+      children: [
+        SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const CarouselWithIndicator(),
+              CategorySection(),
+              const PromotionsSection(),
+              const Divider(thickness: 8, color: Color(0xFFEEEEEE)),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                child: Row(
+                  children: [
+                    const Text(
+                      "Suggestions pour vous",
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                   ],
-                );
-              }
-              return const SizedBox();
-            },
+                ),
+              ),
+              BlocBuilder<RemoteProductsBloc, RemoteProductState>(
+                builder: (context, state) {
+                  if (state is RemoteProductsDone) {
+                    // Create a randomized list of products
+                    final products = List<ProductEntity>.from(state.allProducts!);
+                    products.shuffle();
+                    
+                    return GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 10,
+                        mainAxisSpacing: 10,
+                        childAspectRatio: 0.65,
+                      ),
+                      itemCount: products.length,
+                      itemBuilder: (context, index) {
+                        return ProductGridCard(product: products[index]);
+                      },
+                    );
+                  }
+                  if (state is RemoteProductsLoading) {
+                    return const Center(child: CupertinoActivityIndicator());
+                  }
+                  return const SizedBox();
+                },
+              ),
+            ],
           ),
-        ],
-      ),
-      body: Stack(
-        children: [
-          SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min, // Ajouté pour éviter les conflits
-              children: [
-                CarouselWithIndicator(),
-                CategorySection(),
-                PromotionsSection(),
-              ],
-            ),
-          ),
-          const SupportAssistant(),
-        ],
-      ),
+        ),
+        const SupportAssistant(),
+      ],
     );
   }
 }

@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
+import 'package:auto/products/presentation/widgets/search.index.bar.dart';
 import '../../injection_container.dart';
 import '../../../main.dart';
 
@@ -42,6 +43,49 @@ class _MainNavigationState extends State<MainNavigation> {
         }
       },
       child: Scaffold(
+        appBar: AppBar(
+          title: const Padding(
+            padding: EdgeInsets.all(1),
+            child: HomeSearchbar(),
+          ),
+          actions: [
+            BlocBuilder<AuthBloc, AuthState>(
+              builder: (context, state) {
+                if (state is AuthAuthenticated) {
+                  return PopupMenuButton<String>(
+                    icon: const Icon(Icons.account_circle),
+                    onSelected: (value) {
+                      if (value == 'logout') {
+                        context.read<AuthBloc>().add(const LogoutRequested());
+                      }
+                    },
+                    itemBuilder: (_) => [
+                      PopupMenuItem(
+                        enabled: false,
+                        child: Text(
+                          state.user.fullName,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      const PopupMenuDivider(),
+                      const PopupMenuItem(
+                        value: 'logout',
+                        child: Row(
+                          children: [
+                            Icon(Icons.logout, size: 18),
+                            SizedBox(width: 8),
+                            Text('Se déconnecter'),
+                          ],
+                        ),
+                      ),
+                    ],
+                  );
+                }
+                return const SizedBox();
+              },
+            ),
+          ],
+        ),
         body: IndexedStack(
           index: _currentIndex,
           children: [
