@@ -1,13 +1,7 @@
 import 'package:auto/brands/data/models/brand_model.dart';
 import 'package:auto/categories/data/models/category_model.dart';
-import 'package:auto/core/constants/constants.dart';
+import 'package:auto/core/utils/url_resolver.dart';
 import 'package:auto/products/domain/entities/product_entity.dart';
-
-String _resolveUrl(String url) {
-  if (url.startsWith('http')) return url;
-  final base = localAPIBaseUrl.replaceAll('/api/v1', '');
-  return '$base$url';
-}
 
 class ProductModel extends ProductEntity {
   const ProductModel({
@@ -25,6 +19,7 @@ class ProductModel extends ProductEntity {
     BrandModel? super.brand,
     super.medias,
     super.seller,
+    super.sellerId,
   });
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
@@ -36,6 +31,7 @@ class ProductModel extends ProductEntity {
         fullName: s['fullName'],
         email: s['email'],
         phone: s['phone'],
+        city: s['city'],
       );
     }
     return ProductModel(
@@ -54,9 +50,20 @@ class ProductModel extends ProductEntity {
       brand: json['brand'] != null ? BrandModel.fromJson(json['brand']) : null,
       features: json['features'] != null ? List<String>.from(json['features']) : [],
       medias: json['medias'] != null
-          ? List<String>.from(json['medias']).map(_resolveUrl).toList()
+          ? (json['medias'] as List)
+              .map((media) {
+                if (media is String) {
+                  return resolveUrl(media);
+                } else if (media is Map<String, dynamic>) {
+                  return resolveUrl(media['url'] ?? '');
+                }
+                return '';
+              })
+              .where((url) => url.isNotEmpty)
+              .toList()
           : [],
       seller: seller,
+      sellerId: json['sellerId'],
     );
   }
 

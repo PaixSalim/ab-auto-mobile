@@ -12,7 +12,7 @@ part of 'feedback_remote_datasource_dio.dart';
 
 class _FeedbackRemoteDatasourceDio implements FeedbackRemoteDatasourceDio {
   _FeedbackRemoteDatasourceDio(this._dio, {this.baseUrl, this.errorLogger}) {
-    baseUrl ??= 'http://192.168.11.100:3333/api/v1';
+    baseUrl ??= localAPIBaseUrl;
   }
 
   final Dio _dio;

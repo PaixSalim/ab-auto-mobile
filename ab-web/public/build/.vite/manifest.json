@@ -1,0 +1,11 @@
+{
+  "inertia/app/app.ts": {
+    "file": "assets/app-ScGBGHpN.js",
+    "name": "app",
+    "src": "inertia/app/app.ts",
+    "isEntry": true,
+    "css": [
+      "assets/app-Cj5ToarI.css"
+    ]
+  }
+}

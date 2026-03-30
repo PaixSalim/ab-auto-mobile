@@ -1,5 +1,6 @@
 import 'package:auto/brands/data/models/brand_model.dart';
 import 'package:auto/categories/domain/entities/category_entity.dart';
+import 'package:auto/core/utils/url_resolver.dart';
 
 class CategoryModel extends CategoryEntity {
   const CategoryModel({
@@ -14,7 +15,7 @@ class CategoryModel extends CategoryEntity {
     return CategoryModel(
       id: int.tryParse(json['id']?.toString() ?? "0") ?? 0,
       name: json['name'] ?? "",
-      url: json['url'] ?? "",
+      url: resolveUrl(json['url'] ?? ""),
       items: int.tryParse(json['items']?.toString() ?? "0") ?? 0,
       brands:
           json['brands'] != null

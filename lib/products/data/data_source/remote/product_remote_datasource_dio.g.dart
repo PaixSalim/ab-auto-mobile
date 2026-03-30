@@ -12,7 +12,7 @@ part of 'product_remote_datasource_dio.dart';
 
 class _ProductRemoteDatasourceDio implements ProductRemoteDatasourceDio {
   _ProductRemoteDatasourceDio(this._dio, {this.baseUrl, this.errorLogger}) {
-    baseUrl ??= 'http://192.168.11.100:3333/api/v1';
+    baseUrl ??= localAPIBaseUrl;
   }
 
   final Dio _dio;
@@ -46,6 +46,34 @@ class _ProductRemoteDatasourceDio implements ProductRemoteDatasourceDio {
                 (dynamic i) => ProductModel.fromJson(i as Map<String, dynamic>),
               )
               .toList();
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options, response: _result);
+      rethrow;
+    }
+    final httpResponse = HttpResponse(_value, _result);
+    return httpResponse;
+  }
+
+  @override
+  Future<HttpResponse<ProductModel>> getProductById(int id) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<HttpResponse<ProductModel>>(
+      Options(method: 'GET', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/products/$id',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<dynamic>(_options);
+    late ProductModel _value;
+    try {
+      _value = ProductModel.fromJson(_result.data! as Map<String, dynamic>);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options, response: _result);
       rethrow;

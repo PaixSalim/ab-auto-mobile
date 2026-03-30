@@ -1,4 +1,5 @@
 import 'package:auto/promotions/domain/entity/promoted_poduct_entity.dart';
+import 'package:auto/core/utils/url_resolver.dart';
 
 class PromotedProductModel extends PromotedProductEntity {
   const PromotedProductModel({
@@ -15,7 +16,7 @@ class PromotedProductModel extends PromotedProductEntity {
     return PromotedProductModel(
       id: json['id'] ?? 0,
       name: json['name'] ?? "",
-      url: json['url'] ?? "",
+      url: resolveUrl(json['url'] ?? ""),
       category: json['category'] ?? "",
       originalPrice:
           double.tryParse(json['originalPrice']?.toString() ?? "0") ?? 0.0,

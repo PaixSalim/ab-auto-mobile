@@ -13,3 +13,14 @@ class GetProductUseCase
     return _productRepository.getProducts();
   }
 }
+
+class GetProductByIdUseCase
+    implements Usecase<DataState<ProductEntity>, int> {
+  final ProductRepository _productRepository;
+  const GetProductByIdUseCase(this._productRepository);
+
+  @override
+  Future<DataState<ProductEntity>> call({int? params}) {
+    return _productRepository.getProductById(params!);
+  }
+}

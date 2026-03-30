@@ -1,10 +1,11 @@
 import 'package:auto/brands/domain/entities/brand_entity.dart';
+import 'package:auto/core/utils/url_resolver.dart';
 
 class BrandModel extends BrandEntity {
   const BrandModel({super.id, super.name, super.url});
 
   factory BrandModel.fromJson(Map<String, dynamic> json) {
-    return BrandModel(id: json['id'], name: json['name'], url: json['url']);
+    return BrandModel(id: json['id'], name: json['name'], url: resolveUrl(json['url']));
   }
 
   Map<String, dynamic> toJson() {

@@ -6,7 +6,8 @@ class SellerEntity {
   final String? fullName;
   final String? email;
   final String? phone;
-  const SellerEntity({this.id, this.fullName, this.email, this.phone});
+  final String? city;
+  const SellerEntity({this.id, this.fullName, this.email, this.phone, this.city});
 }
 
 class ProductEntity {
@@ -24,6 +25,7 @@ class ProductEntity {
   final BrandEntity? brand;
   final List<String>? medias;
   final SellerEntity? seller;
+  final int? sellerId;
 
   const ProductEntity({
     this.id,
@@ -40,5 +42,6 @@ class ProductEntity {
     this.brand,
     this.medias,
     this.seller,
+    this.sellerId,
   });
 }

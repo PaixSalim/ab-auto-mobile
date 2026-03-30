@@ -6,14 +6,14 @@ import 'package:auto/products/presentation/widgets/similar/SimilarProductsSectio
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../data/models/media_model.dart';
-import '../widgets/ActionButtons.dart';
-import '../widgets/ProductInfo.dart';
-import '../widgets/ProductMediaGallery.dart';
-import '../widgets/ProductTabs.dart';
-import '../widgets/ProductTitle.dart';
-import '../widgets/QuantitySelector.dart';
-import '../widgets/ToggleState.dart';
+// Import des nouveaux widgets modernes
+import '../widgets/ProductBreadcrumb.dart';
+import '../widgets/ModernProductGallery.dart';
+import '../widgets/ProductPriceSection.dart';
+import '../widgets/ProductStateSelector.dart';
+import '../widgets/ProductActionButtons.dart';
+import '../widgets/ProductAdditionalInfo.dart';
+import '../widgets/ProductDetailTabs.dart';
 
 class ProductDetailPage extends StatefulWidget {
   final ProductEntity product;
@@ -25,57 +25,127 @@ class ProductDetailPage extends StatefulWidget {
 }
 
 class _ProductDetailPageState extends State<ProductDetailPage> {
+  String? selectedState = 'new';
   int quantity = 1;
 
   @override
   Widget build(BuildContext context) {
-    final List<ProductMediaModel> mediaItems =
-        ProductMediaModel.parseProductMedias(widget.product.medias!);
-
     return Scaffold(
+      backgroundColor: const Color(0xFFF9FAFB),
       appBar: AppBar(
         title: const Text("Détail du produit"),
         backgroundColor: Colors.white,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black),
       ),
-      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            //ProductImages(images: widget.product.medias!),
-            ProductMediaGallery(
-              mediaItems: mediaItems,
-              product: widget.product,
+            // Breadcrumb
+            ProductBreadcrumb(product: widget.product),
+            
+            // Main content container
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Gallery and info in a responsive layout
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      if (constraints.maxWidth > 800) {
+                        // Desktop layout
+                        return Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              flex: 2,
+                              child: ModernProductGallery(product: widget.product),
+                            ),
+                            const SizedBox(width: 32),
+                            Expanded(
+                              flex: 3,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  ProductPriceSection(product: widget.product),
+                                  ProductStateSelector(
+                                    initialState: selectedState,
+                                    onStateChanged: (state) {
+                                      setState(() {
+                                        selectedState = state;
+                                      });
+                                    },
+                                  ),
+                                  ProductActionButtons(
+                                    product: widget.product,
+                                    selectedState: selectedState,
+                                    quantity: quantity,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        );
+                      } else {
+                        // Mobile layout
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ModernProductGallery(product: widget.product),
+                            const SizedBox(height: 24),
+                            ProductPriceSection(product: widget.product),
+                            ProductStateSelector(
+                              initialState: selectedState,
+                              onStateChanged: (state) {
+                                setState(() {
+                                  selectedState = state;
+                                });
+                              },
+                            ),
+                            ProductActionButtons(
+                              product: widget.product,
+                              selectedState: selectedState,
+                              quantity: quantity,
+                            ),
+                          ],
+                        );
+                      }
+                    },
+                  ),
+                  
+                  const SizedBox(height: 24),
+                  
+                  // Additional info
+                  ProductAdditionalInfo(product: widget.product),
+                ],
+              ),
             ),
-
-            ProductTitle(widget: widget),
-
-            const Text(
-              "État du produit :",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            ToggleState(widget: widget),
-
-            QuantitySelector(
-              quantity: quantity,
-              onQuantityChanged: (newQuantity) {
-                setState(() {
-                  quantity = newQuantity;
-                });
-              },
-            ),
-
-            ActionButtons(product: widget.product, quantity: quantity),
-
-            ProductInfo(product: widget.product),
-
-            ProductTabs(product: widget.product),
-
+            
+            const SizedBox(height: 24),
+            
+            // Tabs
+            ProductDetailTabs(product: widget.product),
+            
+            const SizedBox(height: 24),
+            
+            // Comments section
             ProductCommentsSection(productId: widget.product.id!),
-
+            
+            // Similar products
             BlocBuilder<RemoteProductsBloc, RemoteProductState>(
               builder: (context, state) {
                 if (state is! RemoteProductsDone) return const SizedBox();
