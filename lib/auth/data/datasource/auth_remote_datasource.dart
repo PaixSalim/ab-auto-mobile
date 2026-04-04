@@ -5,28 +5,47 @@ class AuthRemoteDatasource {
   AuthRemoteDatasource(this._dio);
 
   Future<Response> login({
-    required String email,
+    required String uid, // API attend "uid" au lieu de "email"
     required String password,
   }) async {
-    return await _dio.post(
+    print('🔐 LOGIN ATTEMPT - uid: $uid, password: ${password.length > 0 ? "***" : "empty"}');
+    
+    final response = await _dio.post(
       '/auth/login',
-      data: {'email': email, 'password': password},
+      data: {'uid': uid, 'password': password}, // API attend "uid"
       options: Options(
         headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
         followRedirects: false,
         validateStatus: (status) => status != null && status < 500,
       ),
     );
+    
+    print('🔐 LOGIN RESPONSE - Status: ${response.statusCode}');
+    print('🔐 LOGIN RESPONSE - Data: ${response.data}');
+    
+    return response;
   }
 
   Future<Response> register({
     required String fullName,
     required String email,
     required String password,
+    required String phone,
+    required String city,
+    required String confirmPassword,
+    required bool isSeller,
   }) async {
     return await _dio.post(
       '/auth/register',
-      data: {'fullName': fullName, 'email': email, 'password': password},
+      data: {
+        'fullName': fullName,
+        'email': email,
+        'phone': phone,
+        'city': city,
+        'password': password,
+        'confirmPassword': confirmPassword,
+        'isSeller': isSeller,
+      }, // API attend tous ces champs
       options: Options(
         headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
         followRedirects: false,

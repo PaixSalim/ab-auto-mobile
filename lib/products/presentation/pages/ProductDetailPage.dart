@@ -30,6 +30,16 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Debug logs pour vérifier les données du produit
+    print('=== PRODUCT DETAIL PAGE DEBUG ===');
+    print('Product ID: ${widget.product.id}');
+    print('Product name: ${widget.product.name}');
+    print('Product category: ${widget.product.category?.name}');
+    print('Product brand: ${widget.product.brand?.name}');
+    print('Product seller: ${widget.product.seller?.fullName}');
+    print('Product medias count: ${widget.product.medias?.length}');
+    print('=====================================');
+
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAFB),
       appBar: AppBar(
@@ -142,8 +152,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
             
             const SizedBox(height: 24),
             
-            // Comments section
-            ProductCommentsSection(productId: widget.product.id!),
+            // Comments section - utilise directement l'UUID en String
+            ProductCommentsSection(productId: widget.product.id ?? ''),
             
             // Similar products
             BlocBuilder<RemoteProductsBloc, RemoteProductState>(

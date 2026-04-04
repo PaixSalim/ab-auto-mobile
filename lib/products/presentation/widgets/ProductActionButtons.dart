@@ -133,7 +133,7 @@ class ProductActionButtons extends StatelessWidget {
                 ),
               ),
               
-              const SizedBox(width: 12),
+              const SizedBox(width: 15),
               
               // Share button
               OutlinedButton.icon(
@@ -152,25 +152,25 @@ class ProductActionButtons extends StatelessWidget {
             ],
           ),
           
-          const SizedBox(height: 12),
+          // const SizedBox(height: 12),
           
-          // Secondary contact option
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton.icon(
-              onPressed: () => _launchEmail(context),
-              icon: const Icon(Icons.email_outlined, size: 20),
-              label: const Text('Envoyer un message email'),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: const Color(0xFF3B82F6),
-                side: const BorderSide(color: Color(0xFF3B82F6)),
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-            ),
-          ),
+          // // Secondary contact option
+          // SizedBox(
+          //   width: double.infinity,
+          //   child: OutlinedButton.icon(
+          //     onPressed: () => _launchEmail(context),
+          //     icon: const Icon(Icons.email_outlined, size: 20),
+          //     label: const Text('Envoyer un message email'),
+          //     style: OutlinedButton.styleFrom(
+          //       foregroundColor: const Color(0xFF3B82F6),
+          //       side: const BorderSide(color: Color(0xFF3B82F6)),
+          //       padding: const EdgeInsets.symmetric(vertical: 12),
+          //       shape: RoundedRectangleBorder(
+          //         borderRadius: BorderRadius.circular(8),
+          //       ),
+          //     ),
+          //   ),
+          // ),
         ],
       ),
     );

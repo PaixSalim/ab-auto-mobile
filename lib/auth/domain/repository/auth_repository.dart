@@ -3,7 +3,7 @@ import 'package:auto/core/resources/data_state.dart';
 
 abstract class AuthRepository {
   Future<DataState<UserEntity>> login({
-    required String email,
+    required String uid, // API attend "uid" au lieu de "email"
     required String password,
   });
 
@@ -11,6 +11,10 @@ abstract class AuthRepository {
     required String fullName,
     required String email,
     required String password,
+    required String phone,
+    required String city,
+    required String confirmPassword,
+    required bool isSeller,
   });
 
   Future<void> logout();

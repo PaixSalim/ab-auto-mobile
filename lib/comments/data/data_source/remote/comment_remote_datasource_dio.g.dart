@@ -22,7 +22,7 @@ class _CommentRemoteDatasourceDio implements CommentRemoteDatasourceDio {
   final ParseErrorLogger? errorLogger;
 
   @override
-  Future<HttpResponse<List<CommentModel>>> getComments({int? productId}) async {
+  Future<HttpResponse<List<CommentModel>>> getComments({String? productId}) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{r'productId': productId};
     queryParameters.removeWhere((k, v) => v == null);

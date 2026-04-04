@@ -13,7 +13,7 @@ class CategoryModel extends CategoryEntity {
 
   factory CategoryModel.fromJson(Map<String, dynamic> json) {
     return CategoryModel(
-      id: int.tryParse(json['id']?.toString() ?? "0") ?? 0,
+      id: json['id']?.toString(),
       name: json['name'] ?? "",
       url: resolveUrl(json['url'] ?? ""),
       items: int.tryParse(json['items']?.toString() ?? "0") ?? 0,
@@ -24,6 +24,16 @@ class CategoryModel extends CategoryEntity {
                   .toList()
               : [],
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'url': url,
+      'items': items,
+      'brands': brands?.map((brand) => brand.toJson()).toList(),
+    };
   }
 
   @override

@@ -26,8 +26,8 @@ class RemoteProductsLoading extends RemoteProductState {
 }
 
 class RemoteProductsDone extends RemoteProductState {
-  final List<int> selectedCategories;
-  final List<int> selectedBrands;
+  final List<String> selectedCategories;
+  final List<String> selectedBrands;
   final double minPrice;
   final double maxPrice;
   final bool isNew;
@@ -53,8 +53,8 @@ class RemoteProductsDone extends RemoteProductState {
     List<ProductEntity>? allProduct,
     List<ProductEntity>? displayedProducts,
     String? query,
-    List<int>? selectedCategories,
-    List<int>? selectedBrands,
+    List<String>? selectedCategories,
+    List<String>? selectedBrands,
     double? minPrice,
     double? maxPrice,
     bool? isNew,

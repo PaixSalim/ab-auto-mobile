@@ -1,5 +1,5 @@
 class PromotedProductEntity {
-  final int? id;
+  final String? id;
   final String? name;
   final String? url;
   final String? category;

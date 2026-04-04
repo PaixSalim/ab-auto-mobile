@@ -1,7 +1,7 @@
 import 'package:auto/brands/domain/entities/brand_entity.dart';
 
 class CategoryEntity {
-  final int? id;
+  final String? id;
   final int? items;
   final String? name;
   final String? url;
@@ -11,7 +11,7 @@ class CategoryEntity {
 
   factory CategoryEntity.fromJson(Map<String, dynamic> json) {
     return CategoryEntity(
-      id: int.tryParse(json['id']?.toString() ?? "0") ?? 0,
+      id: json['id']?.toString(),
       name: json['name'] ?? "",
       url: json['url'] ?? "",
     );

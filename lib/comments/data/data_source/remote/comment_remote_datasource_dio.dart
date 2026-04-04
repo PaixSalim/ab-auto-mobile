@@ -11,6 +11,6 @@ abstract class CommentRemoteDatasourceDio {
 
   @GET('/comments')
   Future<HttpResponse<List<CommentModel>>> getComments({
-    @Query("productId") int? productId,
+    @Query("productId") String? productId, // Changé de int à String
   });
 }

@@ -4,6 +4,6 @@ import 'package:auto/products/domain/entities/order_entity.dart';
 
 abstract class ProductRepository {
   Future<DataState<List<ProductEntity>>> getProducts();
-  Future<DataState<ProductEntity>> getProductById(int id);
+  Future<DataState<ProductEntity>> getProductById(String id);
   Future<bool> sendOrder(OrderEntity order);
 }

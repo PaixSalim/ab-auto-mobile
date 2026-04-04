@@ -11,11 +11,11 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<DataState<UserEntity>> login({
-    required String email,
+    required String uid, // API attend "uid" au lieu de "email"
     required String password,
   }) async {
     try {
-      final response = await _datasource.login(email: email, password: password);
+      final response = await _datasource.login(uid: uid, password: password);
       if (response.statusCode == 200) {
         final data = response.data as Map<String, dynamic>;
         final user = _parseUser(data);
@@ -43,12 +43,20 @@ class AuthRepositoryImpl implements AuthRepository {
     required String fullName,
     required String email,
     required String password,
+    required String phone,
+    required String city,
+    required String confirmPassword,
+    required bool isSeller,
   }) async {
     try {
       final response = await _datasource.register(
         fullName: fullName,
         email: email,
         password: password,
+        phone: phone,
+        city: city,
+        confirmPassword: confirmPassword,
+        isSeller: isSeller,
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = response.data as Map<String, dynamic>;

@@ -137,7 +137,7 @@ class HomePage extends StatelessWidget {
             ],
           ),
         ),
-        const SupportAssistant(),
+        // const SupportAssistant(),
       ],
     );
   }

@@ -67,17 +67,17 @@ class _MainNavigationState extends State<MainNavigation> {
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ),
-                      const PopupMenuDivider(),
-                      const PopupMenuItem(
-                        value: 'logout',
-                        child: Row(
-                          children: [
-                            Icon(Icons.logout, size: 18),
-                            SizedBox(width: 8),
-                            Text('Se déconnecter'),
-                          ],
-                        ),
-                      ),
+                      // const PopupMenuDivider(),
+                      // const PopupMenuItem(
+                      //   value: 'logout',
+                      //   child: Row(
+                      //     children: [
+                      //       Icon(Icons.logout, size: 18),
+                      //       SizedBox(width: 8),
+                      //       Text('Se déconnecter'),
+                      //     ],
+                      //   ),
+                      // ),
                     ],
                   );
                 }
@@ -133,9 +133,17 @@ class _LoginPromptPage extends StatelessWidget {
               ),
               const SizedBox(height: 24),
               ElevatedButton(
-                onPressed: () => Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const LoginPage()),
-                ),
+                onPressed: () {
+                  print('🔗 NAVIGATION - Attempting to navigate to LoginPage');
+                  try {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const LoginPage()),
+                    );
+                    print('🔗 NAVIGATION - Navigation successful');
+                  } catch (e) {
+                    print('🔗 NAVIGATION - Navigation failed: $e');
+                  }
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: primary,
                   foregroundColor: Colors.white,

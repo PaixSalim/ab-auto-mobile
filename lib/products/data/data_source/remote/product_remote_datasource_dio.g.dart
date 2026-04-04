@@ -55,7 +55,7 @@ class _ProductRemoteDatasourceDio implements ProductRemoteDatasourceDio {
   }
 
   @override
-  Future<HttpResponse<ProductModel>> getProductById(int id) async {
+  Future<HttpResponse<ProductModel>> getProductById(String id) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};

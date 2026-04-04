@@ -15,12 +15,12 @@ class GetProductUseCase
 }
 
 class GetProductByIdUseCase
-    implements Usecase<DataState<ProductEntity>, int> {
+    implements Usecase<DataState<ProductEntity>, String> {
   final ProductRepository _productRepository;
   const GetProductByIdUseCase(this._productRepository);
 
   @override
-  Future<DataState<ProductEntity>> call({int? params}) {
+  Future<DataState<ProductEntity>> call({String? params}) {
     return _productRepository.getProductById(params!);
   }
 }

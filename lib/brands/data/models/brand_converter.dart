@@ -11,7 +11,7 @@ class BrandObjectBox {
   @Id()
   int id = 0;
 
-  int? externalId;
+  String? externalId;
   String? name;
   String? url;
 
@@ -31,6 +31,6 @@ class BrandObjectBox {
 
   // Conversion vers BrandModel
   BrandModel toModel() {
-    return BrandModel(id: externalId, name: name, url: url);
+    return BrandModel(id: externalId?.toString(), name: name, url: url);
   }
 }

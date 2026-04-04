@@ -14,7 +14,7 @@ class PromotedProductModel extends PromotedProductEntity {
 
   factory PromotedProductModel.fromJson(Map<String, dynamic> json) {
     return PromotedProductModel(
-      id: json['id'] ?? 0,
+      id: json['id']?.toString() ?? "",
       name: json['name'] ?? "",
       url: resolveUrl(json['url'] ?? ""),
       category: json['category'] ?? "",

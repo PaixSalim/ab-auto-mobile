@@ -1,5 +1,5 @@
 class CommentPostEntity {
-  final int? productId;
+  final String? productId; // Changé de int à String
   final String? user;
   final String? comment;
 

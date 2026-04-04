@@ -2,7 +2,7 @@ import 'package:auto/categories/domain/entities/category_entity.dart';
 import '../../../brands/domain/entities/brand_entity.dart';
 
 class SellerEntity {
-  final int? id;
+  final String? id;
   final String? fullName;
   final String? email;
   final String? phone;
@@ -11,7 +11,7 @@ class SellerEntity {
 }
 
 class ProductEntity {
-  final int? id;
+  final String? id;
   final String? name;
   final String? slug;
   final String? cta;
@@ -25,7 +25,7 @@ class ProductEntity {
   final BrandEntity? brand;
   final List<String>? medias;
   final SellerEntity? seller;
-  final int? sellerId;
+  final String? sellerId;
 
   const ProductEntity({
     this.id,

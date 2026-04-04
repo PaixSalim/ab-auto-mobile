@@ -51,7 +51,7 @@ final _entities = <obx_int.ModelEntity>[
       obx_int.ModelProperty(
         id: const obx_int.IdUid(4, 5739220338375738239),
         name: 'externalId',
-        type: 6,
+        type: 9,
         flags: 0,
       ),
     ],
@@ -91,7 +91,7 @@ final _entities = <obx_int.ModelEntity>[
       obx_int.ModelProperty(
         id: const obx_int.IdUid(5, 592175416742668986),
         name: 'externalId',
-        type: 6,
+        type: 9,
         flags: 0,
       ),
       obx_int.ModelProperty(
@@ -207,13 +207,13 @@ final _entities = <obx_int.ModelEntity>[
       obx_int.ModelProperty(
         id: const obx_int.IdUid(11, 8255731902632710813),
         name: 'categoryId',
-        type: 6,
+        type: 9,
         flags: 0,
       ),
       obx_int.ModelProperty(
         id: const obx_int.IdUid(12, 4446655472623764377),
         name: 'brandId',
-        type: 6,
+        type: 9,
         flags: 0,
       ),
       obx_int.ModelProperty(
@@ -404,11 +404,14 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final urlOffset = object.url == null
             ? null
             : fbb.writeString(object.url!);
+        final externalIdOffset = object.externalId == null
+            ? null
+            : fbb.writeString(object.externalId!);
         fbb.startTable(5);
         fbb.addInt64(0, object.id);
         fbb.addOffset(1, nameOffset);
         fbb.addOffset(2, urlOffset);
-        fbb.addInt64(3, object.externalId);
+        fbb.addOffset(3, externalIdOffset);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -421,11 +424,9 @@ obx_int.ModelDefinition getObjectBoxModel() {
           4,
           0,
         );
-        final externalIdParam = const fb.Int64Reader().vTableGetNullable(
-          buffer,
-          rootOffset,
-          10,
-        );
+        final externalIdParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 10);
         final nameParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGetNullable(buffer, rootOffset, 6);
@@ -457,6 +458,9 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final urlOffset = object.url == null
             ? null
             : fbb.writeString(object.url!);
+        final externalIdOffset = object.externalId == null
+            ? null
+            : fbb.writeString(object.externalId!);
         final brandsOffset = object.brands == null
             ? null
             : fbb.writeString(object.brands!);
@@ -465,7 +469,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addOffset(1, nameOffset);
         fbb.addOffset(2, urlOffset);
         fbb.addInt64(3, object.items);
-        fbb.addInt64(4, object.externalId);
+        fbb.addOffset(4, externalIdOffset);
         fbb.addOffset(5, brandsOffset);
         fbb.finish(fbb.endTable());
         return object.id;
@@ -479,11 +483,9 @@ obx_int.ModelDefinition getObjectBoxModel() {
           4,
           0,
         );
-        final externalIdParam = const fb.Int64Reader().vTableGetNullable(
-          buffer,
-          rootOffset,
-          12,
-        );
+        final externalIdParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 12);
         final nameParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGetNullable(buffer, rootOffset, 6);
@@ -593,6 +595,12 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final mediasOffset = object.medias == null
             ? null
             : fbb.writeString(object.medias!);
+        final categoryIdOffset = object.categoryId == null
+            ? null
+            : fbb.writeString(object.categoryId!);
+        final brandIdOffset = object.brandId == null
+            ? null
+            : fbb.writeString(object.brandId!);
         final categoryOffset = object.category == null
             ? null
             : fbb.writeString(object.category!);
@@ -613,8 +621,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addFloat64(7, object.discount);
         fbb.addOffset(8, featuresJsonOffset);
         fbb.addOffset(9, mediasOffset);
-        fbb.addInt64(10, object.categoryId);
-        fbb.addInt64(11, object.brandId);
+        fbb.addOffset(10, categoryIdOffset);
+        fbb.addOffset(11, brandIdOffset);
         fbb.addInt64(12, object.externalId);
         fbb.addOffset(13, categoryOffset);
         fbb.addOffset(14, brandOffset);
@@ -676,16 +684,12 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final brandParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGetNullable(buffer, rootOffset, 32);
-        final categoryIdParam = const fb.Int64Reader().vTableGetNullable(
-          buffer,
-          rootOffset,
-          24,
-        );
-        final brandIdParam = const fb.Int64Reader().vTableGetNullable(
-          buffer,
-          rootOffset,
-          26,
-        );
+        final categoryIdParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 24);
+        final brandIdParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 26);
         final object = ProductObjectBox(
           id: idParam,
           externalId: externalIdParam,
@@ -861,7 +865,7 @@ class BrandObjectBox_ {
   );
 
   /// See [BrandObjectBox.externalId].
-  static final externalId = obx.QueryIntegerProperty<BrandObjectBox>(
+  static final externalId = obx.QueryStringProperty<BrandObjectBox>(
     _entities[0].properties[3],
   );
 }
@@ -889,7 +893,7 @@ class CategoryObjectBox_ {
   );
 
   /// See [CategoryObjectBox.externalId].
-  static final externalId = obx.QueryIntegerProperty<CategoryObjectBox>(
+  static final externalId = obx.QueryStringProperty<CategoryObjectBox>(
     _entities[1].properties[4],
   );
 
@@ -975,12 +979,12 @@ class ProductObjectBox_ {
   );
 
   /// See [ProductObjectBox.categoryId].
-  static final categoryId = obx.QueryIntegerProperty<ProductObjectBox>(
+  static final categoryId = obx.QueryStringProperty<ProductObjectBox>(
     _entities[3].properties[10],
   );
 
   /// See [ProductObjectBox.brandId].
-  static final brandId = obx.QueryIntegerProperty<ProductObjectBox>(
+  static final brandId = obx.QueryStringProperty<ProductObjectBox>(
     _entities[3].properties[11],
   );
 

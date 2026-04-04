@@ -12,8 +12,8 @@ class SearchProducts extends RemoteProductsEvent {
 }
 
 class FilterProducts extends RemoteProductsEvent {
-  final List<int> selectedCategories;
-  final List<int> selectedBrands;
+  final List<String> selectedCategories;
+  final List<String> selectedBrands;
   final double minPrice;
   final double maxPrice;
   final bool isNew;

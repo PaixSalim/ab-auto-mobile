@@ -27,8 +27,8 @@ class ProductObjectBox {
 
   String? category;
   String? brand;
-  int? categoryId;
-  int? brandId;
+  String? categoryId;
+  String? brandId;
 
   ProductObjectBox({
     int? id,
@@ -55,7 +55,7 @@ class ProductObjectBox {
   factory ProductObjectBox.fromModel(ProductEntity model) {
     return ProductObjectBox(
       id: 0,
-      externalId: model.id,
+      externalId: model.id != null ? int.tryParse(model.id!) : null,
       name: model.name,
       slug: model.slug,
       cta: model.cta,
@@ -66,8 +66,8 @@ class ProductObjectBox {
       discount: model.discount,
       featuresJson: jsonEncode(model.features),
       medias: jsonEncode(model.medias),
-      category: jsonEncode(model.category!.toJson()),
-      brand: jsonEncode(model.brand!.toJson()),
+      category: model.category != null ? jsonEncode(model.category!.toJson()) : null,
+      brand: model.brand != null ? jsonEncode(model.brand!.toJson()) : null,
       categoryId: model.category?.id,
       brandId: model.brand?.id,
     );
@@ -76,7 +76,7 @@ class ProductObjectBox {
   // Conversion vers BrandModel
   ProductModel toModel() {
     return ProductModel(
-      id: externalId,
+      id: externalId?.toString(),
       name: name,
       slug: slug,
       warranty: warranty,
@@ -87,8 +87,8 @@ class ProductObjectBox {
       discount: discount,
       features: getFeatures(),
       medias: getMedias(),
-      brand: BrandModel.fromJson(jsonDecode(brand!)),
-      category: CategoryModel.fromJson(jsonDecode(category!)),
+      brand: brand != null ? BrandModel.fromJson(jsonDecode(brand!)) : null,
+      category: category != null ? CategoryModel.fromJson(jsonDecode(category!)) : null,
       //medias: product.medias,
     );
   }

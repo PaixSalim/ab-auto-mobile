@@ -17,22 +17,34 @@ class RegisterPage extends StatefulWidget {
 class _RegisterPageState extends State<RegisterPage> {
   final _fullNameController = TextEditingController();
   final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _cityController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
   bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
+  bool _isSeller = false;
 
   @override
   void dispose() {
     _fullNameController.dispose();
     _emailController.dispose();
+    _phoneController.dispose();
+    _cityController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
   void _submit() {
     final fullName = _fullNameController.text.trim();
     final email = _emailController.text.trim();
+    final phone = _phoneController.text.trim();
+    final city = _cityController.text.trim();
     final password = _passwordController.text.trim();
-    if (fullName.isEmpty || email.isEmpty || password.isEmpty) {
+    final confirmPassword = _confirmPasswordController.text.trim();
+    
+    if (fullName.isEmpty || email.isEmpty || phone.isEmpty || city.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
       showCustomToast(context, 'Erreur', 'Veuillez remplir tous les champs', false);
       return;
     }
@@ -40,8 +52,21 @@ class _RegisterPageState extends State<RegisterPage> {
       showCustomToast(context, 'Erreur', 'Le mot de passe doit contenir au moins 8 caractères', false);
       return;
     }
+    if (password != confirmPassword) {
+      showCustomToast(context, 'Erreur', 'Les mots de passe ne correspondent pas', false);
+      return;
+    }
+    
     context.read<AuthBloc>().add(
-          RegisterRequested(fullName: fullName, email: email, password: password),
+          RegisterRequested(
+            fullName: fullName,
+            email: email,
+            password: password,
+            phone: phone,
+            city: city,
+            confirmPassword: confirmPassword,
+            isSeller: _isSeller,
+          ),
         );
   }
 
@@ -104,6 +129,25 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                   const SizedBox(height: 16),
                   TextField(
+                    controller: _phoneController,
+                    keyboardType: TextInputType.phone,
+                    decoration: buildInputDecoration(
+                      context,
+                      'Téléphone',
+                      const Icon(LucideIcons.phone),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: _cityController,
+                    decoration: buildInputDecoration(
+                      context,
+                      'Ville',
+                      const Icon(LucideIcons.mapPin),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
                     controller: _passwordController,
                     obscureText: _obscurePassword,
                     decoration: buildInputDecoration(
@@ -116,6 +160,32 @@ class _RegisterPageState extends State<RegisterPage> {
                         onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                       ),
                     ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: _confirmPasswordController,
+                    obscureText: _obscureConfirmPassword,
+                    decoration: buildInputDecoration(
+                      context,
+                      'Confirmer le mot de passe',
+                      const Icon(LucideIcons.lock),
+                    ).copyWith(
+                      suffixIcon: IconButton(
+                        icon: Icon(_obscureConfirmPassword ? LucideIcons.eyeOff : LucideIcons.eye),
+                        onPressed: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  CheckboxListTile(
+                    title: const Text('Je suis un vendeur professionnel'),
+                    value: _isSeller,
+                    onChanged: (bool? value) {
+                      setState(() {
+                        _isSeller = value ?? false;
+                      });
+                    },
+                    controlAffinity: ListTileControlAffinity.leading,
                   ),
                   const SizedBox(height: 24),
                   SizedBox(

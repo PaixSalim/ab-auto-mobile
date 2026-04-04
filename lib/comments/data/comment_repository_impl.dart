@@ -3,13 +3,13 @@ import 'dart:io';
 import 'package:auto/comments/data/data_source/remote/comment_post_remote_datasource_dio.dart';
 import 'package:auto/comments/data/data_source/remote/comment_remote_datasource_dio.dart';
 import 'package:auto/comments/data/models/comment_model.dart';
+import 'package:auto/comments/data/models/comment_post_model.dart';
+import 'package:auto/comments/domain/entities/comment_entity.dart';
 import 'package:auto/comments/domain/entities/comment_post_entity.dart';
 import 'package:auto/comments/domain/repositories/comment_repository_impl.dart';
 import 'package:auto/core/resources/data_state.dart';
 import 'package:auto/core/resources/network_info.dart';
 import 'package:dio/dio.dart';
-
-import 'dto/comment_dto.dart';
 
 class CommentRepositoryImpl implements CommentRepository {
   final CommentPostRemoteDatasourceDio _postRemoteDatasourceDio;
@@ -21,8 +21,9 @@ class CommentRepositoryImpl implements CommentRepository {
     this._remoteDatasourceDio,
     this._networkInfo,
   );
+  
   @override
-  Future<DataState<List<CommentModel>>> getComments(int productId) async {
+  Future<DataState<List<CommentModel>>> getComments(String productId) async {
     if (await _networkInfo.isConnected) {
       try {
         final httpResponse = await _remoteDatasourceDio.getComments(
@@ -43,30 +44,50 @@ class CommentRepositoryImpl implements CommentRepository {
         return DataFailed(e);
       }
     } else {
-      return DataSuccess([]);
+      return DataFailed(
+        DioException(
+          requestOptions: RequestOptions(),
+          error: 'No Internet Connection',
+          type: DioExceptionType.unknown,
+        ),
+      );
     }
   }
 
   @override
-  Future<DataState<CommentModel>> postComment(CommentPostEntity comment) async {
-    try {
-      final commentModel = CommentDto.postToModel(comment);
-      final httpResponse = await _postRemoteDatasourceDio.postComment(
-        commentModel,
-      );
-      if (httpResponse.response.statusCode == HttpStatus.ok) {
-        return DataSuccess(httpResponse.data);
-      } else {
-        return DataFailed(
-          DioException(
-            requestOptions: httpResponse.response.requestOptions,
-            error: httpResponse.response.statusMessage,
-            type: DioExceptionType.badResponse,
-          ),
+  Future<DataState<CommentEntity>> postComment(CommentPostEntity comment) async {
+    if (await _networkInfo.isConnected) {
+      try {
+        final commentModel = CommentPostModel(
+          productId: comment.productId,
+          user: comment.user,
+          comment: comment.comment,
         );
+        final httpResponse = await _postRemoteDatasourceDio.postComment(
+          commentModel,
+        );
+        if (httpResponse.response.statusCode == HttpStatus.ok) {
+          return DataSuccess(httpResponse.data);
+        } else {
+          return DataFailed(
+            DioException(
+              requestOptions: httpResponse.response.requestOptions,
+              error: httpResponse.response.statusMessage,
+              type: DioExceptionType.badResponse,
+            ),
+          );
+        }
+      } on DioException catch (e) {
+        return DataFailed(e);
       }
-    } on DioException catch (e) {
-      return DataFailed(e);
+    } else {
+      return DataFailed(
+        DioException(
+          requestOptions: RequestOptions(),
+          error: 'No Internet Connection',
+          type: DioExceptionType.unknown,
+        ),
+      );
     }
   }
 }

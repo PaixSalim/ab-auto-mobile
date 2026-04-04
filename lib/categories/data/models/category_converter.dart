@@ -11,7 +11,7 @@ class CategoryObjectBox {
   @Id()
   int id = 0;
 
-  int? externalId;
+  String? externalId;
   String? name;
   String? url;
   int? items;
@@ -56,7 +56,7 @@ class CategoryObjectBox {
             : [];
 
     return CategoryModel(
-      id: externalId,
+      id: externalId?.toString(),
       name: name,
       url: url,
       items: items,

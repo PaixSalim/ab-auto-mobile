@@ -267,12 +267,14 @@ class _OrderConfirmationModalState extends State<OrderConfirmationModal> {
                               _nameController.text,
                               _phoneController.text,
                               _cityController.text,
-                              widget.product.id!,
+                              int.parse(widget.product.id!),
                               widget.quantity,
                             );
-                            context.read<RemoteOrderBloc>().add(
-                              SendOrder(order),
-                            );
+                            if (context.mounted) {
+                              context.read<RemoteOrderBloc>().add(
+                                SendOrder(order),
+                              );
+                            }
                             showCustomToast(
                               context,
                               'Félicitations',

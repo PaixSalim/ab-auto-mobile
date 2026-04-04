@@ -92,15 +92,15 @@ class ProductGridCard extends StatelessWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          product.brand!.name!.toUpperCase(),
-                          style: TextStyle(
-                            color: Theme.of(context).primaryColor,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 1.1,
-                          ),
-                        ),
+                        // Text(
+                        //   product.brand!.name!.toUpperCase(),
+                        //   style: TextStyle(
+                        //     color: Theme.of(context).primaryColor,
+                        //     fontSize: 10,
+                        //     fontWeight: FontWeight.bold,
+                        //     letterSpacing: 1.1,
+                        //   ),
+                        // ),
                         const SizedBox(height: 2),
                         Text(
                           product.name!,

@@ -13,5 +13,5 @@ abstract class ProductRemoteDatasourceDio {
   Future<HttpResponse<List<ProductModel>>> getProducts();
 
   @GET('/products/{id}')
-  Future<HttpResponse<ProductModel>> getProductById(@Path('id') int id);
+  Future<HttpResponse<ProductModel>> getProductById(@Path('id') String id);
 }

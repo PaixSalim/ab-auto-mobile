@@ -1,5 +1,5 @@
 class BrandEntity {
-  final int? id;
+  final String? id;
   final String? name;
   final String? url;
 
@@ -11,7 +11,7 @@ class BrandEntity {
 
   factory BrandEntity.fromJson(Map<String, dynamic> json) {
     return BrandEntity(
-      id: json['id'] as int?,
+      id: json['id']?.toString(),
       name: json['name'] as String?,
       url: json['url'] as String?,
     );

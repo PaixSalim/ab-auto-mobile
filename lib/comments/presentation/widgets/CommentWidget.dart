@@ -11,7 +11,7 @@ import '../bloc/comment_bloc.dart';
 import 'CommentItem.dart';
 
 class ProductCommentsSection extends StatefulWidget {
-  final int productId;
+  final String productId; // Changé de int à String
   final Color backgroundColor;
   final Color textColor;
 

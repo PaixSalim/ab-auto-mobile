@@ -5,19 +5,28 @@ abstract class AuthEvent {
 }
 
 class LoginRequested extends AuthEvent {
-  final String email;
+  final String uid; // API attend "uid" au lieu de "email"
   final String password;
-  const LoginRequested({required this.email, required this.password});
+  const LoginRequested({required this.uid, required this.password});
 }
 
 class RegisterRequested extends AuthEvent {
   final String fullName;
   final String email;
   final String password;
+  final String phone;
+  final String city;
+  final String confirmPassword;
+  final bool isSeller;
+  
   const RegisterRequested({
     required this.fullName,
     required this.email,
     required this.password,
+    required this.phone,
+    required this.city,
+    required this.confirmPassword,
+    required this.isSeller,
   });
 }
 

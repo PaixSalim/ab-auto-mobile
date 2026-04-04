@@ -7,10 +7,10 @@ class LoginUseCase {
   LoginUseCase(this._repository);
 
   Future<DataState<UserEntity>> call({
-    required String email,
+    required String uid, // API attend "uid" au lieu de "email"
     required String password,
   }) =>
-      _repository.login(email: email, password: password);
+      _repository.login(uid: uid, password: password);
 }
 
 class RegisterUseCase {
@@ -21,8 +21,20 @@ class RegisterUseCase {
     required String fullName,
     required String email,
     required String password,
+    required String phone,
+    required String city,
+    required String confirmPassword,
+    required bool isSeller,
   }) =>
-      _repository.register(fullName: fullName, email: email, password: password);
+      _repository.register(
+        fullName: fullName,
+        email: email,
+        password: password,
+        phone: phone,
+        city: city,
+        confirmPassword: confirmPassword,
+        isSeller: isSeller,
+      );
 }
 
 class LogoutUseCase {

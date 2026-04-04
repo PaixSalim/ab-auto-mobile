@@ -4,6 +4,7 @@ import 'package:auto/core/resources/data_state.dart';
 import 'package:auto/core/resources/network_info.dart';
 import 'package:auto/products/data/data_source/local/product_local_data_source.dart';
 import 'package:auto/products/data/data_source/remote/product_remote_datasource_dio.dart';
+import 'package:auto/products/data/models/product.model.dart';
 import 'package:auto/products/domain/entities/product_entity.dart';
 import 'package:auto/products/domain/entities/order_entity.dart';
 import 'package:auto/products/domain/repository/product_repository.dart';
@@ -23,33 +24,51 @@ class ProductRepositoryImpl implements ProductRepository {
         final httpResponse = await _remote.getProducts();
         
         if (httpResponse.response.statusCode == HttpStatus.ok) {
-          final products = httpResponse.data as List<ProductEntity>;
+          final productModels = httpResponse.data as List<dynamic>;
+          print('Received ${productModels.length} products from API');
           
-          // Pour chaque produit, récupérer les détails complets qui incluent le seller
-          final productsWithSeller = <ProductEntity>[];
+          // Les données sont déjà des ProductModel (converties par Retrofit)
+          // Il faut juste les convertir en ProductEntity
+          final products = <ProductEntity>[];
           
-          for (final product in products) {
-            if (product.id != null) {
-              try {
-                // Récupérer les détails complets du produit (avec seller)
-                final detailResponse = await _remote.getProductById(product.id!);
-                if (detailResponse.response.statusCode == HttpStatus.ok) {
-                  // L'API retourne maintenant le seller complet !
-                  productsWithSeller.add(detailResponse.data);
-                } else {
-                  productsWithSeller.add(product);
-                }
-              } catch (e) {
-                // Si erreur, utiliser le produit sans seller
-                productsWithSeller.add(product);
-              }
-            } else {
-              productsWithSeller.add(product);
+          for (int i = 0; i < productModels.length; i++) {
+            try {
+              print('Converting product $i...');
+              final model = productModels[i] as ProductModel;  // Changé ici
+              print('ProductModel received for: ${model.name}');
+              
+              final entity = ProductEntity(
+                id: model.id,
+                name: model.name ?? '',
+                slug: model.slug ?? '',
+                cta: model.cta ?? '',
+                warranty: model.warranty ?? '',
+                state: model.state ?? '',
+                description: model.description ?? '',
+                price: model.price,
+                discount: model.discount,
+                category: model.category,
+                features: model.features,
+                brand: model.brand,
+                medias: model.medias,
+                seller: model.seller,
+                sellerId: model.sellerId,
+              );
+              print('ProductEntity created for: ${entity.name}');
+              products.add(entity);
+            } catch (e) {
+              print('Error converting product $i: $e');
+              print('Product data: ${productModels[i]}');
             }
           }
           
-          await _local.cacheProducts(productsWithSeller);
-          return DataSuccess(productsWithSeller);
+          print('Converted ${products.length} products to ProductEntity');
+          
+          // Pour l'instant, utilisons les produits sans détails supplémentaires
+          // pour vérifier si l'affichage fonctionne
+          print('Using products without seller details for now');
+          await _local.cacheProducts(products);
+          return DataSuccess(products);
         } else {
           return DataFailed(
             DioException(
@@ -68,7 +87,7 @@ class ProductRepositoryImpl implements ProductRepository {
   }
 
   @override
-  Future<DataState<ProductEntity>> getProductById(int id) async {
+  Future<DataState<ProductEntity>> getProductById(String id) async {
     if (await _networkInfo.isConnected) {
       try {
         final httpResponse = await _remote.getProductById(id);

@@ -22,22 +22,30 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   Future<void> _onAppStarted(AppStarted event, Emitter<AuthState> emit) async {
+    print('🚀 AUTH BLOC - App started, checking login status');
     if (LocalStorageService.isLoggedIn) {
+      print('🚀 AUTH BLOC - User is logged in, restoring session');
       emit(AuthAuthenticated(UserEntity(
         token: 'session',
         fullName: LocalStorageService.userFullName ?? '',
         email: LocalStorageService.userEmail ?? '',
         role: 'customer',
       )));
+    } else {
+      print('🚀 AUTH BLOC - User not logged in');
     }
   }
 
   Future<void> _onLogin(LoginRequested event, Emitter<AuthState> emit) async {
+    print('🔐 AUTH BLOC - Login attempt with uid: ${event.uid}');
     emit(AuthLoading());
-    final result = await _loginUseCase(email: event.email, password: event.password);
+    final result = await _loginUseCase(uid: event.uid, password: event.password);
+    
     if (result is DataSuccess<UserEntity>) {
+      print('🔐 AUTH BLOC - Login success');
       emit(AuthAuthenticated(result.data!));
     } else {
+      print('🔐 AUTH BLOC - Login failed: ${result.error?.message}');
       emit(AuthError(result.error?.message ?? 'Identifiants invalides'));
     }
   }
@@ -48,11 +56,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       fullName: event.fullName,
       email: event.email,
       password: event.password,
+      phone: event.phone,
+      city: event.city,
+      confirmPassword: event.confirmPassword,
+      isSeller: event.isSeller,
     );
     if (result is DataSuccess<UserEntity>) {
       emit(AuthAuthenticated(result.data!));
     } else {
-      emit(AuthError(result.error?.message ?? 'Erreur lors de l\'inscription'));
+      emit(AuthError(result.error?.message ?? 'Échec d\'inscription'));
     }
   }
 

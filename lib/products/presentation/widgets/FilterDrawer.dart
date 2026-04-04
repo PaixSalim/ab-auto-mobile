@@ -67,7 +67,7 @@ class _FilterDrawerState extends State<FilterDrawer> {
                           selectedCategories,
                           (id, value) {
                             setState(() {
-                              selectedCategories[id.toString()] = value!;
+                              selectedCategories[id] = value!;
                               //context.read<RemoteProductsBloc>().add(ShortByCategory(id),);
                             });
                           },
@@ -160,13 +160,13 @@ class _FilterDrawerState extends State<FilterDrawer> {
                       final selectedCategoryIds =
                           selectedCategories.entries
                               .where((entry) => entry.value)
-                              .map((entry) => int.parse(entry.key))
+                              .map((entry) => entry.key)
                               .toList();
 
                       final selectedBrandIds =
                           selectedBrands.entries
                               .where((entry) => entry.value)
-                              .map((entry) => int.parse(entry.key))
+                              .map((entry) => entry.key)
                               .toList();
 
                       context.read<RemoteProductsBloc>().add(
@@ -210,7 +210,7 @@ class _FilterDrawerState extends State<FilterDrawer> {
   Widget _buildCheckboxCategoryList(
     List<CategoryEntity> items,
     Map<String, bool> selectedItems,
-    Function(int, bool?) onChanged,
+    Function(String, bool?) onChanged,
   ) {
     return Column(
       children:
@@ -229,7 +229,7 @@ class _FilterDrawerState extends State<FilterDrawer> {
   Widget _buildCheckboxBrandList(
     List<BrandEntity> brands,
     Map<String, bool> selectedItems,
-    Function(int, bool?) onChanged,
+    Function(String, bool?) onChanged,
   ) {
     return Column(
       children:

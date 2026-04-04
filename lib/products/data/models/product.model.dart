@@ -27,7 +27,7 @@ class ProductModel extends ProductEntity {
     if (json['seller'] != null) {
       final s = json['seller'] as Map<String, dynamic>;
       seller = SellerEntity(
-        id: s['id'],
+        id: s['id']?.toString(),
         fullName: s['fullName'],
         email: s['email'],
         phone: s['phone'],
@@ -35,7 +35,7 @@ class ProductModel extends ProductEntity {
       );
     }
     return ProductModel(
-      id: json['id'] ?? 0,
+      id: json['id']?.toString() ?? '',
       name: json['name'] ?? '',
       slug: json['slug'] ?? '',
       cta: json['cta'] ?? '',
@@ -48,7 +48,11 @@ class ProductModel extends ProductEntity {
           ? CategoryModel.fromJson(json['category'])
           : null,
       brand: json['brand'] != null ? BrandModel.fromJson(json['brand']) : null,
-      features: json['features'] != null ? List<String>.from(json['features']) : [],
+      features: json['features'] != null 
+          ? (json['features'] is String 
+              ? (json['features'] == '[]' || json['features'] == 'null' ? [] : [json['features'] as String])
+              : List<String>.from(json['features'] ?? []))
+          : [],
       medias: json['medias'] != null
           ? (json['medias'] as List)
               .map((media) {
@@ -63,7 +67,7 @@ class ProductModel extends ProductEntity {
               .toList()
           : [],
       seller: seller,
-      sellerId: json['sellerId'],
+      sellerId: json['sellerId']?.toString(),
     );
   }
 

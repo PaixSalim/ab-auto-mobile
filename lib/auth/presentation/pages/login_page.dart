@@ -27,13 +27,13 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _submit() {
-    final email = _emailController.text.trim();
+    final uid = _emailController.text.trim(); // API attend "uid" au lieu de "email"
     final password = _passwordController.text.trim();
-    if (email.isEmpty || password.isEmpty) {
+    if (uid.isEmpty || password.isEmpty) {
       showCustomToast(context, 'Erreur', 'Veuillez remplir tous les champs', false);
       return;
     }
-    context.read<AuthBloc>().add(LoginRequested(email: email, password: password));
+    context.read<AuthBloc>().add(LoginRequested(uid: uid, password: password));
   }
 
   @override

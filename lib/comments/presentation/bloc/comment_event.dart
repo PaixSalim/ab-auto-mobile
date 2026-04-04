@@ -5,7 +5,7 @@ sealed class CommentEvent {
 }
 
 class FetchComments extends CommentEvent {
-  final int productId;
+  final String productId; // Changé de int à String
 
   const FetchComments(this.productId);
 
@@ -14,7 +14,7 @@ class FetchComments extends CommentEvent {
 }
 
 class AddComment extends CommentEvent {
-  final int productId;
+  final String productId; // Changé de int à String
   final String user;
   final String comment;
 

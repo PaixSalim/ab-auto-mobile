@@ -382,24 +382,28 @@ class _SellerTab extends StatelessWidget {
                 label: 'Téléphone',
                 value: seller.phone ?? 'Non disponible',
                 iconColor: const Color(0xFF3B82F6),
+                fontSize: 12, // Taille réduite
               ),
               _ContactCard(
                 icon: Icons.email_outlined,
                 label: 'Email',
                 value: seller.email ?? 'Non disponible',
                 iconColor: const Color(0xFF10B981),
+                fontSize: 12, // Taille réduite
               ),
               _ContactCard(
                 icon: Icons.location_on_outlined,
                 label: 'Ville',
                 value: seller.city ?? 'Non spécifiée',
                 iconColor: const Color(0xFFF59E0B),
+                fontSize: 12, // Taille réduite
               ),
               _ContactCard(
                 icon: Icons.store_outlined,
                 label: 'Type de compte',
                 value: 'Vendeur professionnel',
                 iconColor: const Color(0xFF8B5CF6),
+                fontSize: 12, // Taille réduite
               ),
             ],
           ),
@@ -424,22 +428,22 @@ class _SellerTab extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: () => _sendMessage(seller.email),
-                  icon: const Icon(Icons.message, size: 18),
-                  label: const Text('Envoyer un message'),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: const Color(0xFF3B82F6),
-                    side: const BorderSide(color: Color(0xFF3B82F6)),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                ),
-              ),
+              //   const SizedBox(width: 12),
+              //   Expanded(
+              //     child: OutlinedButton.icon(
+              //       onPressed: () => _sendMessage(seller.email),
+              //       icon: const Icon(Icons.message, size: 18),
+              //       label: const Text('Envoyer un message'),
+              //       style: OutlinedButton.styleFrom(
+              //         foregroundColor: const Color(0xFF3B82F6),
+              //         side: const BorderSide(color: Color(0xFF3B82F6)),
+              //         padding: const EdgeInsets.symmetric(vertical: 12),
+              //         shape: RoundedRectangleBorder(
+              //           borderRadius: BorderRadius.circular(8),
+              //         ),
+              //       ),
+              //     ),
+              // ),
             ],
           ),
           
@@ -480,12 +484,14 @@ class _ContactCard extends StatelessWidget {
   final String label;
   final String value;
   final Color iconColor;
+  final double? fontSize; // Paramètre optionnel pour la taille du texte
 
   const _ContactCard({
     required this.icon,
     required this.label,
     required this.value,
     required this.iconColor,
+    this.fontSize, // Paramètre optionnel
   });
 
   @override
@@ -518,18 +524,18 @@ class _ContactCard extends StatelessWidget {
               children: [
                 Text(
                   label,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Color(0xFF6B7280),
+                  style: TextStyle(
+                    fontSize: fontSize ?? 12, // Utilise fontSize ou 12 par défaut
+                    color: const Color(0xFF6B7280),
                     fontWeight: FontWeight.w500,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   value,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Color(0xFF1F2937),
+                  style: TextStyle(
+                    fontSize: (fontSize != null ? fontSize! - 2 : 12), // Valeur légèrement plus petit
+                    color: const Color(0xFF1F2937),
                     fontWeight: FontWeight.w600,
                   ),
                   overflow: TextOverflow.ellipsis,
