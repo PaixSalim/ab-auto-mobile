@@ -39,7 +39,7 @@ class ProductBreadcrumb extends StatelessWidget {
               children: [
                 const Icon(
                   Icons.home_outlined,
-                  size: 16,
+                  size: 12,
                   color: Color(0xFF6B7280),
                 ),
                 const SizedBox(width: 4),
@@ -47,7 +47,7 @@ class ProductBreadcrumb extends StatelessWidget {
                   'Accueil',
                   style: TextStyle(
                     color: Color(0xFF6B7280),
-                    fontSize: 14,
+                    fontSize: 12,
                   ),
                 ),
               ],
@@ -59,7 +59,7 @@ class ProductBreadcrumb extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: 8),
             child: Icon(
               Icons.chevron_right,
-              size: 16,
+              size: 12,
               color: Color(0xFF9CA3AF),
             ),
           ),
@@ -71,7 +71,7 @@ class ProductBreadcrumb extends StatelessWidget {
               product.category?.name ?? 'Catégorie',
               style: const TextStyle(
                 color: Color(0xFF4B5563),
-                fontSize: 14,
+                fontSize: 12,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -82,7 +82,7 @@ class ProductBreadcrumb extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: 8),
             child: Icon(
               Icons.chevron_right,
-              size: 16,
+              size: 12,
               color: Color(0xFF9CA3AF),
             ),
           ),
@@ -93,7 +93,7 @@ class ProductBreadcrumb extends StatelessWidget {
             children: [
               Icon(
                 Icons.grid_view_outlined,
-                size: 16,
+                size: 12,
                 color: Color(0xFF6B7280),
               ),
               SizedBox(width: 4),
@@ -101,7 +101,7 @@ class ProductBreadcrumb extends StatelessWidget {
                 'Catalogue',
                 style: TextStyle(
                   color: Color(0xFF6B7280),
-                  fontSize: 14,
+                  fontSize: 12,
                 ),
               ),
             ],
@@ -112,7 +112,7 @@ class ProductBreadcrumb extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: 8),
             child: Icon(
               Icons.chevron_right,
-              size: 16,
+              size: 12,
               color: Color(0xFF9CA3AF),
             ),
           ),
@@ -123,7 +123,7 @@ class ProductBreadcrumb extends StatelessWidget {
               product.name ?? 'Produit',
               style: const TextStyle(
                 color: Color(0xFF3B82F6),
-                fontSize: 14,
+                fontSize: 12,
                 fontWeight: FontWeight.w600,
               ),
               overflow: TextOverflow.ellipsis,

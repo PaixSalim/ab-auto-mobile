@@ -1,15 +1,15 @@
 import 'package:auto/auth/presentation/bloc/auth_bloc.dart';
-import 'package:auto/auth/presentation/pages/login_page.dart';
-import 'package:auto/core/resources/local_storage_service.dart';
-import 'package:auto/orders/presentation/bloc/my_orders_bloc.dart';
-import 'package:auto/orders/presentation/pages/my_orders_page.dart';
+// import 'package:auto/auth/presentation/pages/login_page.dart';
+// import 'package:auto/core/resources/local_storage_service.dart';
+// import 'package:auto/orders/presentation/bloc/my_orders_bloc.dart';
+// import 'package:auto/orders/presentation/pages/my_orders_page.dart';
 import 'package:auto/products/presentation/pages/ProductCatalogPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import 'package:auto/products/presentation/widgets/search.index.bar.dart';
-import '../../injection_container.dart';
+// import '../../injection_container.dart';
 import '../../../main.dart';
 
 class MainNavigation extends StatefulWidget {
@@ -22,15 +22,15 @@ class MainNavigation extends StatefulWidget {
 class _MainNavigationState extends State<MainNavigation> {
   int _currentIndex = 0;
 
-  Widget _buildOrdersTab() {
-    if (LocalStorageService.isLoggedIn) {
-      return BlocProvider(
-        create: (_) => sl<MyOrdersBloc>(),
-        child: const MyOrdersPage(),
-      );
-    }
-    return const _LoginPromptPage();
-  }
+  // Widget _buildOrdersTab() {
+  //   if (LocalStorageService.isLoggedIn) {
+  //     return BlocProvider(
+  //       create: (_) => sl<MyOrdersBloc>(),
+  //       child: const MyOrdersPage(),
+  //     );
+  //   }
+  //   return const _LoginPromptPage();
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -91,7 +91,7 @@ class _MainNavigationState extends State<MainNavigation> {
           children: [
             const HomePage(),
             const ProductCatalogPage(),
-            _buildOrdersTab(),
+            // _buildOrdersTab(), // Temporairement désactivé
           ],
         ),
         bottomNavigationBar: BottomNavigationBar(
@@ -102,7 +102,7 @@ class _MainNavigationState extends State<MainNavigation> {
           items: const [
             BottomNavigationBarItem(icon: Icon(LucideIcons.home), label: 'Accueil'),
             BottomNavigationBarItem(icon: Icon(LucideIcons.shoppingBag), label: 'Catalogue'),
-            BottomNavigationBarItem(icon: Icon(LucideIcons.clipboardList), label: 'Commandes'),
+            // BottomNavigationBarItem(icon: Icon(LucideIcons.clipboardList), label: 'Commandes'), // Temporairement désactivé
           ],
         ),
       ),
@@ -110,52 +110,52 @@ class _MainNavigationState extends State<MainNavigation> {
   }
 }
 
-class _LoginPromptPage extends StatelessWidget {
-  const _LoginPromptPage();
+// class _LoginPromptPage extends StatelessWidget {
+//   const _LoginPromptPage();
 
-  @override
-  Widget build(BuildContext context) {
-    final primary = Theme.of(context).primaryColor;
-    return Scaffold(
-      appBar: AppBar(title: const Text('Mes commandes')),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(LucideIcons.logIn, size: 64, color: Colors.grey[400]),
-              const SizedBox(height: 16),
-              const Text(
-                'Connectez-vous pour voir vos commandes',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16, color: Colors.grey),
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: () {
-                  print('🔗 NAVIGATION - Attempting to navigate to LoginPage');
-                  try {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const LoginPage()),
-                    );
-                    print('🔗 NAVIGATION - Navigation successful');
-                  } catch (e) {
-                    print('🔗 NAVIGATION - Navigation failed: $e');
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primary,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                ),
-                child: const Text('Se connecter'),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     final primary = Theme.of(context).primaryColor;
+//     return Scaffold(
+//       appBar: AppBar(title: const Text('Mes commandes')),
+//       body: Center(
+//         child: Padding(
+//           padding: const EdgeInsets.all(32),
+//           child: Column(
+//             mainAxisAlignment: MainAxisAlignment.center,
+//             children: [
+//               Icon(LucideIcons.logIn, size: 64, color: Colors.grey[400]),
+//               const SizedBox(height: 16),
+//               const Text(
+//                 'Connectez-vous pour voir vos commandes',
+//                 textAlign: TextAlign.center,
+//                 style: TextStyle(fontSize: 16, color: Colors.grey),
+//               ),
+//               const SizedBox(height: 24),
+//               ElevatedButton(
+//                 onPressed: () {
+//                   print('🔗 NAVIGATION - Attempting to navigate to LoginPage');
+//                   try {
+//                     Navigator.of(context).push(
+//                       MaterialPageRoute(builder: (_) => const LoginPage()),
+//                     );
+//                     print('🔗 NAVIGATION - Navigation successful');
+//                   } catch (e) {
+//                     print('🔗 NAVIGATION - Navigation failed: $e');
+//                   }
+//                 },
+//                 style: ElevatedButton.styleFrom(
+//                   backgroundColor: primary,
+//                   foregroundColor: Colors.white,
+//                   padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+//                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+//                 ),
+//                 child: const Text('Se connecter'),
+//               ),
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }

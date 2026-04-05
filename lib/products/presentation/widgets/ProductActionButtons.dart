@@ -120,7 +120,7 @@ class ProductActionButtons extends StatelessWidget {
                 child: ElevatedButton.icon(
                   onPressed: () => _launchWhatsApp(context),
                   icon: const Icon(Icons.phone_outlined, size: 20),
-                  label: const Text('Contacter le vendeur'),
+                  label: const Text('Contacter le vendeur', style: TextStyle(fontSize: 14)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF3B82F6),
                     foregroundColor: Colors.white,

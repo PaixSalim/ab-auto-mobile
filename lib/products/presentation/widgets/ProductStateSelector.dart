@@ -29,151 +29,214 @@ class _ProductStateSelectorState extends State<ProductStateSelector> {
       margin: const EdgeInsets.only(bottom: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'État du produit',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-              color: Color(0xFF1F2937),
-            ),
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              // Neuf button
-              Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      selectedState = 'new';
-                    });
-                    widget.onStateChanged?.call('new');
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                    decoration: BoxDecoration(
-                      color: selectedState == 'new'
-                          ? const Color(0xFF3B82F6)
-                          : Colors.white,
-                      border: Border.all(
-                        color: selectedState == 'new'
-                            ? const Color(0xFF3B82F6)
-                            : const Color(0xFFE5E7EB),
-                        width: 1,
-                      ),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.new_releases_outlined,
-                          size: 18,
-                          color: selectedState == 'new'
-                              ? Colors.white
-                              : const Color(0xFF6B7280),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Neuf',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: selectedState == 'new'
-                                ? Colors.white
-                                : const Color(0xFF374151),
-                          ),
-                        ),
-                        if (selectedState == 'new') ...[
-                          const SizedBox(width: 4),
-                          const Icon(
-                            Icons.check,
-                            size: 16,
-                            color: Colors.white,
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-                ),
-              ),
+        // children: [
+        //   const Text(
+        //     'État du produit',
+        //     style: TextStyle(
+        //       fontSize: 16,
+        //       fontWeight: FontWeight.w500,
+        //       color: Color(0xFF1F2937),
+        //     ),
+        //   ),
+        //   const SizedBox(height: 12),
+        //   Row(
+        //     children: [
+        //       // Neuf button
+        //       Expanded(
+        //         child: GestureDetector(
+        //           onTap: () {
+        //             setState(() {
+        //               selectedState = 'new';
+        //             });
+        //             widget.onStateChanged?.call('new');
+        //           },
+        //           child: Container(
+        //             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        //             decoration: BoxDecoration(
+        //               color: selectedState == 'new'
+        //                   ? const Color(0xFF3B82F6)
+        //                   : Colors.white,
+        //               border: Border.all(
+        //                 color: selectedState == 'new'
+        //                     ? const Color(0xFF3B82F6)
+        //                     : const Color(0xFFE5E7EB),
+        //                 width: 1,
+        //               ),
+        //               borderRadius: BorderRadius.circular(8),
+        //             ),
+        //             child: Row(
+        //               mainAxisAlignment: MainAxisAlignment.center,
+        //               children: [
+        //                 Icon(
+        //                   Icons.new_releases_outlined,
+        //                   size: 18,
+        //                   color: selectedState == 'new'
+        //                       ? Colors.white
+        //                       : const Color(0xFF6B7280),
+        //                 ),
+        //                 const SizedBox(width: 8),
+        //                 Text(
+        //                   'Neuf',
+        //                   style: TextStyle(
+        //                     fontSize: 14,
+        //                     fontWeight: FontWeight.w500,
+        //                     color: selectedState == 'new'
+        //                         ? Colors.white
+        //                         : const Color(0xFF374151),
+        //                   ),
+        //                 ),
+        //                 if (selectedState == 'new') ...[
+        //                   const SizedBox(width: 4),
+        //                   const Icon(
+        //                     Icons.check,
+        //                     size: 16,
+        //                     color: Colors.white,
+        //                   ),
+        //                 ],
+        //               ],
+        //             ),
+        //           ),
+        //         ),
+        //       ),
               
-              const SizedBox(width: 12),
+        //       const SizedBox(width: 8),
               
-              // Occasion button
-              Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      selectedState = 'used';
-                    });
-                    widget.onStateChanged?.call('used');
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                    decoration: BoxDecoration(
-                      color: selectedState == 'used'
-                          ? const Color(0xFF3B82F6)
-                          : Colors.white,
-                      border: Border.all(
-                        color: selectedState == 'used'
-                            ? const Color(0xFF3B82F6)
-                            : const Color(0xFFE5E7EB),
-                        width: 1,
-                      ),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.inventory_2_outlined,
-                          size: 18,
-                          color: selectedState == 'used'
-                              ? Colors.white
-                              : const Color(0xFF6B7280),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Occasion',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: selectedState == 'used'
-                                ? Colors.white
-                                : const Color(0xFF374151),
-                          ),
-                        ),
-                        if (selectedState == 'used') ...[
-                          const SizedBox(width: 4),
-                          const Icon(
-                            Icons.check,
-                            size: 16,
-                            color: Colors.white,
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
+        //       // Occasion button
+        //       Expanded(
+        //         child: GestureDetector(
+        //           onTap: () {
+        //             setState(() {
+        //               selectedState = 'old';
+        //             });
+        //             widget.onStateChanged?.call('old');
+        //           },
+        //           child: Container(
+        //             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        //             decoration: BoxDecoration(
+        //               color: selectedState == 'old'
+        //                   ? const Color(0xFF3B82F6)
+        //                   : Colors.white,
+        //               border: Border.all(
+        //                 color: selectedState == 'old'
+        //                     ? const Color(0xFF3B82F6)
+        //                     : const Color(0xFFE5E7EB),
+        //                 width: 1,
+        //               ),
+        //               borderRadius: BorderRadius.circular(8),
+        //             ),
+        //             child: Row(
+        //               mainAxisAlignment: MainAxisAlignment.center,
+        //               children: [
+        //                 Icon(
+        //                   Icons.inventory_2_outlined,
+        //                   size: 18,
+        //                   color: selectedState == 'old'
+        //                       ? Colors.white
+        //                       : const Color(0xFF6B7280),
+        //                 ),
+        //                 const SizedBox(width: 8),
+        //                 Text(
+        //                   'Occasion',
+        //                   style: TextStyle(
+        //                     fontSize: 14,
+        //                     fontWeight: FontWeight.w500,
+        //                     color: selectedState == 'old'
+        //                         ? Colors.white
+        //                         : const Color(0xFF374151),
+        //                   ),
+        //                 ),
+        //                 if (selectedState == 'old') ...[
+        //                   const SizedBox(width: 4),
+        //                   const Icon(
+        //                     Icons.check,
+        //                     size: 16,
+        //                     color: Colors.white,
+        //                   ),
+        //                 ],
+        //               ],
+        //             ),
+        //           ),
+        //         ),
+        //       ),
+              
+        //       const SizedBox(width: 8),
+              
+        //       // France Aurevoir button
+        //       Expanded(
+        //         child: GestureDetector(
+        //           onTap: () {
+        //             setState(() {
+        //               selectedState = 'use';
+        //             });
+        //             widget.onStateChanged?.call('use');
+        //           },
+        //           child: Container(
+        //             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        //             decoration: BoxDecoration(
+        //               color: selectedState == 'use'
+        //                   ? const Color(0xFF3B82F6)
+        //                   : Colors.white,
+        //               border: Border.all(
+        //                 color: selectedState == 'use'
+        //                     ? const Color(0xFF3B82F6)
+        //                     : const Color(0xFFE5E7EB),
+        //                 width: 1,
+        //               ),
+        //               borderRadius: BorderRadius.circular(8),
+        //             ),
+        //             child: Row(
+        //               mainAxisAlignment: MainAxisAlignment.center,
+        //               children: [
+        //                 Icon(
+        //                   Icons.recycling_outlined,
+        //                   size: 18,
+        //                   color: selectedState == 'use'
+        //                       ? Colors.white
+        //                       : const Color(0xFF6B7280),
+        //                 ),
+        //                 const SizedBox(width: 8),
+        //                 Text(
+        //                   'France\nAurevoir',
+        //                   textAlign: TextAlign.center,
+        //                   style: TextStyle(
+        //                     fontSize: 12,
+        //                     fontWeight: FontWeight.w500,
+        //                     color: selectedState == 'use'
+        //                         ? Colors.white
+        //                         : const Color(0xFF374151),
+        //                   ),
+        //                 ),
+        //                 if (selectedState == 'use') ...[
+        //                   const SizedBox(width: 4),
+        //                   const Icon(
+        //                     Icons.check,
+        //                     size: 16,
+        //                     color: Colors.white,
+        //                   ),
+        //                 ],
+        //               ],
+        //             ),
+        //           ),
+        //         ),
+        //       ),
+        //     ],
+        //   ),
           
-          // Additional info for used state
-          if (selectedState == 'used') ...[
-            const SizedBox(height: 8),
-            Text(
-              'Prix variable selon l\'état',
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey[600],
-                fontStyle: FontStyle.italic,
-              ),
-            ),
-          ],
-        ],
+        //   // Additional info for old and use states
+        //   if (selectedState == 'old' || selectedState == 'use') ...[
+        //     const SizedBox(height: 8),
+        //     Text(
+        //       selectedState == 'old' 
+        //           ? 'Prix variable selon l\'état'
+        //           : 'Service de reprise France Aurevoir',
+        //       style: TextStyle(
+        //         fontSize: 12,
+        //         color: Colors.grey[600],
+        //         fontStyle: FontStyle.italic,
+        //       ),
+        //     ),
+        //   ],
+        // ],
       ),
     );
   }
