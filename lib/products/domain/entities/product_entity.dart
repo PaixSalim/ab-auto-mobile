@@ -17,6 +17,7 @@ class ProductEntity {
   final String? cta;
   final String? warranty;
   final String? state;
+  final String? validationStatus;
   final String? description;
   final double? price;
   final double? discount;
@@ -34,6 +35,7 @@ class ProductEntity {
     this.cta,
     this.warranty,
     this.state,
+    this.validationStatus,
     this.description,
     this.price,
     this.discount,

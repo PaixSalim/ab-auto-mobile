@@ -79,8 +79,22 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  int _displayedProductsCount = 8; // Initial number of products to display
+  static const int _incrementCount = 8; // Number of products to load each time
+
+  void _loadMoreProducts() {
+    setState(() {
+      _displayedProductsCount += _incrementCount;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -90,14 +104,13 @@ class HomePage extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const CarouselWithIndicator(),
-              CategorySection(),
+              const CarouselWithIndicator(), 
               const PromotionsSection(),
               const Divider(thickness: 8, color: Color(0xFFEEEEEE)),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                 child: Row(
-                  children: [
+                  children: [ 
                     const Text(
                       "Suggestions pour vous",
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -108,24 +121,100 @@ class HomePage extends StatelessWidget {
               BlocBuilder<RemoteProductsBloc, RemoteProductState>(
                 builder: (context, state) {
                   if (state is RemoteProductsDone) {
-                    // Create a randomized list of products
-                    final products = List<ProductEntity>.from(state.allProducts!);
-                    products.shuffle();
+                    // Debug: Check all products
+                    final allProducts = List<ProductEntity>.from(state.allProducts!);
+                    print('🔍 DEBUG: Total products received: ${allProducts.length}');
                     
-                    return GridView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 10,
-                        mainAxisSpacing: 10,
-                        childAspectRatio: 0.65,
-                      ),
-                      itemCount: products.length,
-                      itemBuilder: (context, index) {
-                        return ProductGridCard(product: products[index]);
-                      },
+                    // Debug: Print all products with their validation status
+                    for (int i = 0; i < allProducts.length; i++) {
+                      final product = allProducts[i];
+                      print('📦 Product $i: ${product.name}');
+                      print('   - ID: ${product.id}');
+                      print('   - validationStatus: "${product.validationStatus}" (type: ${product.validationStatus.runtimeType})');
+                      print('   - price: ${product.price}');
+                      print('   - state: ${product.state}');
+                    }
+                    
+                    // Debug: Filter only approved products (including null validationStatus)
+                    final approvedProducts = allProducts.where((product) => 
+                    product.validationStatus == "approved"
+                    ).toList();
+                    print('✅ DEBUG: Approved products count: ${approvedProducts.length}');
+                    
+                    // Debug: Print approved products
+                    for (int i = 0; i < approvedProducts.length; i++) {
+                      final product = approvedProducts[i];
+                      print('✅ Approved Product $i: ${product.name} - price: ${product.price}');
+                    }
+                    
+                    approvedProducts.shuffle();
+                    
+                    // Limit the number of products displayed for pagination
+                    final displayedProducts = approvedProducts.take(_displayedProductsCount).toList();
+                    final hasMoreProducts = _displayedProductsCount < approvedProducts.length;
+                    print('📊 DEBUG: Displayed products count: ${displayedProducts.length}, hasMore: $hasMoreProducts');
+                    
+                    return Column(
+                      children: [
+                        GridView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 10,
+                            childAspectRatio: 0.65,
+                          ),
+                          itemCount: displayedProducts.length,
+                          itemBuilder: (context, index) {
+                            return ProductGridCard(product: displayedProducts[index]);
+                          },
+                        ),
+                        
+                        // Load More Button
+                        if (hasMoreProducts) ...[
+                          const SizedBox(height: 16),
+                          Center(
+                            child: ElevatedButton(
+                              onPressed: _loadMoreProducts,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Theme.of(context).primaryColor,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 32,
+                                  vertical: 12,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(25),
+                                ),
+                              ),
+                              child: const Text(
+                                "Charger plus d'articles",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                        
+                        // End message if all products are displayed
+                        if (!hasMoreProducts && displayedProducts.isNotEmpty) ...[
+                          const SizedBox(height: 16),
+                          Center(
+                            child: Text(
+                              "Tous les articles sont affichés",
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                                fontSize: 12,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
                     );
                   }
                   if (state is RemoteProductsLoading) {
@@ -134,9 +223,11 @@ class HomePage extends StatelessWidget {
                   return const SizedBox();
                 },
               ),
+              CategorySection(),
             ],
           ),
         ),
+        
         // const SupportAssistant(),
       ],
     );

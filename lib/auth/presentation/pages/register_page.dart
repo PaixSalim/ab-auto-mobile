@@ -123,7 +123,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     keyboardType: TextInputType.emailAddress,
                     decoration: buildInputDecoration(
                       context,
-                      'Adresse email',
+                      'Adresse email (optionnel)',
                       const Icon(LucideIcons.mail),
                     ),
                   ),
@@ -133,19 +133,19 @@ class _RegisterPageState extends State<RegisterPage> {
                     keyboardType: TextInputType.phone,
                     decoration: buildInputDecoration(
                       context,
-                      'Téléphone',
+                      'Téléphone (obligatoire)',
                       const Icon(LucideIcons.phone),
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: _cityController,
-                    decoration: buildInputDecoration(
-                      context,
-                      'Ville',
-                      const Icon(LucideIcons.mapPin),
-                    ),
-                  ),
+                  // const SizedBox(height: 16),
+                  // TextField(
+                  //   controller: _cityController,
+                  //   decoration: buildInputDecoration(
+                  //     context,
+                  //     'Ville',
+                  //     const Icon(LucideIcons.mapPin),
+                  //   ),
+                  // ),
                   const SizedBox(height: 16),
                   TextField(
                     controller: _passwordController,
@@ -176,17 +176,17 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  CheckboxListTile(
-                    title: const Text('Je suis un vendeur professionnel'),
-                    value: _isSeller,
-                    onChanged: (bool? value) {
-                      setState(() {
-                        _isSeller = value ?? false;
-                      });
-                    },
-                    controlAffinity: ListTileControlAffinity.leading,
-                  ),
+                  // const SizedBox(height: 16),
+                  // CheckboxListTile(
+                  //   title: const Text('Je suis un vendeur professionnel'),
+                  //   value: _isSeller,
+                  //   onChanged: (bool? value) {
+                  //     setState(() {
+                  //       _isSeller = value ?? false;
+                  //     });
+                  //   },
+                  //   controlAffinity: ListTileControlAffinity.leading,
+                  // ),
                   const SizedBox(height: 24),
                   SizedBox(
                     width: double.infinity,

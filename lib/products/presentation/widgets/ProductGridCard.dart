@@ -15,6 +15,32 @@ class ProductGridCard extends StatelessWidget {
   final ProductEntity product;
   const ProductGridCard({super.key, required this.product});
 
+  String getStateText(String? state) {
+    switch (state) {
+      case 'new':
+        return 'Neuf';
+      case 'old':
+        return 'Occasion';
+      case 'used':
+        return 'France Aurevoir';
+      default:
+        return 'Neuf';
+    }
+  }
+
+  Color getStateColor(String? state) {
+    switch (state) {
+      case 'new':
+        return Colors.green;
+      case 'old':
+        return Colors.orange;
+      case 'used':
+        return Colors.blue;
+      default:
+        return Colors.green;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -55,7 +81,27 @@ class ProductGridCard extends StatelessWidget {
                             ),
                     ),
                   ),
-                  if (product.discount! > 0)
+                  // State Badge
+                  Positioned(
+                    top: 8,
+                    left: 8,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: getStateColor(product.state),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        getStateText(product.state),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                  if (product.discount != null && product.discount! > 0)
                     Positioned(
                       top: 8,
                       right: 8,
@@ -88,22 +134,21 @@ class ProductGridCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Title and Brand
+                    // Title and Category
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Text(
-                        //   product.brand!.name!.toUpperCase(),
-                        //   style: TextStyle(
-                        //     color: Theme.of(context).primaryColor,
-                        //     fontSize: 10,
-                        //     fontWeight: FontWeight.bold,
-                        //     letterSpacing: 1.1,
-                        //   ),
-                        // ),
+                        Text(
+                          product.category?.name ?? 'Catégorie',
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: 10,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
                         const SizedBox(height: 2),
                         Text(
-                          product.name!,
+                          product.name ?? 'Produit',
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
@@ -115,13 +160,13 @@ class ProductGridCard extends StatelessWidget {
                       ],
                     ),
                     
-                    // Price
+                    // Price and Seller
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        if (product.discount! > 0)
+                        if (product.discount != null && product.discount! > 0)
                           Text(
-                            "${getProductPrice(product.price!, 0)} Fcfa",
+                            "${getProductPrice(double.tryParse(product.price?.toString() ?? '0') ?? 0, 0)} Fcfa",
                             style: const TextStyle(
                               decoration: TextDecoration.lineThrough,
                               color: Colors.grey,
@@ -129,13 +174,55 @@ class ProductGridCard extends StatelessWidget {
                             ),
                           ),
                         Text(
-                          "${getProductPrice(product.price!, product.discount!)} Fcfa",
+                          "${getProductPrice(double.tryParse(product.price?.toString() ?? '0') ?? 0, product.discount!)} Fcfa",
                           style: TextStyle(
                             color: Theme.of(context).primaryColor,
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
+                        const SizedBox(height: 4),
+                        // Seller info
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.store_outlined,
+                              size: 12,
+                              color: Colors.grey[600],
+                            ),
+                            const SizedBox(width: 4),
+                            Expanded(
+                              child: Text(
+                                product.seller?.fullName ?? 'Vendeur',
+                                style: TextStyle(
+                                  color: Colors.grey[600],
+                                  fontSize: 10,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                        if (product.warranty != null) ...[
+                          const SizedBox(height: 2),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.verified_outlined,
+                                size: 12,
+                                color: Colors.green[600],
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                "Garantie: ${product.warranty}",
+                                style: TextStyle(
+                                  color: Colors.green[600],
+                                  fontSize: 10,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ],
                     ),
                   ],

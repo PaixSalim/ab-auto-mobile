@@ -1,9 +1,7 @@
 import 'package:auto/promotions/domain/entity/promoted_poduct_entity.dart';
 import 'package:auto/promotions/presentation/bloc/remote/remote_promoted_product_bloc.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:lottie/lottie.dart';
 
 import 'PromotionCard.dart';
 
@@ -16,6 +14,14 @@ class PromotionsSection extends StatefulWidget {
 
 class _PromotionsSectionState extends State<PromotionsSection> {
   String selectedCategory = "Tout";
+  int _displayedPromotionsCount = 6; // Initial number of promotions to display
+  static const int _incrementCount = 6; // Number of promotions to load each time
+
+  void _loadMorePromotions() {
+    setState(() {
+      _displayedPromotionsCount += _incrementCount;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +35,7 @@ class _PromotionsSectionState extends State<PromotionsSection> {
           List<PromotedProductEntity> promotions = state.promotedProducts!;
 
           List<String> categories =
-              promotions.map((p) => p.category!).toSet().toList();
+              promotions.map((p) => p.product?.category?.name ?? 'Non catégorisé').toSet().toList();
           categories.insert(0, "Tout"); // Ajouter "Tout" au début
 
           // Filtrer les promotions selon la catégorie sélectionnée
@@ -38,9 +44,16 @@ class _PromotionsSectionState extends State<PromotionsSection> {
                   ? promotions
                   : promotions
                       .where(
-                        (promotion) => promotion.category == selectedCategory,
+                        (promotion) => promotion.product?.category?.name == selectedCategory,
                       )
                       .toList();
+
+          // Limiter le nombre de promotions affichées pour la pagination
+          List<PromotedProductEntity> displayedPromotions = 
+              filteredPromotions.take(_displayedPromotionsCount).toList();
+          
+          // Vérifier s'il y a plus de promotions à charger
+          bool hasMorePromotions = _displayedPromotionsCount < filteredPromotions.length;
           return (promotions.isNotEmpty)
               ? Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -62,19 +75,19 @@ class _PromotionsSectionState extends State<PromotionsSection> {
                       borderRadius: BorderRadius.circular(
                         8.0,
                       ), // Définir le rayon du bord
-                      child: CachedNetworkImage(
-                        imageUrl:
-                            'https://auto-cdn.uvatis.com/promos/banner.jpg',
-                        fit: BoxFit.cover,
-                        progressIndicatorBuilder:
-                            (context, url, downloadProgress) => Lottie.asset(
-                              'assets/animations/lottie/loading-image.json',
-                            ),
-                        errorWidget:
-                            (context, url, error) => Lottie.asset(
-                              'assets/animations/lottie/error-network.json',
-                            ),
-                      ),
+                      // child: CachedNetworkImage(
+                      //   imageUrl:
+                      //       'https://auto-cdn.uvatis.com/promos/banner.jpg',
+                      //   fit: BoxFit.cover,
+                      //   progressIndicatorBuilder:
+                      //       (context, url, downloadProgress) => Lottie.asset(
+                      //         'assets/animations/lottie/loading-image.json',
+                      //       ),
+                      //   errorWidget:
+                      //       (context, url, error) => Lottie.asset(
+                      //         'assets/animations/lottie/error-network.json',
+                      //       ),
+                      // ),
                     ),
                   ),
 
@@ -121,26 +134,73 @@ class _PromotionsSectionState extends State<PromotionsSection> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
                     child:
-                        filteredPromotions.isEmpty
+                        displayedPromotions.isEmpty
                             ? const Center(
                               child: Text("Aucune promotion disponible"),
                             )
-                            : GridView.builder(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              gridDelegate:
-                                  const SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 2,
-                                    crossAxisSpacing: 10,
-                                    mainAxisSpacing: 10,
-                                    childAspectRatio: 0.65,
+                            : Column(
+                              children: [
+                                GridView.builder(
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  gridDelegate:
+                                      const SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisCount: 2,
+                                        crossAxisSpacing: 10,
+                                        mainAxisSpacing: 10,
+                                        childAspectRatio: 0.65,
+                                      ),
+                                  itemCount: displayedPromotions.length,
+                                  itemBuilder: (context, index) {
+                                    return PromotionCard(
+                                      promotion: displayedPromotions[index],
+                                    );
+                                  },
+                                ),
+                                
+                                // Bouton "Charger plus"
+                                if (hasMorePromotions) ...[
+                                  const SizedBox(height: 16),
+                                  Center(
+                                    child: ElevatedButton(
+                                      onPressed: _loadMorePromotions,
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Theme.of(context).primaryColor,
+                                        foregroundColor: Colors.white,
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 32,
+                                          vertical: 12,
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(25),
+                                        ),
+                                      ),
+                                      child: const Text(
+                                        "Charger plus",
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                              itemCount: filteredPromotions.length,
-                              itemBuilder: (context, index) {
-                                return PromotionCard(
-                                  promotion: filteredPromotions[index],
-                                );
-                              },
+                                ],
+                                
+                                // Message de fin si toutes les promotions sont affichées
+                                if (!hasMorePromotions && displayedPromotions.isNotEmpty) ...[
+                                  const SizedBox(height: 16),
+                                  Center(
+                                    child: Text(
+                                      "Toutes les promotions sont affichées",
+                                      style: TextStyle(
+                                        color: Colors.grey[600],
+                                        fontSize: 12,
+                                        fontStyle: FontStyle.italic,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ],
                             ),
                   ),
                   const SizedBox(height: 50),

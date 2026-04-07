@@ -80,7 +80,7 @@ class _LoginPageState extends State<LoginPage> {
                     keyboardType: TextInputType.emailAddress,
                     decoration: buildInputDecoration(
                       context,
-                      'Adresse email',
+                      'Téléphone ou email',
                       const Icon(LucideIcons.mail),
                     ),
                   ),
