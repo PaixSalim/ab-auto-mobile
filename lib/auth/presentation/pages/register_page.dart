@@ -40,12 +40,16 @@ class _RegisterPageState extends State<RegisterPage> {
     final fullName = _fullNameController.text.trim();
     final email = _emailController.text.trim();
     final phone = _phoneController.text.trim();
-    final city = _cityController.text.trim();
     final password = _passwordController.text.trim();
     final confirmPassword = _confirmPasswordController.text.trim();
     
-    if (fullName.isEmpty || email.isEmpty || phone.isEmpty || city.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
-      showCustomToast(context, 'Erreur', 'Veuillez remplir tous les champs', false);
+    // Validation des champs obligatoires (comme le web)
+    if (fullName.isEmpty || phone.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
+      showCustomToast(context, 'Erreur', 'Veuillez remplir tous les champs obligatoires', false);
+      return;
+    }
+    if (phone.length < 8) {
+      showCustomToast(context, 'Erreur', 'Le numéro de téléphone doit contenir au moins 8 caractères', false);
       return;
     }
     if (password.length < 8) {
@@ -60,10 +64,9 @@ class _RegisterPageState extends State<RegisterPage> {
     context.read<AuthBloc>().add(
           RegisterRequested(
             fullName: fullName,
-            email: email,
+            email: email.isNotEmpty ? email : null,
             password: password,
             phone: phone,
-            city: city,
             confirmPassword: confirmPassword,
             isSeller: _isSeller,
           ),
@@ -119,22 +122,22 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                   const SizedBox(height: 16),
                   TextField(
+                    controller: _phoneController,
+                    keyboardType: TextInputType.phone,
+                    decoration: buildInputDecoration(
+                      context,
+                      'Téléphone',
+                      const Icon(LucideIcons.phone),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
                     decoration: buildInputDecoration(
                       context,
                       'Adresse email (optionnel)',
                       const Icon(LucideIcons.mail),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: _phoneController,
-                    keyboardType: TextInputType.phone,
-                    decoration: buildInputDecoration(
-                      context,
-                      'Téléphone (obligatoire)',
-                      const Icon(LucideIcons.phone),
                     ),
                   ),
                   // const SizedBox(height: 16),

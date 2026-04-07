@@ -9,10 +9,10 @@ abstract class AuthRepository {
 
   Future<DataState<UserEntity>> register({
     required String fullName,
-    required String email,
+    String? email, // Optionnel comme sur le web
     required String password,
     required String phone,
-    required String city,
+    String? city, // Optionnel pour les clients
     required String confirmPassword,
     required bool isSeller,
   });

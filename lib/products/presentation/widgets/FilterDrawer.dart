@@ -16,6 +16,7 @@ class FilterDrawer extends StatefulWidget {
 
 class _FilterDrawerState extends State<FilterDrawer> {
   Map<String, bool> selectedCategories = {};
+  Map<String, bool> selectedSubCategories = {}; // Sous-catégories sélectionnées
   Map<String, bool> selectedBrands = {};
   double _minPrice = 0;
   double _maxPrice = 50000000;
@@ -62,13 +63,21 @@ class _FilterDrawerState extends State<FilterDrawer> {
                         return CupertinoActivityIndicator();
                       }
                       if (state is RemoteCategoryDone) {
+                        // Filtrer uniquement les catégories principales (sans parentId)
+                        final mainCategories = state.categories!
+                            .where((cat) => cat.parentId == null)
+                            .toList();
+                        
                         return _buildCheckboxCategoryList(
-                          state.categories!,
+                          mainCategories,
                           selectedCategories,
                           (id, value) {
                             setState(() {
                               selectedCategories[id] = value!;
-                              //context.read<RemoteProductsBloc>().add(ShortByCategory(id),);
+                              // Réinitialiser les sous-catégories quand on change de catégorie
+                              if (!value) {
+                                selectedSubCategories.clear();
+                              }
                             });
                           },
                         );
@@ -76,6 +85,52 @@ class _FilterDrawerState extends State<FilterDrawer> {
                       return Text(
                         'Aucune catégorie de tri disponible pour le moment',
                       );
+                    },
+                  ),
+
+                  // Sous-catégories (affichées uniquement si une catégorie est sélectionnée)
+                  BlocBuilder<RemoteCategoryBloc, RemoteCategoryState>(
+                    builder: (context, state) {
+                      if (state is RemoteCategoryDone) {
+                        // Récupérer les catégories sélectionnées
+                        final selectedCategoryIds = selectedCategories.entries
+                            .where((entry) => entry.value)
+                            .map((entry) => entry.key)
+                            .toList();
+
+                        // Trouver les sous-catégories des catégories sélectionnées
+                        final subCategories = <CategoryEntity>[];
+                        for (var categoryId in selectedCategoryIds) {
+                          final category = state.categories?.firstWhere(
+                            (cat) => cat.id == categoryId,
+                            orElse: () => CategoryEntity(),
+                          );
+                          if (category?.subCategories != null) {
+                            subCategories.addAll(category!.subCategories!);
+                          }
+                        }
+
+                        // Afficher la section sous-catégories seulement s'il y en a
+                        if (subCategories.isNotEmpty) {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Divider(),
+                              _buildSectionTitle("Sous-catégories"),
+                              _buildCheckboxCategoryList(
+                                subCategories,
+                                selectedSubCategories,
+                                (id, value) {
+                                  setState(() {
+                                    selectedSubCategories[id] = value!;
+                                  });
+                                },
+                              ),
+                            ],
+                          );
+                        }
+                      }
+                      return SizedBox.shrink();
                     },
                   ),
 
@@ -163,15 +218,26 @@ class _FilterDrawerState extends State<FilterDrawer> {
                               .map((entry) => entry.key)
                               .toList();
 
+                      final selectedSubCategoryIds =
+                          selectedSubCategories.entries
+                              .where((entry) => entry.value)
+                              .map((entry) => entry.key)
+                              .toList();
+
                       final selectedBrandIds =
                           selectedBrands.entries
                               .where((entry) => entry.value)
                               .map((entry) => entry.key)
                               .toList();
 
+                      // Si des sous-catégories sont sélectionnées, les utiliser comme filtre principal
+                      final finalCategoryIds = selectedSubCategoryIds.isNotEmpty
+                          ? selectedSubCategoryIds
+                          : selectedCategoryIds;
+
                       context.read<RemoteProductsBloc>().add(
                         FilterProducts(
-                          selectedCategories: selectedCategoryIds,
+                          selectedCategories: finalCategoryIds,
                           selectedBrands: selectedBrandIds,
                           minPrice: _minPrice,
                           maxPrice: _maxPrice,

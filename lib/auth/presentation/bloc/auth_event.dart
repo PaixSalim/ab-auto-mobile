@@ -12,19 +12,19 @@ class LoginRequested extends AuthEvent {
 
 class RegisterRequested extends AuthEvent {
   final String fullName;
-  final String email;
+  final String? email; // Optionnel comme sur le web
   final String password;
   final String phone;
-  final String city;
+  final String? city; // Optionnel pour les clients
   final String confirmPassword;
   final bool isSeller;
   
   const RegisterRequested({
     required this.fullName,
-    required this.email,
+    this.email,
     required this.password,
     required this.phone,
-    required this.city,
+    this.city,
     required this.confirmPassword,
     required this.isSeller,
   });

@@ -28,24 +28,34 @@ class AuthRemoteDatasource {
 
   Future<Response> register({
     required String fullName,
-    required String email,
+    String? email,
     required String password,
     required String phone,
-    required String city,
+    String? city,
     required String confirmPassword,
     required bool isSeller,
   }) async {
+    final data = {
+      'fullName': fullName,
+      'phone': phone,
+      'password': password,
+      'confirmPassword': confirmPassword,
+      'isSeller': isSeller,
+    };
+    
+    // Ajouter email seulement s'il est fourni
+    if (email != null && email.isNotEmpty) {
+      data['email'] = email;
+    }
+    
+    // Ajouter city seulement si elle est fournie
+    if (city != null && city.isNotEmpty) {
+      data['city'] = city;
+    }
+    
     return await _dio.post(
       '/auth/register',
-      data: {
-        'fullName': fullName,
-        'email': email,
-        'phone': phone,
-        'city': city,
-        'password': password,
-        'confirmPassword': confirmPassword,
-        'isSeller': isSeller,
-      }, // API attend tous ces champs
+      data: data,
       options: Options(
         headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
         followRedirects: false,

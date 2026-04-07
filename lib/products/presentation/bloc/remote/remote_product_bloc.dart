@@ -197,12 +197,61 @@ class RemoteProductsBloc extends Bloc<RemoteProductsEvent, RemoteProductState> {
         final newProducts = responseData['products'] as List<ProductEntity>;
         
         final allProducts = List<ProductEntity>.from(currentState.allProducts!);
-        allProducts.addAll(newProducts);
+        
+        // Éviter les doublons en filtrant par ID
+        final existingIds = allProducts.map((p) => p.id).toSet();
+        final uniqueNewProducts = newProducts.where((p) => !existingIds.contains(p.id)).toList();
+        
+        allProducts.addAll(uniqueNewProducts);
+
+        // Recalculer displayedProducts en appliquant les filtres actuels
+        List<ProductEntity> displayedProducts = List.from(allProducts);
+        
+        // Appliquer les filtres s'ils existent
+        if (currentState.selectedCategories.isNotEmpty) {
+          displayedProducts = displayedProducts.where((p) => 
+            p.category?.id != null && currentState.selectedCategories.contains(p.category?.id)
+          ).toList();
+        }
+        
+        if (currentState.selectedBrands.isNotEmpty) {
+          displayedProducts = displayedProducts.where((p) => 
+            p.brand?.id != null && currentState.selectedBrands.contains(p.brand?.id)
+          ).toList();
+        }
+        
+        if (currentState.minPrice > 0) {
+          displayedProducts = displayedProducts.where((p) => 
+            (p.price ?? 0) >= currentState.minPrice
+          ).toList();
+        }
+        
+        if (currentState.maxPrice < 50000000) {
+          displayedProducts = displayedProducts.where((p) => 
+            (p.price ?? 0) <= currentState.maxPrice
+          ).toList();
+        }
+        
+        if (currentState.isNew) {
+          displayedProducts = displayedProducts.where((p) => p.state == 'new').toList();
+        }
+        
+        if (currentState.isUsed) {
+          displayedProducts = displayedProducts.where((p) => p.state == 'used' || p.state == 'old').toList();
+        }
+        
+        if (currentState.query != null && currentState.query!.isNotEmpty) {
+          final query = currentState.query!.toLowerCase();
+          displayedProducts = displayedProducts.where((p) => 
+            (p.name?.toLowerCase().contains(query) ?? false) ||
+            (p.description?.toLowerCase().contains(query) ?? false)
+          ).toList();
+        }
 
         emit(
           RemoteProductsDone(
             allProducts,
-            allProducts,
+            displayedProducts, // Utiliser displayedProducts filtré au lieu de allProducts
             currentState.query ?? '',
             currentState.selectedCategories,
             currentState.selectedBrands,

@@ -28,17 +28,19 @@ class _ModernProductGalleryState extends State<ModernProductGallery> {
     final medias = widget.product.medias ?? [];
     
     if (medias.isEmpty) {
-      return Container(
-        height: 300,
-        decoration: BoxDecoration(
-          color: Colors.grey[200],
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: const Center(
-          child: Icon(
-            Icons.image_not_supported_outlined,
-            size: 64,
-            color: Colors.grey,
+      return AspectRatio(
+        aspectRatio: 4 / 3,
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.grey[200],
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: const Center(
+            child: Icon(
+              Icons.image_not_supported_outlined,
+              size: 64,
+              color: Colors.grey,
+            ),
           ),
         ),
       );
@@ -49,13 +51,14 @@ class _ModernProductGalleryState extends State<ModernProductGallery> {
         // Main image with discount badge
         Stack(
           children: [
-            Container(
-              height: 300,
-              decoration: BoxDecoration(
-                color: Colors.grey[100],
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: PageView.builder(
+            AspectRatio(
+              aspectRatio: 4 / 3,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: PageView.builder(
                 controller: _pageController,
                 onPageChanged: (index) {
                   setState(() {
@@ -105,6 +108,7 @@ class _ModernProductGalleryState extends State<ModernProductGallery> {
                     ),
                   );
                 },
+              ),
               ),
             ),
             

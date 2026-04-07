@@ -41,10 +41,10 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<DataState<UserEntity>> register({
     required String fullName,
-    required String email,
+    String? email,
     required String password,
     required String phone,
-    required String city,
+    String? city,
     required String confirmPassword,
     required bool isSeller,
   }) async {

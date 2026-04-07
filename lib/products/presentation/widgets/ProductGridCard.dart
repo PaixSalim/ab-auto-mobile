@@ -13,7 +13,13 @@ String resolveMediaUrl(String url) {
 
 class ProductGridCard extends StatelessWidget {
   final ProductEntity product;
-  const ProductGridCard({super.key, required this.product});
+  final int? index; // Index pour créer un tag unique
+  
+  const ProductGridCard({
+    super.key, 
+    required this.product,
+    this.index,
+  });
 
   String getStateText(String? state) {
     switch (state) {
@@ -63,7 +69,9 @@ class ProductGridCard extends StatelessWidget {
                   ClipRRect(
                     borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
                     child: Hero(
-                      tag: 'home-product-${product.id}',
+                      tag: index != null 
+                          ? 'home-product-${product.id}-$index'
+                          : 'home-product-${product.id}',
                       child: product.medias != null && product.medias!.isNotEmpty
                           ? CachedNetworkImage(
                               width: double.infinity,

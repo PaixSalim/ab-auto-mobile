@@ -65,14 +65,17 @@ class ProductBreadcrumb extends StatelessWidget {
           ),
           
           // Category
-          InkWell(
-            onTap: onCatalogTap,
-            child: Text(
-              product.category?.name ?? 'Catégorie',
-              style: const TextStyle(
-                color: Color(0xFF4B5563),
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
+          Flexible(
+            child: InkWell(
+              onTap: onCatalogTap,
+              child: Text(
+                product.category?.name ?? 'Catégorie',
+                style: const TextStyle(
+                  color: Color(0xFF4B5563),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ),
