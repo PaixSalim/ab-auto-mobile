@@ -105,6 +105,7 @@ class _HomePageState extends State<HomePage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               const CarouselWithIndicator(), 
+               CategorySection(),
               const PromotionsSection(),
               const Divider(thickness: 8, color: Color(0xFFEEEEEE)),
               Padding(
@@ -135,23 +136,14 @@ class _HomePageState extends State<HomePage> {
                       print('   - state: ${product.state}');
                     }
                     
-                    // Debug: Filter only approved products (including null validationStatus)
-                    final approvedProducts = allProducts.where((product) => 
-                    product.validationStatus == "approved"
-                    ).toList();
-                    print('✅ DEBUG: Approved products count: ${approvedProducts.length}');
+                    // Display all products without filtering
+                    print('📦 DEBUG: Total products to display: ${allProducts.length}');
                     
-                    // Debug: Print approved products
-                    for (int i = 0; i < approvedProducts.length; i++) {
-                      final product = approvedProducts[i];
-                      print('✅ Approved Product $i: ${product.name} - price: ${product.price}');
-                    }
-                    
-                    approvedProducts.shuffle();
+                    allProducts.shuffle();
                     
                     // Limit the number of products displayed for pagination
-                    final displayedProducts = approvedProducts.take(_displayedProductsCount).toList();
-                    final hasMoreProducts = _displayedProductsCount < approvedProducts.length;
+                    final displayedProducts = allProducts.take(_displayedProductsCount).toList();
+                    final hasMoreProducts = _displayedProductsCount < allProducts.length;
                     print('📊 DEBUG: Displayed products count: ${displayedProducts.length}, hasMore: $hasMoreProducts');
                     
                     return Column(
@@ -223,7 +215,7 @@ class _HomePageState extends State<HomePage> {
                   return const SizedBox();
                 },
               ),
-              CategorySection(),
+             
             ],
           ),
         ),

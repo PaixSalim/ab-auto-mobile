@@ -63,7 +63,7 @@ class ProductGridCard extends StatelessWidget {
                   ClipRRect(
                     borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
                     child: Hero(
-                      tag: 'product-${product.id}',
+                      tag: 'home-product-${product.id}',
                       child: product.medias != null && product.medias!.isNotEmpty
                           ? CachedNetworkImage(
                               width: double.infinity,
