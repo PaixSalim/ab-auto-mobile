@@ -24,3 +24,16 @@ class GetProductByIdUseCase
     return _productRepository.getProductById(params!);
   }
 }
+
+class GetProductsPaginatedUseCase
+    implements Usecase<DataState<Map<String, dynamic>>, Map<String, int>> {
+  final ProductRepository _productRepository;
+  const GetProductsPaginatedUseCase(this._productRepository);
+
+  @override
+  Future<DataState<Map<String, dynamic>>> call({Map<String, int>? params}) {
+    final page = params?['page'] ?? 1;
+    final limit = params?['limit'] ?? 20;
+    return _productRepository.getProductsPaginated(page: page, limit: limit);
+  }
+}

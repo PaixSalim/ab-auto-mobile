@@ -201,9 +201,14 @@ Future<void> initializeDependencies() async {
   sl.registerSingleton<RegisterUseCase>(RegisterUseCase(sl()));
   sl.registerSingleton<LogoutUseCase>(LogoutUseCase(sl()));
   sl.registerSingleton<GetMyOrdersUseCase>(GetMyOrdersUseCase(sl()));
+  sl.registerSingleton<GetProductsPaginatedUseCase>(
+    GetProductsPaginatedUseCase(sl()),
+  );
 
   // 📦 BLoCs
-  sl.registerFactory<RemoteProductsBloc>(() => RemoteProductsBloc(sl()));
+  sl.registerFactory<RemoteProductsBloc>(
+    () => RemoteProductsBloc(sl(), sl()),
+  );
   sl.registerFactory<RemoteCategoryBloc>(() => RemoteCategoryBloc(sl()));
   sl.registerFactory<RemoteBannerBloc>(() => RemoteBannerBloc(sl()));
   sl.registerFactory<RemotePromotedProductBloc>(

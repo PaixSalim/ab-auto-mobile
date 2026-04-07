@@ -8,26 +8,40 @@ import 'remote_product_event.dart';
 
 class RemoteProductsBloc extends Bloc<RemoteProductsEvent, RemoteProductState> {
   final GetProductUseCase _getProductUseCase;
+  final GetProductsPaginatedUseCase _getProductsPaginatedUseCase;
+  int _currentPage = 1;
+  final int _limit = 20;
 
-  RemoteProductsBloc(this._getProductUseCase)
-    : super(const RemoteProductsLoading()) {
+  RemoteProductsBloc(
+    this._getProductUseCase,
+    this._getProductsPaginatedUseCase,
+  ) : super(const RemoteProductsLoading()) {
     on<GetProducts>(onGetProducts);
     on<SearchProducts>(_onSearchProducts);
     on<ResetProductFilter>(_onResetProductFilter);
     on<FilterProducts>(_onFilterProducts);
     on<SortByAlphabet>(_onSortByAlphabet);
+    on<LoadMoreProducts>(_onLoadMoreProducts);
+    on<RefreshProducts>(_onRefreshProducts);
   }
 
   Future<void> onGetProducts(
     GetProducts event,
     Emitter<RemoteProductState> emit,
   ) async {
-    final dataState = await _getProductUseCase();
-    if (dataState is DataSuccess && dataState.data!.isNotEmpty) {
+    _currentPage = 1;
+    final dataState = await _getProductsPaginatedUseCase(
+      params: {'page': _currentPage, 'limit': _limit},
+    );
+    
+    if (dataState is DataSuccess && dataState.data != null) {
+      final responseData = dataState.data!;
+      final products = responseData['products'] as List<ProductEntity>;
+      
       emit(
         RemoteProductsDone(
-          dataState.data!,
-          dataState.data!,
+          products,
+          products,
           '',
           [],
           [],
@@ -35,6 +49,9 @@ class RemoteProductsBloc extends Bloc<RemoteProductsEvent, RemoteProductState> {
           50000000,
           false,
           false,
+          currentPage: responseData['page'] ?? 1,
+          totalPages: responseData['totalPages'] ?? 1,
+          hasNextPage: responseData['hasNextPage'] ?? false,
         ),
       );
     }
@@ -154,6 +171,91 @@ class RemoteProductsBloc extends Bloc<RemoteProductsEvent, RemoteProductState> {
       );
 
       emit(currentState.copyWith(displayedProducts: sortedProducts));
+    }
+  }
+
+  Future<void> _onLoadMoreProducts(
+    LoadMoreProducts event,
+    Emitter<RemoteProductState> emit,
+  ) async {
+    if (state is RemoteProductsDone) {
+      final currentState = state as RemoteProductsDone;
+      
+      if (!currentState.hasNextPage || currentState.isLoadingMore) {
+        return;
+      }
+
+      emit(currentState.copyWith(isLoadingMore: true));
+
+      _currentPage++;
+      final dataState = await _getProductsPaginatedUseCase(
+        params: {'page': _currentPage, 'limit': _limit},
+      );
+
+      if (dataState is DataSuccess && dataState.data != null) {
+        final responseData = dataState.data!;
+        final newProducts = responseData['products'] as List<ProductEntity>;
+        
+        final allProducts = List<ProductEntity>.from(currentState.allProducts!);
+        allProducts.addAll(newProducts);
+
+        emit(
+          RemoteProductsDone(
+            allProducts,
+            allProducts,
+            currentState.query ?? '',
+            currentState.selectedCategories,
+            currentState.selectedBrands,
+            currentState.minPrice,
+            currentState.maxPrice,
+            currentState.isNew,
+            currentState.isUsed,
+            currentPage: responseData['page'] ?? _currentPage,
+            totalPages: responseData['totalPages'] ?? currentState.totalPages,
+            hasNextPage: responseData['hasNextPage'] ?? false,
+            isLoadingMore: false,
+          ),
+        );
+      } else {
+        _currentPage--;
+        emit(currentState.copyWith(isLoadingMore: false));
+      }
+    }
+  }
+
+  Future<void> _onRefreshProducts(
+    RefreshProducts event,
+    Emitter<RemoteProductState> emit,
+  ) async {
+    _currentPage = 1;
+    final dataState = await _getProductsPaginatedUseCase(
+      params: {'page': _currentPage, 'limit': _limit},
+    );
+    
+    if (dataState is DataSuccess && dataState.data != null) {
+      final responseData = dataState.data!;
+      final products = responseData['products'] as List<ProductEntity>;
+      
+      emit(
+        RemoteProductsDone(
+          products,
+          products,
+          '',
+          [],
+          [],
+          0,
+          50000000,
+          false,
+          false,
+          currentPage: responseData['page'] ?? 1,
+          totalPages: responseData['totalPages'] ?? 1,
+          hasNextPage: responseData['hasNextPage'] ?? false,
+        ),
+      );
+    }
+
+    if (dataState is DataFailed) {
+      emit(RemoteProductsError(dataState.error!));
     }
   }
 }

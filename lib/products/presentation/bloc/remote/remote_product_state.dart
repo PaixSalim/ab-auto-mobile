@@ -32,6 +32,10 @@ class RemoteProductsDone extends RemoteProductState {
   final double maxPrice;
   final bool isNew;
   final bool isUsed;
+  final int currentPage;
+  final int totalPages;
+  final bool hasNextPage;
+  final bool isLoadingMore;
 
   const RemoteProductsDone(
     List<ProductEntity> allProduct,
@@ -42,8 +46,12 @@ class RemoteProductsDone extends RemoteProductState {
     this.minPrice,
     this.maxPrice,
     this.isNew,
-    this.isUsed,
-  ) : super(
+    this.isUsed, {
+    this.currentPage = 1,
+    this.totalPages = 1,
+    this.hasNextPage = false,
+    this.isLoadingMore = false,
+  }) : super(
         allProducts: allProduct,
         displayedProducts: displayedProducts,
         query: query,
@@ -59,6 +67,10 @@ class RemoteProductsDone extends RemoteProductState {
     double? maxPrice,
     bool? isNew,
     bool? isUsed,
+    int? currentPage,
+    int? totalPages,
+    bool? hasNextPage,
+    bool? isLoadingMore,
   }) {
     return RemoteProductsDone(
       allProduct ?? this.allProducts!,
@@ -70,6 +82,10 @@ class RemoteProductsDone extends RemoteProductState {
       maxPrice ?? this.maxPrice,
       isNew ?? this.isNew,
       isUsed ?? this.isUsed,
+      currentPage: currentPage ?? this.currentPage,
+      totalPages: totalPages ?? this.totalPages,
+      hasNextPage: hasNextPage ?? this.hasNextPage,
+      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
     );
   }
 }

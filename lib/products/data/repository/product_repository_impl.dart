@@ -87,6 +87,87 @@ class ProductRepositoryImpl implements ProductRepository {
   }
 
   @override
+  Future<DataState<Map<String, dynamic>>> getProductsPaginated({
+    int page = 1,
+    int limit = 20,
+  }) async {
+    if (await _networkInfo.isConnected) {
+      try {
+        final response = await _dio.get(
+          '/products',
+          queryParameters: {'page': page, 'limit': limit},
+        );
+
+        if (response.statusCode == HttpStatus.ok) {
+          final responseData = response.data as Map<String, dynamic>;
+          final productModels = responseData['data'] as List<dynamic>;
+          
+          print('Received ${productModels.length} products from API (page $page)');
+          
+          final products = <ProductEntity>[];
+          
+          for (int i = 0; i < productModels.length; i++) {
+            try {
+              final json = productModels[i] as Map<String, dynamic>;
+              final model = ProductModel.fromJson(json);
+              
+              final entity = ProductEntity(
+                id: model.id,
+                name: model.name ?? '',
+                slug: model.slug ?? '',
+                cta: model.cta ?? '',
+                warranty: model.warranty ?? '',
+                state: model.state ?? '',
+                description: model.description ?? '',
+                price: model.price,
+                discount: model.discount,
+                category: model.category,
+                features: model.features,
+                brand: model.brand,
+                medias: model.medias,
+                seller: model.seller,
+                sellerId: model.sellerId,
+              );
+              products.add(entity);
+            } catch (e) {
+              print('Error converting product $i: $e');
+            }
+          }
+          
+          // Retourner les produits avec les métadonnées de pagination
+          return DataSuccess({
+            'products': products,
+            'total': responseData['total'],
+            'page': responseData['page'],
+            'limit': responseData['limit'],
+            'totalPages': responseData['totalPages'],
+            'hasNextPage': responseData['hasNextPage'],
+            'hasPreviousPage': responseData['hasPreviousPage'],
+          });
+        } else {
+          return DataFailed(
+            DioException(
+              error: response.statusMessage,
+              type: DioExceptionType.badResponse,
+              requestOptions: response.requestOptions,
+            ),
+          );
+        }
+      } on DioException catch (e) {
+        return DataFailed(e);
+      }
+    } else {
+      return DataFailed(
+        DioException(
+          error: 'No internet connection',
+          type: DioExceptionType.unknown,
+          requestOptions: RequestOptions(path: '/products'),
+        ),
+      );
+    }
+  }
+
+  @override
   Future<DataState<ProductEntity>> getProductById(String id) async {
     if (await _networkInfo.isConnected) {
       try {

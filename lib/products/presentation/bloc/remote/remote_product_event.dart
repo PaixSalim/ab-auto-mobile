@@ -37,3 +37,11 @@ class SortByAlphabet extends RemoteProductsEvent {
 class ResetProductFilter extends RemoteProductsEvent {
   const ResetProductFilter();
 }
+
+class LoadMoreProducts extends RemoteProductsEvent {
+  const LoadMoreProducts();
+}
+
+class RefreshProducts extends RemoteProductsEvent {
+  const RefreshProducts();
+}
