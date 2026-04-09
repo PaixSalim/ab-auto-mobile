@@ -11,8 +11,8 @@ class AuthRemoteDatasource {
     print('🔐 LOGIN ATTEMPT - uid: $uid, password: ${password.length > 0 ? "***" : "empty"}');
     
     final response = await _dio.post(
-      '/auth/login',
-      data: {'uid': uid, 'password': password}, // API attend "uid"
+      '/auth/mobile/login',
+      data: {'uid': uid, 'password': password},
       options: Options(
         headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
         followRedirects: false,
@@ -54,7 +54,7 @@ class AuthRemoteDatasource {
     }
     
     return await _dio.post(
-      '/auth/register',
+      '/auth/mobile/register',
       data: data,
       options: Options(
         headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},

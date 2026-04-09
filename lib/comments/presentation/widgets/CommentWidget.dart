@@ -37,7 +37,14 @@ class _ProductCommentsSectionState extends State<ProductCommentsSection> {
     super.initState();
     _commentsBloc = GetIt.instance<CommentBloc>();
     _commentsBloc.add(FetchComments(widget.productId));
-    _nameController.text = LocalStorageService.userFullName ?? '';
+    _loadUserName();
+  }
+
+  void _loadUserName() {
+    // Load username from local storage if logged in
+    if (LocalStorageService.isLoggedIn) {
+      _nameController.text = LocalStorageService.userFullName ?? '';
+    }
   }
 
   @override
@@ -130,14 +137,22 @@ class _ProductCommentsSectionState extends State<ProductCommentsSection> {
                               child: const Text('Annuler'),
                             ),
                             ElevatedButton(
-                              onPressed: () {
+                              onPressed: () async {
                                 Navigator.pop(ctx);
-                                Navigator.push(
+                                // Navigate to login with return route
+                                final result = await Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (_) => const LoginPage(),
+                                    builder: (_) => const LoginPage(returnRoute: 'comments'),
                                   ),
                                 );
+                                // If login was successful, refresh username and expand form
+                                if (result == true) {
+                                  _loadUserName();
+                                  setState(() {
+                                    _isFormExpanded = true;
+                                  });
+                                }
                               },
                               child: const Text('Se connecter'),
                             ),

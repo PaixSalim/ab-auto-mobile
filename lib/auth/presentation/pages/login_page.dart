@@ -8,7 +8,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+  final String? returnRoute;
+  
+  const LoginPage({super.key, this.returnRoute});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -47,10 +49,15 @@ class _LoginPageState extends State<LoginPage> {
             showCustomToast(context, 'Erreur', state.message, false);
           }
           if (state is AuthAuthenticated) {
-            Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: (_) => const MainNavigation()),
-              (_) => false,
-            );
+            // If there's a return route, go back instead of navigating to main
+            if (widget.returnRoute == 'comments' && Navigator.canPop(context)) {
+              Navigator.of(context).pop(true); // Return true to indicate successful login
+            } else {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (_) => const MainNavigation()),
+                (_) => false,
+              );
+            }
           }
         },
         builder: (context, state) {

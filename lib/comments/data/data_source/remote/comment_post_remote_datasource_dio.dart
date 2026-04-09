@@ -11,6 +11,6 @@ abstract class CommentPostRemoteDatasourceDio {
   factory CommentPostRemoteDatasourceDio(Dio dio) =
       _CommentPostRemoteDatasourceDio;
 
-  @POST('/comment')
+  @POST('/comments')
   Future<HttpResponse<CommentModel>> postComment(@Body() CommentPostModel body);
 }

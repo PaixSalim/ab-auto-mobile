@@ -96,6 +96,18 @@ Future<void> initializeDependencies() async {
   );
   final dio = Dio(BaseOptions(baseUrl: localAPIBaseUrl));
   dio.interceptors.add(CookieManager(cookieJar));
+  // Add authentication token to requests
+  dio.interceptors.add(
+    InterceptorsWrapper(
+      onRequest: (options, handler) {
+        // Add token from local storage if available
+        if (LocalStorageService.isLoggedIn && LocalStorageService.token != null) {
+          options.headers['Authorization'] = 'Bearer ${LocalStorageService.token}';
+        }
+        return handler.next(options);
+      },
+    ),
+  );
   dio.interceptors.add(
     InterceptorsWrapper(
       onRequest: (options, handler) {

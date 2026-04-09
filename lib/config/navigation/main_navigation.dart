@@ -22,6 +22,41 @@ class MainNavigation extends StatefulWidget {
 class _MainNavigationState extends State<MainNavigation> {
   int _currentIndex = 0;
 
+  void _showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Row(
+            children: [
+              Icon(Icons.logout, color: Colors.red),
+              SizedBox(width: 8),
+              Text('Déconnexion'),
+            ],
+          ),
+          content: const Text('Êtes-vous sûr de vouloir vous déconnecter ?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Annuler'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                context.read<AuthBloc>().add(const LogoutRequested());
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Se déconnecter'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   // Widget _buildOrdersTab() {
   //   if (LocalStorageService.isLoggedIn) {
   //     return BlocProvider(
@@ -41,6 +76,16 @@ class _MainNavigationState extends State<MainNavigation> {
         if (state is AuthAuthenticated || state is AuthInitial) {
           setState(() {});
         }
+        // Show success message after logout
+        if (state is AuthInitial) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Vous avez été déconnecté avec succès'),
+              backgroundColor: Colors.grey,
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
       },
       child: Scaffold(
         appBar: AppBar(
@@ -53,31 +98,49 @@ class _MainNavigationState extends State<MainNavigation> {
               builder: (context, state) {
                 if (state is AuthAuthenticated) {
                   return PopupMenuButton<String>(
-                    icon: const Icon(Icons.account_circle),
+                    icon: const Icon(Icons.account_circle, size: 28),
                     onSelected: (value) {
                       if (value == 'logout') {
-                        context.read<AuthBloc>().add(const LogoutRequested());
+                        _showLogoutDialog(context);
                       }
                     },
                     itemBuilder: (_) => [
                       PopupMenuItem(
                         enabled: false,
-                        child: Text(
-                          state.user.fullName,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              state.user.fullName,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                            Text(
+                              state.user.email,
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      // const PopupMenuDivider(),
-                      // const PopupMenuItem(
-                      //   value: 'logout',
-                      //   child: Row(
-                      //     children: [
-                      //       Icon(Icons.logout, size: 18),
-                      //       SizedBox(width: 8),
-                      //       Text('Se déconnecter'),
-                      //     ],
-                      //   ),
-                      // ),
+                      const PopupMenuDivider(),
+                      const PopupMenuItem(
+                        value: 'logout',
+                        child: Row(
+                          children: [
+                            Icon(Icons.logout, size: 20, color: Colors.red),
+                            SizedBox(width: 8),
+                            Text(
+                              'Se déconnecter',
+                              style: TextStyle(color: Colors.red),
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
                   );
                 }

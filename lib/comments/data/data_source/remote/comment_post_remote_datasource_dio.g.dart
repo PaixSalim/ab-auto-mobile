@@ -33,7 +33,7 @@ class _CommentPostRemoteDatasourceDio
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/comment',
+            '/comments',
             queryParameters: queryParameters,
             data: _data,
           )

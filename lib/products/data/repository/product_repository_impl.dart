@@ -93,23 +93,32 @@ class ProductRepositoryImpl implements ProductRepository {
   }) async {
     if (await _networkInfo.isConnected) {
       try {
+        print('📡 Fetching products from /products?page=$page&limit=$limit');
         final response = await _dio.get(
           '/products',
           queryParameters: {'page': page, 'limit': limit},
         );
 
+        print('📡 Response status: ${response.statusCode}');
+        print('📡 Response data: ${response.data}');
+
         if (response.statusCode == HttpStatus.ok) {
           final responseData = response.data as Map<String, dynamic>;
+          print('📡 Response keys: ${responseData.keys.toList()}');
+          
           final productModels = responseData['data'] as List<dynamic>;
           
-          print('Received ${productModels.length} products from API (page $page)');
+          print('✅ Received ${productModels.length} products from API (page $page)');
           
           final products = <ProductEntity>[];
           
           for (int i = 0; i < productModels.length; i++) {
             try {
               final json = productModels[i] as Map<String, dynamic>;
+              print('📦 Product $i JSON: ${json['name']} - validationStatus: ${json['validationStatus']}');
+              
               final model = ProductModel.fromJson(json);
+              print('📦 Product $i Model: ${model.name} - validationStatus: ${model.validationStatus}');
               
               final entity = ProductEntity(
                 id: model.id,
@@ -127,12 +136,17 @@ class ProductRepositoryImpl implements ProductRepository {
                 medias: model.medias,
                 seller: model.seller,
                 sellerId: model.sellerId,
+                validationStatus: model.validationStatus,
               );
+              print('✅ ProductEntity created: ${entity.name}');
               products.add(entity);
             } catch (e) {
-              print('Error converting product $i: $e');
+              print('❌ Error converting product $i: $e');
+              print('❌ Product data: ${productModels[i]}');
             }
           }
+          
+          print('✅ Total converted products: ${products.length}');
           
           // Retourner les produits avec les métadonnées de pagination
           return DataSuccess({
@@ -154,6 +168,8 @@ class ProductRepositoryImpl implements ProductRepository {
           );
         }
       } on DioException catch (e) {
+        print('❌ DioException: ${e.message}');
+        print('❌ Error details: ${e.error}');
         return DataFailed(e);
       }
     } else {

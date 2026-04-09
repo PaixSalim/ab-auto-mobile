@@ -26,9 +26,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     if (LocalStorageService.isLoggedIn) {
       print('🚀 AUTH BLOC - User is logged in, restoring session');
       emit(AuthAuthenticated(UserEntity(
-        token: 'session',
+        token: LocalStorageService.token ?? 'session',
         fullName: LocalStorageService.userFullName ?? '',
         email: LocalStorageService.userEmail ?? '',
+        phone: LocalStorageService.userPhone ?? '',
         role: 'customer',
       )));
     } else {

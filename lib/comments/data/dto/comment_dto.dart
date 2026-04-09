@@ -16,10 +16,14 @@ class CommentDto {
   static getToModel(CommentEntity entity) {
     return CommentModel(
       id: entity.id,
+      userId: entity.userId,
       user: entity.user,
       comment: entity.comment,
       productId: entity.productId,
       createdAt: entity.createdAt,
+      isActive: entity.isActive,
+      parentId: entity.parentId,
+      author: entity.author,
     );
   }
 }
