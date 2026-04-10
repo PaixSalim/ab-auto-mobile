@@ -2,18 +2,22 @@ import 'dart:io';
 import 'package:auto/banners/data/models/banner_converter.dart';
 import 'package:auto/chatbot/data/models/chat_message_converter.dart';
 import 'package:auto/products/data/models/product_converter.dart';
+import 'package:auto/notifications/data/models/notification_model.dart';
 
 import 'brands/data/models/brand_converter.dart';
 import 'categories/data/models/category_converter.dart';
 import 'objectbox.g.dart';
 
 class ObjectBoxService {
-  static late final Store _store;
+  static bool _initialized = false;
+  static Store? _storeInstance;
 
   static Future<void> init() async {
+    if (_initialized) return;
     try {
       print('Attempting to open ObjectBox store...');
-      _store = await openStore();
+      _storeInstance = await openStore();
+      _initialized = true;
       print('ObjectBox store opened successfully');
     } catch (e) {
       print('Error opening store: $e');
@@ -48,7 +52,8 @@ class ObjectBoxService {
           
           // Try to open again with new schema
           print('Attempting to open store with new schema...');
-          _store = await openStore();
+          _storeInstance = await openStore();
+          _initialized = true;
           print('Store opened with new schema successfully');
         } catch (deleteError) {
           print('Error during database deletion/recreation: $deleteError');
@@ -62,7 +67,8 @@ class ObjectBoxService {
   }
 
   static Store get store {
-    return _store;
+    if (_storeInstance == null) throw Exception('ObjectBox store not initialized');
+    return _storeInstance!;
   }
 
   Box<T> box<T>() {
@@ -71,6 +77,7 @@ class ObjectBoxService {
     if (T == CategoryObjectBox) return store.box<CategoryObjectBox>() as Box<T>;
     if (T == BannerObjectBox) return store.box<BannerObjectBox>() as Box<T>;
     if (T == ChatObjectBox) return store.box<ChatObjectBox>() as Box<T>;
+    if (T == NotificationObjectBox) return store.box<NotificationObjectBox>() as Box<T>;
     throw Exception('Unsupported box type: $T');
   }
 }

@@ -12,7 +12,7 @@ part of 'brand_remote_datasource_dio.dart';
 
 class _BrandRemoteDatasourceDio implements BrandRemoteDatasourceDio {
   _BrandRemoteDatasourceDio(this._dio, {this.baseUrl, this.errorLogger}) {
-    baseUrl ??= localAPIBaseUrl;
+    baseUrl ??= 'http://192.168.11.104:3334/api/v1';
   }
 
   final Dio _dio;

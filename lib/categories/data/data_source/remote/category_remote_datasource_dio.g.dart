@@ -12,7 +12,7 @@ part of 'category_remote_datasource_dio.dart';
 
 class _CategoryRemoteDataSourceDio implements CategoryRemoteDataSourceDio {
   _CategoryRemoteDataSourceDio(this._dio, {this.baseUrl, this.errorLogger}) {
-    baseUrl ??= localAPIBaseUrl;
+    baseUrl ??= 'http://192.168.11.104:3334/api/v1';
   }
 
   final Dio _dio;

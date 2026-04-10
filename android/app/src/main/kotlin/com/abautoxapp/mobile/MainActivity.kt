@@ -1,4 +1,4 @@
-package com.uvatis.auto
+package com.abautoxapp.mobile
 
 import io.flutter.embedding.android.FlutterActivity
 

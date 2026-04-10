@@ -8,7 +8,7 @@
 PRODUCT_NAME = auto
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.uvatis.auto
+PRODUCT_BUNDLE_IDENTIFIER = com.abautoxapp.mobileios
 
 // The copyright displayed in application information
 PRODUCT_COPYRIGHT = Copyright © 2025 com.uvatis. All rights reserved.

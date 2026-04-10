@@ -12,7 +12,7 @@ part of 'comment_remote_datasource_dio.dart';
 
 class _CommentRemoteDatasourceDio implements CommentRemoteDatasourceDio {
   _CommentRemoteDatasourceDio(this._dio, {this.baseUrl, this.errorLogger}) {
-    baseUrl ??= localAPIBaseUrl;
+    baseUrl ??= 'http://192.168.11.104:3334/api/v1';
   }
 
   final Dio _dio;
@@ -22,7 +22,9 @@ class _CommentRemoteDatasourceDio implements CommentRemoteDatasourceDio {
   final ParseErrorLogger? errorLogger;
 
   @override
-  Future<HttpResponse<List<CommentModel>>> getComments({String? productId}) async {
+  Future<HttpResponse<List<CommentModel>>> getComments({
+    String? productId,
+  }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{r'productId': productId};
     queryParameters.removeWhere((k, v) => v == null);

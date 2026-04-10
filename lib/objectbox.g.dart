@@ -18,6 +18,7 @@ import 'banners/data/models/banner_converter.dart';
 import 'brands/data/models/brand_converter.dart';
 import 'categories/data/models/category_converter.dart';
 import 'chatbot/data/models/chat_message_converter.dart';
+import 'notifications/data/models/notification_model.dart';
 import 'products/data/models/media_converter.dart';
 import 'products/data/models/product_converter.dart';
 
@@ -330,6 +331,58 @@ final _entities = <obx_int.ModelEntity>[
     relations: <obx_int.ModelRelation>[],
     backlinks: <obx_int.ModelBacklink>[],
   ),
+  obx_int.ModelEntity(
+    id: const obx_int.IdUid(7, 2183842583382835785),
+    name: 'NotificationObjectBox',
+    lastPropertyId: const obx_int.IdUid(7, 1526500761333533194),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 3660932265052852859),
+        name: 'id',
+        type: 6,
+        flags: 1,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 8931288054870090),
+        name: 'title',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 7430638736977842597),
+        name: 'body',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(4, 6157552373074252062),
+        name: 'type',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(5, 3542033952437634230),
+        name: 'data',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(6, 5085156783930320423),
+        name: 'receivedAt',
+        type: 10,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(7, 1526500761333533194),
+        name: 'isRead',
+        type: 1,
+        flags: 0,
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
 ];
 
 /// Shortcut for [obx.Store.new] that passes [getObjectBoxModel] and for Flutter
@@ -375,7 +428,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
     // Typically, this is done with `dart run build_runner build`.
     generatorVersion: obx_int.GeneratorVersion.v2025_12_16,
     entities: _entities,
-    lastEntityId: const obx_int.IdUid(6, 7055027686109035790),
+    lastEntityId: const obx_int.IdUid(7, 2183842583382835785),
     lastIndexId: const obx_int.IdUid(0, 0),
     lastRelationId: const obx_int.IdUid(0, 0),
     lastSequenceId: const obx_int.IdUid(0, 0),
@@ -842,6 +895,86 @@ obx_int.ModelDefinition getObjectBoxModel() {
         return object;
       },
     ),
+    NotificationObjectBox: obx_int.EntityDefinition<NotificationObjectBox>(
+      model: _entities[6],
+      toOneRelations: (NotificationObjectBox object) => [],
+      toManyRelations: (NotificationObjectBox object) => {},
+      getId: (NotificationObjectBox object) => object.id,
+      setId: (NotificationObjectBox object, int id) {
+        object.id = id;
+      },
+      objectToFB: (NotificationObjectBox object, fb.Builder fbb) {
+        final titleOffset = object.title == null
+            ? null
+            : fbb.writeString(object.title!);
+        final bodyOffset = object.body == null
+            ? null
+            : fbb.writeString(object.body!);
+        final typeOffset = object.type == null
+            ? null
+            : fbb.writeString(object.type!);
+        final dataOffset = object.data == null
+            ? null
+            : fbb.writeString(object.data!);
+        fbb.startTable(8);
+        fbb.addInt64(0, object.id);
+        fbb.addOffset(1, titleOffset);
+        fbb.addOffset(2, bodyOffset);
+        fbb.addOffset(3, typeOffset);
+        fbb.addOffset(4, dataOffset);
+        fbb.addInt64(5, object.receivedAt?.millisecondsSinceEpoch);
+        fbb.addBool(6, object.isRead);
+        fbb.finish(fbb.endTable());
+        return object.id;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final receivedAtValue = const fb.Int64Reader().vTableGetNullable(
+          buffer,
+          rootOffset,
+          14,
+        );
+        final idParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          4,
+          0,
+        );
+        final titleParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 6);
+        final bodyParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 8);
+        final typeParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 10);
+        final dataParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 12);
+        final receivedAtParam = receivedAtValue == null
+            ? null
+            : DateTime.fromMillisecondsSinceEpoch(receivedAtValue);
+        final isReadParam = const fb.BoolReader().vTableGet(
+          buffer,
+          rootOffset,
+          16,
+          false,
+        );
+        final object = NotificationObjectBox(
+          id: idParam,
+          title: titleParam,
+          body: bodyParam,
+          type: typeParam,
+          data: dataParam,
+          receivedAt: receivedAtParam,
+          isRead: isReadParam,
+        );
+
+        return object;
+      },
+    ),
   };
 
   return obx_int.ModelDefinition(model, bindings);
@@ -1067,5 +1200,43 @@ class ChatObjectBox_ {
   /// See [ChatObjectBox.externalId].
   static final externalId = obx.QueryStringProperty<ChatObjectBox>(
     _entities[5].properties[4],
+  );
+}
+
+/// [NotificationObjectBox] entity fields to define ObjectBox queries.
+class NotificationObjectBox_ {
+  /// See [NotificationObjectBox.id].
+  static final id = obx.QueryIntegerProperty<NotificationObjectBox>(
+    _entities[6].properties[0],
+  );
+
+  /// See [NotificationObjectBox.title].
+  static final title = obx.QueryStringProperty<NotificationObjectBox>(
+    _entities[6].properties[1],
+  );
+
+  /// See [NotificationObjectBox.body].
+  static final body = obx.QueryStringProperty<NotificationObjectBox>(
+    _entities[6].properties[2],
+  );
+
+  /// See [NotificationObjectBox.type].
+  static final type = obx.QueryStringProperty<NotificationObjectBox>(
+    _entities[6].properties[3],
+  );
+
+  /// See [NotificationObjectBox.data].
+  static final data = obx.QueryStringProperty<NotificationObjectBox>(
+    _entities[6].properties[4],
+  );
+
+  /// See [NotificationObjectBox.receivedAt].
+  static final receivedAt = obx.QueryDateProperty<NotificationObjectBox>(
+    _entities[6].properties[5],
+  );
+
+  /// See [NotificationObjectBox.isRead].
+  static final isRead = obx.QueryBooleanProperty<NotificationObjectBox>(
+    _entities[6].properties[6],
   );
 }

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "703006298560",
+    "project_id": "abautoxproject",
+    "storage_bucket": "abautoxproject.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:703006298560:android:2e58839783b555985db825",
+        "android_client_info": {
+          "package_name": "com.abautoxapp.mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB_aUqSatJIIef4EGdFiPyyFLO6l8ocADY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

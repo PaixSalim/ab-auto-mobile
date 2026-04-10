@@ -66,7 +66,7 @@ class ProductInfoModel extends ProductInfo {
       validationStatus: json['validationStatus'] ?? "",
       rejectionReason: json['rejectionReason'],
       discount: json['discount']?.toString() ?? "0",
-      features: json['features'],
+      features: json['features'] is List ? (json['features'] as List).join(', ') : json['features']?.toString(),
       categoryId: json['categoryId']?.toString() ?? "",
       brandId: json['brandId']?.toString() ?? "",
       subCategoryId: json['subCategoryId']?.toString() ?? "",

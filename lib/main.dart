@@ -8,6 +8,10 @@ import 'package:auto/chatbot/presentation/widgets/SupportAssistant.dart';
 import 'package:auto/comments/presentation/bloc/comment_bloc.dart';
 import 'package:auto/config/navigation/main_navigation.dart';
 
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'firebase_options.dart';
+
 import 'package:auto/config/theme/app.theme.dart';
 import 'package:auto/products/presentation/bloc/remote/order/remote_order_bloc.dart';
 import 'package:auto/products/presentation/bloc/remote/remote_product_bloc.dart';
@@ -15,6 +19,7 @@ import 'package:auto/products/presentation/bloc/remote/remote_product_event.dart
 
 import 'package:auto/promotions/presentation/bloc/remote/remote_promoted_product_bloc.dart';
 import 'package:auto/promotions/presentation/widgets/PromotionsSection.dart';
+import 'package:auto/notifications/data/notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -27,8 +32,55 @@ import 'package:flutter/cupertino.dart';
 import 'core/resources/local_storage_service.dart';
 import 'injection_container.dart';
 
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  print("Handling a background message: ${message.messageId}");
+}
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  try {
+    if (Firebase.apps.isEmpty) {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+    }
+    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+    
+    // Demander les permissions de notification
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+    await messaging.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+
+    // Autoriser spécifiquement l'affichage pour iOS (et certaines surcouches Android) au premier plan
+    await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+      alert: true, // Required to display a heads up notification
+      badge: true,
+      sound: true,
+    );
+    
+    // Souscrire au topic de promotions
+    await messaging.subscribeToTopic('promotions_topic');
+    print("Inscrit avec succès au topic des promotions");
+
+    // Initialiser les notifications locales
+    await NotificationService.init();
+
+    // Écoute locale pour afficher la notif en mode premier plan
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print('🔥 INFO: Notif reçue en mode ouvert: ${message.notification?.title}');
+      NotificationService.showNotification(message);
+    });
+    
+  } catch (e) {
+    print("Erreur d'initialisation Firebase (vérifiez google-services.json): $e");
+  }
+
   await LocalStorageService.init();
   await ObjectBoxService.init();
 

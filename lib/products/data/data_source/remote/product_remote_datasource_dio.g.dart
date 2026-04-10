@@ -12,7 +12,7 @@ part of 'product_remote_datasource_dio.dart';
 
 class _ProductRemoteDatasourceDio implements ProductRemoteDatasourceDio {
   _ProductRemoteDatasourceDio(this._dio, {this.baseUrl, this.errorLogger}) {
-    baseUrl ??= localAPIBaseUrl;
+    baseUrl ??= 'http://192.168.11.104:3334/api/v1';
   }
 
   final Dio _dio;
@@ -64,16 +64,16 @@ class _ProductRemoteDatasourceDio implements ProductRemoteDatasourceDio {
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/products/$id',
+            '/products/${id}',
             queryParameters: queryParameters,
             data: _data,
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
-    final _result = await _dio.fetch<dynamic>(_options);
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
     late ProductModel _value;
     try {
-      _value = ProductModel.fromJson(_result.data! as Map<String, dynamic>);
+      _value = ProductModel.fromJson(_result.data!);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options, response: _result);
       rethrow;

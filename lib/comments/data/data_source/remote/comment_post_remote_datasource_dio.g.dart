@@ -13,7 +13,7 @@ part of 'comment_post_remote_datasource_dio.dart';
 class _CommentPostRemoteDatasourceDio
     implements CommentPostRemoteDatasourceDio {
   _CommentPostRemoteDatasourceDio(this._dio, {this.baseUrl, this.errorLogger}) {
-    baseUrl ??= localAPIBaseUrl;
+    baseUrl ??= 'http://192.168.11.104:3334/api/v1';
   }
 
   final Dio _dio;

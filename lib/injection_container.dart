@@ -68,6 +68,7 @@ import 'categories/data/data_source/local/category_local_datasource_objectbox.da
 final sl = GetIt.instance;
 
 Future<void> initializeDependencies() async {
+  await sl.reset();
   // ✅ Injecter ObjectBox d'abord
   sl.registerSingleton<ObjectBoxService>(ObjectBoxService());
 

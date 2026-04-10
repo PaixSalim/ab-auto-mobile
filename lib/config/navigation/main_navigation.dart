@@ -4,6 +4,7 @@ import 'package:auto/auth/presentation/bloc/auth_bloc.dart';
 // import 'package:auto/orders/presentation/bloc/my_orders_bloc.dart';
 // import 'package:auto/orders/presentation/pages/my_orders_page.dart';
 import 'package:auto/products/presentation/pages/ProductCatalogPage.dart';
+import 'package:auto/notifications/presentation/pages/NotificationCenterPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -94,6 +95,14 @@ class _MainNavigationState extends State<MainNavigation> {
             child: HomeSearchbar(),
           ),
           actions: [
+            IconButton(
+              icon: const Icon(LucideIcons.bell, size: 24),
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const NotificationCenterPage()),
+                ).then((_) => setState(() {})); // Refresh unread count on return
+              },
+            ),
             BlocBuilder<AuthBloc, AuthState>(
               builder: (context, state) {
                 if (state is AuthAuthenticated) {

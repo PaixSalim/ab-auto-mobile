@@ -261,9 +261,53 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "7:2183842583382835785",
+      "lastPropertyId": "7:1526500761333533194",
+      "name": "NotificationObjectBox",
+      "properties": [
+        {
+          "id": "1:3660932265052852859",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:8931288054870090",
+          "name": "title",
+          "type": 9
+        },
+        {
+          "id": "3:7430638736977842597",
+          "name": "body",
+          "type": 9
+        },
+        {
+          "id": "4:6157552373074252062",
+          "name": "type",
+          "type": 9
+        },
+        {
+          "id": "5:3542033952437634230",
+          "name": "data",
+          "type": 9
+        },
+        {
+          "id": "6:5085156783930320423",
+          "name": "receivedAt",
+          "type": 10
+        },
+        {
+          "id": "7:1526500761333533194",
+          "name": "isRead",
+          "type": 1
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "6:7055027686109035790",
+  "lastEntityId": "7:2183842583382835785",
   "lastIndexId": "0:0",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
