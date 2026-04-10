@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demande de Suppression de Compte</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin-bottom: 30px;
+            border-radius: 5px;
+        }
+
+        .warning h3 {
+            color: #856404;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .warning ul {
+            color: #856404;
+            margin-left: 20px;
+            line-height: 1.6;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .checkbox-group {
+            margin-bottom: 25px;
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .checkbox-wrapper input[type="checkbox"] {
+            margin-right: 10px;
+            margin-top: 3px;
+            transform: scale(1.2);
+        }
+
+        .checkbox-wrapper label {
+            color: #333;
+            line-height: 1.5;
+            cursor: pointer;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .submit-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .success-message {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .form-group input,
+            .form-group textarea,
+            .form-group select {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Demande de Suppression de Compte</h1>
+            <p>Veuillez remplir ce formulaire pour demander la suppression permanente de votre compte.</p>
+        </div>
+
+        <div class="warning">
+            <h3>Important : Action Irréversible</h3>
+            <ul>
+                <li>La suppression de votre compte est permanente et ne peut être annulée</li>
+                <li>Toutes vos données personnelles seront supprimées de nos serveurs</li>
+                <li>Vous perdrez l'accès à tous les services associés à votre compte</li>
+                <li>Cette action ne peut pas être inversée</li>
+            </ul>
+        </div>
+
+        <form id="deletionForm">
+            <div class="form-group">
+                <label for="fullName">Nom complet *</label>
+                <input type="text" id="fullName" name="fullName" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Adresse email associée au compte</label>
+                <input type="email" id="email" name="email">
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Numéro de téléphone (si applicable)</label>
+                <input type="tel" id="phone" name="phone">
+            </div>
+
+            <div class="form-group">
+                <label for="reason">Raison de la suppression *</label>
+                <select id="reason" name="reason" required>
+                    <option value="">-- Sélectionnez une raison --</option>
+                    <option value="privacy">Préoccupations relatives à la confidentialité</option>
+                    <option value="usage">Je n'utilise plus le service</option>
+                    <option value="alternative">J'ai trouvé une alternative</option>
+                    <option value="technical">Problèmes techniques</option>
+                    <option value="cost">Coût du service</option>
+                    <option value="other">Autre raison</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="details">Informations complémentaires</label>
+                <textarea id="details" name="details" placeholder="Veuillez fournir plus de détails sur votre demande de suppression..."></textarea>
+            </div>
+
+            <div class="checkbox-group">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="confirmation1" name="confirmation1" required>
+                    <label for="confirmation1">Je comprends que la suppression de mon compte est permanente et irréversible</label>
+                </div>
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="confirmation2" name="confirmation2" required>
+                    <label for="confirmation2">Je comprends que toutes mes données seront perdues définitivement</label>
+                </div>
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="confirmation3" name="confirmation3" required>
+                    <label for="confirmation3">Je confirme vouloir supprimer mon compte et toutes les données associées</label>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn">Envoyer la demande de suppression</button>
+        </form>
+
+        <div class="success-message" id="successMessage">
+            <strong>Votre demande a été envoyée avec succès !</strong><br>
+            Nous avons reçu votre demande de suppression de compte et vous contacterons dans les plus brefs délais à l'adresse email fournie.
+        </div>
+
+        <div class="error-message" id="errorMessage">
+            <strong>Une erreur s'est produite.</strong><br>
+            Veuillez vérifier que tous les champs obligatoires sont remplis et réessayer.
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('deletionForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Récupérer les données du formulaire
+            const formData = new FormData(this);
+            const submitBtn = document.querySelector('.submit-btn');
+            
+            // Désactiver le bouton pendant l'envoi
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Envoi en cours...';
+            
+            // Envoyer les données via AJAX
+            fetch('send-deletion-request.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Afficher le message de succès
+                    document.getElementById('successMessage').style.display = 'block';
+                    document.getElementById('errorMessage').style.display = 'none';
+                    
+                    // Réinitialiser le formulaire
+                    this.reset();
+                    
+                    // Réactiver le bouton
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Demande envoyée avec succès';
+                } else {
+                    // Afficher le message d'erreur
+                    document.getElementById('errorMessage').innerHTML = '<strong>Erreur:</strong><br>' + data.message;
+                    document.getElementById('errorMessage').style.display = 'block';
+                    document.getElementById('successMessage').style.display = 'none';
+                    
+                    // Réactiver le bouton
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Envoyer la demande de suppression';
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                // Afficher le message d'erreur générique
+                document.getElementById('errorMessage').style.display = 'block';
+                document.getElementById('successMessage').style.display = 'none';
+                
+                // Réactiver le bouton
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Envoyer la demande de suppression';
+            });
+        });
+        
+        // Désactiver le bouton si les confirmations ne sont pas cochées
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        const submitBtn = document.querySelector('.submit-btn');
+        
+        function updateSubmitButton() {
+            const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+            submitBtn.disabled = !allChecked;
+        }
+        
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', updateSubmitButton);
+        });
+        
+        // État initial
+        updateSubmitButton();
+    </script>
+</body>
+</html>
