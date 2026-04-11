@@ -13,6 +13,7 @@ class SearchProducts extends RemoteProductsEvent {
 
 class FilterProducts extends RemoteProductsEvent {
   final List<String> selectedCategories;
+  final List<String> selectedSubCategories;
   final List<String> selectedBrands;
   final double minPrice;
   final double maxPrice;
@@ -21,6 +22,7 @@ class FilterProducts extends RemoteProductsEvent {
 
   const FilterProducts({
     required this.selectedCategories,
+    this.selectedSubCategories = const [],
     required this.selectedBrands,
     required this.minPrice,
     required this.maxPrice,
@@ -32,6 +34,15 @@ class FilterProducts extends RemoteProductsEvent {
 class SortByAlphabet extends RemoteProductsEvent {
   final bool ascending;
   const SortByAlphabet(this.ascending);
+}
+
+class SortByPrice extends RemoteProductsEvent {
+  final bool ascending;
+  const SortByPrice(this.ascending);
+}
+
+class SortByNewest extends RemoteProductsEvent {
+  const SortByNewest();
 }
 
 class ResetProductFilter extends RemoteProductsEvent {

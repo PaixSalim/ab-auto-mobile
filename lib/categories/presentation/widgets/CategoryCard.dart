@@ -1,5 +1,5 @@
-import 'package:auto/brands/presentation/widgets/showBrandSelectionModal.dart';
 import 'package:auto/categories/domain/entities/category_entity.dart';
+import 'package:auto/categories/presentation/widgets/showSubCategorySelectionDialog.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
@@ -13,7 +13,7 @@ class CategoryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        showCenteredBrandSelectionDialog(context, category);
+        showSubCategorySelectionDialog(context, category);
       },
       child: Container(
         width: 80,

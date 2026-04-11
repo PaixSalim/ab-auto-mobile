@@ -27,6 +27,7 @@ class RemoteProductsLoading extends RemoteProductState {
 
 class RemoteProductsDone extends RemoteProductState {
   final List<String> selectedCategories;
+  final List<String> selectedSubCategories;
   final List<String> selectedBrands;
   final double minPrice;
   final double maxPrice;
@@ -42,6 +43,7 @@ class RemoteProductsDone extends RemoteProductState {
     List<ProductEntity> displayedProducts,
     String query,
     this.selectedCategories,
+    this.selectedSubCategories,
     this.selectedBrands,
     this.minPrice,
     this.maxPrice,
@@ -62,6 +64,7 @@ class RemoteProductsDone extends RemoteProductState {
     List<ProductEntity>? displayedProducts,
     String? query,
     List<String>? selectedCategories,
+    List<String>? selectedSubCategories,
     List<String>? selectedBrands,
     double? minPrice,
     double? maxPrice,
@@ -77,6 +80,7 @@ class RemoteProductsDone extends RemoteProductState {
       displayedProducts ?? this.displayedProducts!,
       query ?? this.query!,
       selectedCategories ?? this.selectedCategories,
+      selectedSubCategories ?? this.selectedSubCategories,
       selectedBrands ?? this.selectedBrands,
       minPrice ?? this.minPrice,
       maxPrice ?? this.maxPrice,

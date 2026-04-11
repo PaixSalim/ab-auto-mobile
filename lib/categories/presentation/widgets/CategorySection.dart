@@ -28,12 +28,14 @@ Widget CategorySection() {
               );
             }
             if (state is RemoteCategoryDone) {
+              // Filtrer pour n'afficher que les catégories principales (parentId: null)
+              final mainCategories = state.categories!.where((category) => category.parentId == null).toList();
               return ListView.builder(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 12),
-                itemCount: state.categories!.length,
+                itemCount: mainCategories.length,
                 itemBuilder: (context, index) {
-                  final category = state.categories![index];
+                  final category = mainCategories[index];
                   return CategoryCard(category: category);
                 },
               );

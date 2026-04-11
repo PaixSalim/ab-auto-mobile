@@ -21,6 +21,8 @@ class RemoteProductsBloc extends Bloc<RemoteProductsEvent, RemoteProductState> {
     on<ResetProductFilter>(_onResetProductFilter);
     on<FilterProducts>(_onFilterProducts);
     on<SortByAlphabet>(_onSortByAlphabet);
+    on<SortByPrice>(_onSortByPrice);
+    on<SortByNewest>(_onSortByNewest);
     on<LoadMoreProducts>(_onLoadMoreProducts);
     on<RefreshProducts>(_onRefreshProducts);
   }
@@ -43,6 +45,7 @@ class RemoteProductsBloc extends Bloc<RemoteProductsEvent, RemoteProductState> {
           products,
           products,
           '',
+          [],
           [],
           [],
           0,
@@ -84,6 +87,7 @@ class RemoteProductsBloc extends Bloc<RemoteProductsEvent, RemoteProductState> {
           query,
           [],
           [],
+          [],
           0,
           50000000,
           false,
@@ -106,6 +110,7 @@ class RemoteProductsBloc extends Bloc<RemoteProductsEvent, RemoteProductState> {
           '',
           [],
           [],
+          [],
           0,
           50000000,
           false,
@@ -121,14 +126,18 @@ class RemoteProductsBloc extends Bloc<RemoteProductsEvent, RemoteProductState> {
   ) {
     if (state is RemoteProductsDone) {
       final currentState = state as RemoteProductsDone;
+      
       final filteredProducts =
           currentState.allProducts!.where((product) {
             final categoryMatch =
                 event.selectedCategories.isEmpty ||
                 event.selectedCategories.contains(product.category!.id);
+            final subCategoryMatch =
+                event.selectedSubCategories.isEmpty ||
+                (product.subCategoryId != null && event.selectedSubCategories.contains(product.subCategoryId!));
             final brandMatch =
                 event.selectedBrands.isEmpty ||
-                event.selectedBrands.contains(product.brand!.id);
+                (product.brand != null && event.selectedBrands.contains(product.brand!.id));
             final priceMatch =
                 product.price! >= event.minPrice &&
                 product.price! <= event.maxPrice;
@@ -137,13 +146,14 @@ class RemoteProductsBloc extends Bloc<RemoteProductsEvent, RemoteProductState> {
                 (event.isNew && (product.state == 'new') ||
                     (event.isUsed && !(product.state == 'new')));
 
-            return categoryMatch && brandMatch && priceMatch && stateMatch;
+            return categoryMatch && subCategoryMatch && brandMatch && priceMatch && stateMatch;
           }).toList();
 
       emit(
         currentState.copyWith(
           displayedProducts: filteredProducts,
           selectedCategories: event.selectedCategories,
+          selectedSubCategories: event.selectedSubCategories,
           selectedBrands: event.selectedBrands,
           minPrice: event.minPrice,
           maxPrice: event.maxPrice,
@@ -169,6 +179,50 @@ class RemoteProductsBloc extends Bloc<RemoteProductsEvent, RemoteProductState> {
                 ? a.name!.compareTo(b.name!)
                 : b.name!.compareTo(a.name!),
       );
+
+      emit(currentState.copyWith(displayedProducts: sortedProducts));
+    }
+  }
+
+  void _onSortByPrice(
+    SortByPrice event,
+    Emitter<RemoteProductState> emit,
+  ) {
+    if (state is RemoteProductsDone) {
+      final currentState = state as RemoteProductsDone;
+
+      final sortedProducts = List<ProductEntity>.from(
+        currentState.displayedProducts!,
+      )..sort(
+        (a, b) => event.ascending
+            ? (a.price ?? 0).compareTo(b.price ?? 0)
+            : (b.price ?? 0).compareTo(a.price ?? 0),
+      );
+
+      emit(currentState.copyWith(displayedProducts: sortedProducts));
+    }
+  }
+
+  void _onSortByNewest(
+    SortByNewest event,
+    Emitter<RemoteProductState> emit,
+  ) {
+    if (state is RemoteProductsDone) {
+      final currentState = state as RemoteProductsDone;
+
+      final sortedProducts = List<ProductEntity>.from(
+        currentState.displayedProducts!,
+      )..sort((a, b) {
+        // Prioriser les produits neufs (state == 'new')
+        final aIsNew = a.state == 'new';
+        final bIsNew = b.state == 'new';
+        
+        if (aIsNew && !bIsNew) return -1;
+        if (!aIsNew && bIsNew) return 1;
+        
+        // Si les deux sont neufs ou les deux ne sont pas neufs, trier par nom
+        return a.name!.compareTo(b.name!);
+      });
 
       emit(currentState.copyWith(displayedProducts: sortedProducts));
     }
@@ -251,9 +305,10 @@ class RemoteProductsBloc extends Bloc<RemoteProductsEvent, RemoteProductState> {
         emit(
           RemoteProductsDone(
             allProducts,
-            displayedProducts, // Utiliser displayedProducts filtré au lieu de allProducts
+            displayedProducts, 
             currentState.query ?? '',
             currentState.selectedCategories,
+            currentState.selectedSubCategories ?? [],
             currentState.selectedBrands,
             currentState.minPrice,
             currentState.maxPrice,
@@ -261,7 +316,7 @@ class RemoteProductsBloc extends Bloc<RemoteProductsEvent, RemoteProductState> {
             currentState.isUsed,
             currentPage: responseData['page'] ?? _currentPage,
             totalPages: responseData['totalPages'] ?? currentState.totalPages,
-            hasNextPage: responseData['hasNextPage'] ?? false,
+            hasNextPage: responseData['hasNextPage'] ?? currentState.hasNextPage,
             isLoadingMore: false,
           ),
         );
@@ -290,6 +345,7 @@ class RemoteProductsBloc extends Bloc<RemoteProductsEvent, RemoteProductState> {
           products,
           products,
           '',
+          [],
           [],
           [],
           0,

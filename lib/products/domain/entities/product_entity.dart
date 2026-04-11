@@ -22,6 +22,8 @@ class ProductEntity {
   final double? price;
   final double? discount;
   final CategoryEntity? category;
+  final CategoryEntity? subCategory;
+  final String? subCategoryId;
   final List<String>? features;
   final BrandEntity? brand;
   final List<String>? medias;
@@ -40,6 +42,8 @@ class ProductEntity {
     this.price,
     this.discount,
     this.category,
+    this.subCategory,
+    this.subCategoryId,
     this.features,
     this.brand,
     this.medias,

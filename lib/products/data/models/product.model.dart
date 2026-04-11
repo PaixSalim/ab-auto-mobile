@@ -16,6 +16,8 @@ class ProductModel extends ProductEntity {
     super.price,
     super.discount,
     CategoryModel? super.category,
+    CategoryModel? super.subCategory,
+    super.subCategoryId,
     super.features,
     BrandModel? super.brand,
     super.medias,
@@ -49,6 +51,10 @@ class ProductModel extends ProductEntity {
       category: json['category'] != null
           ? CategoryModel.fromJson(json['category'])
           : null,
+      subCategory: json['subCategory'] != null
+          ? CategoryModel.fromJson(json['subCategory'])
+          : null,
+      subCategoryId: json['subCategoryId']?.toString(),
       brand: json['brand'] != null ? BrandModel.fromJson(json['brand']) : null,
       features: json['features'] != null 
           ? (json['features'] is String 
