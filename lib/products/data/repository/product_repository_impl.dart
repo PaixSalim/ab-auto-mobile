@@ -131,6 +131,8 @@ class ProductRepositoryImpl implements ProductRepository {
                 price: model.price,
                 discount: model.discount,
                 category: model.category,
+                subCategory: model.subCategory,
+                subCategoryId: model.subCategoryId,
                 features: model.features,
                 brand: model.brand,
                 medias: model.medias,

@@ -186,6 +186,22 @@ class ProductCatalogPageState extends State<ProductCatalogPage> {
                   color: Theme.of(context).primaryColor,
                 ),
               ),
+              // Bouton de rafraîchissement forcé
+              IconButton(
+                onPressed: () {
+                  context.read<RemoteProductsBloc>().add(const RefreshProducts());
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Actualisation des produits en cours...'),
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                },
+                icon: Icon(
+                  Icons.refresh,
+                  color: Theme.of(context).primaryColor,
+                ),
+              ),
             ],
           ),
           

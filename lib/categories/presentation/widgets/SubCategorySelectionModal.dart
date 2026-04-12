@@ -1,25 +1,28 @@
 import 'package:auto/categories/domain/entities/category_entity.dart';
-import 'package:auto/config/routes/custom_navigation.dart';
 import 'package:auto/products/presentation/bloc/remote/remote_product_bloc.dart';
 import 'package:auto/products/presentation/bloc/remote/remote_product_event.dart';
 import 'package:auto/products/presentation/pages/ProductCatalogPage.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lottie/lottie.dart';
 
 class SubCategorySelectionModal extends StatefulWidget {
   final CategoryEntity category;
-  const SubCategorySelectionModal({super.key, required this.category});
+  final RemoteProductsBloc bloc;
+
+  const SubCategorySelectionModal({
+    super.key,
+    required this.category,
+    required this.bloc,
+  });
 
   @override
-  SubCategorySelectionModalState createState() => SubCategorySelectionModalState();
+  State<SubCategorySelectionModal> createState() => _SubCategorySelectionModalState();
 }
 
-class SubCategorySelectionModalState extends State<SubCategorySelectionModal> {
-  TextEditingController searchController = TextEditingController();
-
+class _SubCategorySelectionModalState extends State<SubCategorySelectionModal> {
   List<CategoryEntity> filteredSubCategories = [];
+  final TextEditingController searchController = TextEditingController();
 
   @override
   void initState() {
@@ -30,19 +33,18 @@ class SubCategorySelectionModalState extends State<SubCategorySelectionModal> {
 
   void filterSubCategories(String query) {
     setState(() {
-      filteredSubCategories =
-          (widget.category.subCategories ?? [])
-              .where(
-                (subCategory) =>
-                    subCategory.name!.toLowerCase().contains(query.toLowerCase()),
-              )
-              .toList();
+      if (query.isEmpty) {
+        filteredSubCategories = List.from(widget.category.subCategories ?? []);
+      } else {
+        filteredSubCategories = widget.category.subCategories!
+            .where((sub) => sub.name!.toLowerCase().contains(query.toLowerCase()))
+            .toList();
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final bloc = context.read<RemoteProductsBloc>();
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 13.0, vertical: 16),
       child: Column(
@@ -129,9 +131,9 @@ class SubCategorySelectionModalState extends State<SubCategorySelectionModal> {
               children:
                   filteredSubCategories.map((subCategory) {
                     return GestureDetector(
-                      onTap:
-                          () => {
-                            bloc.add(
+                      onTap: () {
+                            // Appliquer le filtre
+                            widget.bloc.add(
                               FilterProducts(
                                 selectedCategories: [],
                                 selectedSubCategories: [subCategory.id!],
@@ -141,12 +143,15 @@ class SubCategorySelectionModalState extends State<SubCategorySelectionModal> {
                                 isNew: false,
                                 isUsed: false,
                               ),
-                            ),
-                            goTo(
-                              context,
-                              ProductCatalogPage(),
-                              AnimationType.gauche,
-                            ),
+                            );
+                            // Fermer le modal et revenir à la page principale
+                            Navigator.of(context).pop();
+                            // Naviguer vers la page catalogue en remplaçant la route actuelle
+                            Navigator.of(context).pushReplacement(
+                              MaterialPageRoute(
+                                builder: (context) => const ProductCatalogPage(),
+                              ),
+                            );
                           },
                       child: Column(
                         children: [
