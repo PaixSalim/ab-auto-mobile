@@ -26,12 +26,13 @@ class _CarouselWithIndicatorState extends State<CarouselWithIndicator> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: Column(
+    final double carouselWidth = MediaQuery.of(context).size.width * 0.9;
+    return Column(
         children: [
           const SizedBox(height: 20),
-          BlocBuilder<RemoteBannerBloc, RemoteBannerState>(
+          SizedBox(
+            width: carouselWidth,
+            child: BlocBuilder<RemoteBannerBloc, RemoteBannerState>(
             builder: (context, state) {
               if (state is RemoteBannerLoading) {
                 return CarouselSlider(
@@ -49,8 +50,10 @@ class _CarouselWithIndicatorState extends State<CarouselWithIndicator> {
                   carouselController: _carouselController,
                   options: CarouselOptions(
                     autoPlay: true,
-                    enlargeCenterPage: true,
-                    aspectRatio: 16 / 9,
+                    enlargeCenterPage: false,
+                    viewportFraction: 1.0,
+                    aspectRatio: 16 / 8,
+                    scrollDirection: Axis.horizontal,
                     onPageChanged: (index, reason) {
                       setState(() {
                         _currentIndex = index;
@@ -87,8 +90,10 @@ class _CarouselWithIndicatorState extends State<CarouselWithIndicator> {
                   carouselController: _carouselController,
                   options: CarouselOptions(
                     autoPlay: true,
-                    enlargeCenterPage: true,
-                    aspectRatio: 16 / 9,
+                    enlargeCenterPage: false,
+                    viewportFraction: 1.0,
+                    aspectRatio: 16 / 8,
+                    scrollDirection: Axis.horizontal,
                     onPageChanged: (index, reason) {
                       setState(() {
                         _currentIndex = index;
@@ -114,8 +119,12 @@ class _CarouselWithIndicatorState extends State<CarouselWithIndicator> {
                   carouselController: _carouselController,
                   options: CarouselOptions(
                     autoPlay: true,
-                    enlargeCenterPage: true,
-                    aspectRatio: 16 / 9,
+                    enlargeCenterPage: false,
+                    viewportFraction: 0.9, // Occupe 90% de la largeur de l'écran
+                    enlargeStrategy: CenterPageEnlargeStrategy.height, // Agrandit en hauteur
+                    aspectRatio: 16 / 8,
+                    padEnds: false, // Pas d'espace supplémentaire au début et à la fin
+                    scrollDirection: Axis.horizontal,
                     onPageChanged: (index, reason) {
                       setState(() {
                         _currentIndex = index;
@@ -126,7 +135,8 @@ class _CarouselWithIndicatorState extends State<CarouselWithIndicator> {
               }
               return Text('');
             },
-          ),
+          )),
+
           const SizedBox(height: 8),
           // Indicateurs
           Row(
@@ -157,7 +167,6 @@ class _CarouselWithIndicatorState extends State<CarouselWithIndicator> {
           ),
           const SizedBox(height: 20),
         ],
-      ),
     );
   }
 }
