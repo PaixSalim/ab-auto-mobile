@@ -105,6 +105,33 @@ class ActionButtons extends StatelessWidget {
             minimumSize: const Size(double.infinity, 50),
           ),
         ),
+        const SizedBox(height: 10),
+        OutlinedButton.icon(
+          onPressed: () async {
+            final url = 'https://ab-autox.com/login';
+            if (await canLaunchUrl(Uri.parse(url))) {
+              await launchUrl(Uri.parse(url));
+            } else {
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Impossible d\'ouvrir le lien')),
+                );
+              }
+            }
+          },
+          icon: Icon(Icons.store, color: Theme.of(context).primaryColor),
+          label: Text(
+            "Devenez vendeur",
+            style: TextStyle(color: Theme.of(context).primaryColor),
+          ),
+          style: OutlinedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            side: BorderSide(color: Theme.of(context).primaryColor),
+            minimumSize: const Size(double.infinity, 50),
+          ),
+        ),
 
         const SizedBox(height: 20),
       ],

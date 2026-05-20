@@ -4,6 +4,8 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lottie/lottie.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class CarouselWithIndicator extends StatefulWidget {
   const CarouselWithIndicator({super.key});
@@ -24,15 +26,33 @@ class _CarouselWithIndicatorState extends State<CarouselWithIndicator> {
   final CarouselSliderController _carouselController =
       CarouselSliderController();
 
+  // Méthode pour ouvrir WhatsApp
+  void _launchWhatsApp() async {
+    const phoneNumber = '+22603231010'; // Numéro de téléphone à configurer
+    final url = 'https://wa.me/$phoneNumber';
+    if (await canLaunchUrl(Uri.parse(url))) {
+      await launchUrl(Uri.parse(url));
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Impossible d\'ouvrir WhatsApp')),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final double carouselWidth = MediaQuery.of(context).size.width * 0.9;
     return Column(
         children: [
           const SizedBox(height: 20),
-          SizedBox(
-            width: carouselWidth,
-            child: BlocBuilder<RemoteBannerBloc, RemoteBannerState>(
+          Stack(
+            children: [
+              // Carousel
+              SizedBox(
+                width: carouselWidth,
+                child: BlocBuilder<RemoteBannerBloc, RemoteBannerState>(
             builder: (context, state) {
               if (state is RemoteBannerLoading) {
                 return CarouselSlider(
@@ -51,8 +71,8 @@ class _CarouselWithIndicatorState extends State<CarouselWithIndicator> {
                   options: CarouselOptions(
                     autoPlay: true,
                     enlargeCenterPage: false,
-                    viewportFraction: 1.0,
-                    aspectRatio: 16 / 8,
+                    viewportFraction: 1.2,
+                    aspectRatio: 16 / 6,
                     scrollDirection: Axis.horizontal,
                     onPageChanged: (index, reason) {
                       setState(() {
@@ -70,7 +90,7 @@ class _CarouselWithIndicatorState extends State<CarouselWithIndicator> {
                           borderRadius: BorderRadius.circular(10),
                           child: CachedNetworkImage(
                             imageUrl: banner.image!,
-                            fit: BoxFit.cover,
+                            fit: BoxFit.fitWidth,
                             width: double.infinity,
                             progressIndicatorBuilder:
                                 (
@@ -91,8 +111,8 @@ class _CarouselWithIndicatorState extends State<CarouselWithIndicator> {
                   options: CarouselOptions(
                     autoPlay: true,
                     enlargeCenterPage: false,
-                    viewportFraction: 1.0,
-                    aspectRatio: 16 / 8,
+                    viewportFraction: 1.2,
+                    aspectRatio: 16 / 6,
                     scrollDirection: Axis.horizontal,
                     onPageChanged: (index, reason) {
                       setState(() {
@@ -122,7 +142,7 @@ class _CarouselWithIndicatorState extends State<CarouselWithIndicator> {
                     enlargeCenterPage: false,
                     viewportFraction: 0.9, // Occupe 90% de la largeur de l'écran
                     enlargeStrategy: CenterPageEnlargeStrategy.height, // Agrandit en hauteur
-                    aspectRatio: 16 / 8,
+                    aspectRatio: 16 / 6,
                     padEnds: false, // Pas d'espace supplémentaire au début et à la fin
                     scrollDirection: Axis.horizontal,
                     onPageChanged: (index, reason) {
@@ -136,6 +156,24 @@ class _CarouselWithIndicatorState extends State<CarouselWithIndicator> {
               return Text('');
             },
           )),
+              
+              // Bouton WhatsApp flottant à droite
+              Positioned(
+                right: 10,
+                bottom: 10,
+                child: FloatingActionButton(
+                  onPressed: _launchWhatsApp,
+                  backgroundColor: const Color(0xFF25D366), // Couleur WhatsApp
+                  mini: true,
+                  child: const FaIcon(
+                    FontAwesomeIcons.whatsapp,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                ),
+              ),
+            ],
+          ),
 
           const SizedBox(height: 8),
           // Indicateurs

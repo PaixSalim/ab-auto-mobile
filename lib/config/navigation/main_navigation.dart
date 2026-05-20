@@ -8,6 +8,7 @@ import 'package:auto/notifications/presentation/pages/NotificationCenterPage.dar
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:auto/products/presentation/widgets/search.index.bar.dart';
 // import '../../injection_container.dart';
@@ -108,8 +109,19 @@ class _MainNavigationState extends State<MainNavigation> {
                 if (state is AuthAuthenticated) {
                   return PopupMenuButton<String>(
                     icon: const Icon(Icons.account_circle, size: 28),
-                    onSelected: (value) {
-                      if (value == 'logout') {
+                    onSelected: (value) async {
+                      if (value == 'become_seller') {
+                        final url = 'https://ab-autox.com/login';
+                        if (await canLaunchUrl(Uri.parse(url))) {
+                          await launchUrl(Uri.parse(url));
+                        } else {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Impossible d\'ouvrir le lien')),
+                            );
+                          }
+                        }
+                      } else if (value == 'logout') {
                         _showLogoutDialog(context);
                       }
                     },
@@ -132,6 +144,20 @@ class _MainNavigationState extends State<MainNavigation> {
                                 fontSize: 12,
                                 color: Colors.grey[600],
                               ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const PopupMenuDivider(),
+                      PopupMenuItem(
+                        value: 'become_seller',
+                        child: Row(
+                          children: [
+                            Icon(Icons.store, size: 20, color: Theme.of(context).primaryColor),
+                            SizedBox(width: 8),
+                            Text(
+                              'Devenir vendeur',
+                              style: TextStyle(color: Theme.of(context).primaryColor),
                             ),
                           ],
                         ),

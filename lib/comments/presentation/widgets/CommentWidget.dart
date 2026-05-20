@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../bloc/comment_bloc.dart';
 import 'CommentItem.dart';
@@ -134,9 +135,37 @@ class _ProductCommentsSectionState extends State<ProductCommentsSection> {
                           actions: [
                             TextButton(
                               onPressed: () => Navigator.pop(ctx),
+                              style: TextButton.styleFrom(
+                                foregroundColor: Colors.grey[600],
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              ),
                               child: const Text('Annuler'),
                             ),
-                            ElevatedButton(
+                            ElevatedButton.icon(
+                              onPressed: () async {
+                                final url = 'https://ab-autox.com/login';
+                                if (await canLaunchUrl(Uri.parse(url))) {
+                                  await launchUrl(Uri.parse(url));
+                                } else {
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text('Impossible d\'ouvrir le lien')),
+                                    );
+                                  }
+                                }
+                              },
+                              icon: const Icon(Icons.store, size: 16),
+                              label: const Text('Devenez vendeur'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF25D366), // Vert WhatsApp
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            ),
+                            ElevatedButton.icon(
                               onPressed: () async {
                                 Navigator.pop(ctx);
                                 // Navigate to login with return route
@@ -154,7 +183,16 @@ class _ProductCommentsSectionState extends State<ProductCommentsSection> {
                                   });
                                 }
                               },
-                              child: const Text('Se connecter'),
+                              icon: const Icon(Icons.login, size: 16),
+                              label: const Text('Se connecter'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Theme.of(context).primaryColor,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
                             ),
                           ],
                         ),
