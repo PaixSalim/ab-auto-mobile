@@ -99,9 +99,15 @@ class _MainNavigationState extends State<MainNavigation> {
             IconButton(
               icon: const Icon(LucideIcons.bell, size: 24),
               onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const NotificationCenterPage()),
-                ).then((_) => setState(() {})); // Refresh unread count on return
+                Navigator.of(context)
+                    .push(
+                      MaterialPageRoute(
+                        builder: (_) => const NotificationCenterPage(),
+                      ),
+                    )
+                    .then(
+                      (_) => setState(() {}),
+                    ); // Refresh unread count on return
               },
             ),
             BlocBuilder<AuthBloc, AuthState>(
@@ -110,73 +116,56 @@ class _MainNavigationState extends State<MainNavigation> {
                   return PopupMenuButton<String>(
                     icon: const Icon(Icons.account_circle, size: 28),
                     onSelected: (value) async {
-                      if (value == 'become_seller') {
-                        final url = 'https://ab-autox.com/login';
-                        if (await canLaunchUrl(Uri.parse(url))) {
-                          await launchUrl(Uri.parse(url));
-                        } else {
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Impossible d\'ouvrir le lien')),
-                            );
-                          }
-                        }
-                      } else if (value == 'logout') {
+                      if (value == 'logout') {
                         _showLogoutDialog(context);
                       }
                     },
-                    itemBuilder: (_) => [
-                      PopupMenuItem(
-                        enabled: false,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              state.user.fullName,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
+                    itemBuilder:
+                        (_) => [
+                          PopupMenuItem(
+                            enabled: false,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  state.user.fullName,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                Text(
+                                  state.user.email,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                              ],
                             ),
-                            Text(
-                              state.user.email,
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey[600],
-                              ),
+                          ),
+                          const PopupMenuDivider(),
+                          const PopupMenuItem(
+                            value: 'logout',
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.logout_rounded,
+                                  size: 22,
+                                  color: Colors.redAccent,
+                                ),
+                                SizedBox(width: 12),
+                                Text(
+                                  'Se déconnecter',
+                                  style: TextStyle(
+                                    color: Colors.redAccent,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                      ),
-                      const PopupMenuDivider(),
-                      PopupMenuItem(
-                        value: 'become_seller',
-                        child: Row(
-                          children: [
-                            Icon(Icons.store, size: 20, color: Theme.of(context).primaryColor),
-                            SizedBox(width: 8),
-                            Text(
-                              'Devenir vendeur',
-                              style: TextStyle(color: Theme.of(context).primaryColor),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const PopupMenuDivider(),
-                      const PopupMenuItem(
-                        value: 'logout',
-                        child: Row(
-                          children: [
-                            Icon(Icons.logout, size: 20, color: Colors.red),
-                            SizedBox(width: 8),
-                            Text(
-                              'Se déconnecter',
-                              style: TextStyle(color: Colors.red),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+                          ),
+                        ],
                   );
                 }
                 return const SizedBox();
@@ -198,8 +187,14 @@ class _MainNavigationState extends State<MainNavigation> {
           selectedItemColor: primary,
           unselectedItemColor: Colors.grey,
           items: const [
-            BottomNavigationBarItem(icon: Icon(LucideIcons.home), label: 'Accueil'),
-            BottomNavigationBarItem(icon: Icon(LucideIcons.shoppingBag), label: 'Catalogue'),
+            BottomNavigationBarItem(
+              icon: Icon(LucideIcons.home),
+              label: 'Accueil',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(LucideIcons.shoppingBag),
+              label: 'Recherche par marque',
+            ),
             // BottomNavigationBarItem(icon: Icon(LucideIcons.clipboardList), label: 'Commandes'), // Temporairement désactivé
           ],
         ),

@@ -1,4 +1,5 @@
 import 'package:auto/auth/presentation/pages/login_page.dart';
+import 'package:auto/auth/presentation/widgets/auth_bottom_sheet.dart';
 import 'package:auto/config/theme/customToast.dart';
 import 'package:auto/core/resources/local_storage_service.dart';
 import 'package:auto/core/resources/network_info.dart';
@@ -126,76 +127,15 @@ class _ProductCommentsSectionState extends State<ProductCommentsSection> {
                   ),
                   onPressed: () {
                     if (!LocalStorageService.isLoggedIn) {
-                      showDialog(
-                        context: context,
-                        builder: (ctx) => AlertDialog(
-                          title: const Text('Connexion requise'),
-                          content: const Text(
-                              'Vous devez être connecté pour laisser un commentaire.'),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(ctx),
-                              style: TextButton.styleFrom(
-                                foregroundColor: Colors.grey[600],
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                              ),
-                              child: const Text('Annuler'),
-                            ),
-                            ElevatedButton.icon(
-                              onPressed: () async {
-                                final url = 'https://ab-autox.com/login';
-                                if (await canLaunchUrl(Uri.parse(url))) {
-                                  await launchUrl(Uri.parse(url));
-                                } else {
-                                  if (context.mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text('Impossible d\'ouvrir le lien')),
-                                    );
-                                  }
-                                }
-                              },
-                              icon: const Icon(Icons.store, size: 16),
-                              label: const Text('Devenez vendeur'),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF25D366), // Vert WhatsApp
-                                foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                            ),
-                            ElevatedButton.icon(
-                              onPressed: () async {
-                                Navigator.pop(ctx);
-                                // Navigate to login with return route
-                                final result = await Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => const LoginPage(returnRoute: 'comments'),
-                                  ),
-                                );
-                                // If login was successful, refresh username and expand form
-                                if (result == true) {
-                                  _loadUserName();
-                                  setState(() {
-                                    _isFormExpanded = true;
-                                  });
-                                }
-                              },
-                              icon: const Icon(Icons.login, size: 16),
-                              label: const Text('Se connecter'),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Theme.of(context).primaryColor,
-                                foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+                      AuthBottomSheet.show(
+                        context,
+                        message: 'Vous devez être connecté pour laisser un commentaire sur ce produit.',
+                        onSuccess: () {
+                          _loadUserName();
+                          setState(() {
+                            _isFormExpanded = true;
+                          });
+                        },
                       );
                       return;
                     }

@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lottie/lottie.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:icons_plus/icons_plus.dart';
 
 class CarouselWithIndicator extends StatefulWidget {
   const CarouselWithIndicator({super.key});
@@ -43,7 +43,7 @@ class _CarouselWithIndicatorState extends State<CarouselWithIndicator> {
 
   @override
   Widget build(BuildContext context) {
-    final double carouselWidth = MediaQuery.of(context).size.width * 0.9;
+    final double carouselWidth = MediaQuery.of(context).size.width;
     return Column(
         children: [
           const SizedBox(height: 20),
@@ -165,8 +165,8 @@ class _CarouselWithIndicatorState extends State<CarouselWithIndicator> {
                   onPressed: _launchWhatsApp,
                   backgroundColor: const Color(0xFF25D366), // Couleur WhatsApp
                   mini: true,
-                  child: const FaIcon(
-                    FontAwesomeIcons.whatsapp,
+                  child: const Icon(
+                    Bootstrap.whatsapp,
                     color: Colors.white,
                     size: 20,
                   ),

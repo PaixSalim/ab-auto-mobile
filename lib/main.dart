@@ -40,7 +40,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   try {
     if (Firebase.apps.isEmpty) {
       await Firebase.initializeApp(
@@ -48,22 +48,19 @@ Future<void> main() async {
       );
     }
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-    
+
     // Demander les permissions de notification
     FirebaseMessaging messaging = FirebaseMessaging.instance;
-    await messaging.requestPermission(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
+    await messaging.requestPermission(alert: true, badge: true, sound: true);
 
     // Autoriser spécifiquement l'affichage pour iOS (et certaines surcouches Android) au premier plan
-    await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
-      alert: true, // Required to display a heads up notification
-      badge: true,
-      sound: true,
-    );
-    
+    await FirebaseMessaging.instance
+        .setForegroundNotificationPresentationOptions(
+          alert: true, // Required to display a heads up notification
+          badge: true,
+          sound: true,
+        );
+
     // Souscrire au topic de promotions
     await messaging.subscribeToTopic('promotions_topic');
     print("Inscrit avec succès au topic des promotions");
@@ -73,12 +70,15 @@ Future<void> main() async {
 
     // Écoute locale pour afficher la notif en mode premier plan
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print('🔥 INFO: Notif reçue en mode ouvert: ${message.notification?.title}');
+      print(
+        '🔥 INFO: Notif reçue en mode ouvert: ${message.notification?.title}',
+      );
       NotificationService.showNotification(message);
     });
-    
   } catch (e) {
-    print("Erreur d'initialisation Firebase (vérifiez google-services.json): $e");
+    print(
+      "Erreur d'initialisation Firebase (vérifiez google-services.json): $e",
+    );
   }
 
   await LocalStorageService.init();
@@ -94,7 +94,6 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
-
     return MultiBlocProvider(
       providers: [
         BlocProvider<RemoteProductsBloc>(
@@ -115,11 +114,13 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider<ChatBloc>(create: (context) => sl()),
         BlocProvider<CommentBloc>(create: (context) => sl()),
-        BlocProvider<AuthBloc>(create: (context) {
-          final bloc = sl<AuthBloc>();
-          bloc.add(const AppStarted());
-          return bloc;
-        }),
+        BlocProvider<AuthBloc>(
+          create: (context) {
+            final bloc = sl<AuthBloc>();
+            bloc.add(const AppStarted());
+            return bloc;
+          },
+        ),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -159,13 +160,18 @@ class _HomePageState extends State<HomePage> {
 
         if (state is RemoteProductsDone && state.allProducts != null) {
           // Verify cache or regenerate if the source list changes
-          if (_cachedShuffledProducts == null || _cachedShuffledProducts!.length != state.allProducts!.length) {
-            _cachedShuffledProducts = List<ProductEntity>.from(state.allProducts!);
+          if (_cachedShuffledProducts == null ||
+              _cachedShuffledProducts!.length != state.allProducts!.length) {
+            _cachedShuffledProducts = List<ProductEntity>.from(
+              state.allProducts!,
+            );
             _cachedShuffledProducts!.shuffle();
           }
-          
-          displayList = _cachedShuffledProducts!.take(_displayedProductsCount).toList();
-          hasMoreProducts = _displayedProductsCount < _cachedShuffledProducts!.length;
+
+          displayList =
+              _cachedShuffledProducts!.take(_displayedProductsCount).toList();
+          hasMoreProducts =
+              _displayedProductsCount < _cachedShuffledProducts!.length;
         }
 
         return Stack(
@@ -175,21 +181,29 @@ class _HomePageState extends State<HomePage> {
                 const SliverToBoxAdapter(child: CarouselWithIndicator()),
                 SliverToBoxAdapter(child: CategorySection()),
                 const SliverToBoxAdapter(child: PromotionsSection()),
-                const SliverToBoxAdapter(child: Divider(thickness: 8, color: Color(0xFFEEEEEE))),
+                const SliverToBoxAdapter(
+                  child: Divider(thickness: 8, color: Color(0xFFEEEEEE)),
+                ),
                 const SliverToBoxAdapter(
                   child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 16.0,
+                      vertical: 8.0,
+                    ),
                     child: Row(
-                      children: [ 
+                      children: [
                         Text(
                           "Suggestions pour vous",
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ],
                     ),
                   ),
                 ),
-                
+
                 if (isLoading)
                   const SliverToBoxAdapter(
                     child: Padding(
@@ -201,24 +215,22 @@ class _HomePageState extends State<HomePage> {
                   SliverPadding(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     sliver: SliverGrid(
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 10,
-                        mainAxisSpacing: 10,
-                        childAspectRatio: 0.65,
-                      ),
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          return ProductGridCard(
-                            product: displayList[index],
-                            index: index, // Passes index for unique Hero tag
-                          );
-                        },
-                        childCount: displayList.length,
-                      ),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 10,
+                            childAspectRatio: 0.65,
+                          ),
+                      delegate: SliverChildBuilderDelegate((context, index) {
+                        return ProductGridCard(
+                          product: displayList[index],
+                          index: index, // Passes index for unique Hero tag
+                        );
+                      }, childCount: displayList.length),
                     ),
                   ),
-                  
+
                   // Load More Button
                   if (hasMoreProducts)
                     SliverToBoxAdapter(
@@ -249,7 +261,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                     ),
-                    
+
                   // End message if all products are displayed
                   if (!hasMoreProducts && displayList.isNotEmpty)
                     SliverToBoxAdapter(
@@ -270,7 +282,7 @@ class _HomePageState extends State<HomePage> {
                 ],
               ],
             ),
-            
+
             // const SupportAssistant(),
           ],
         );
