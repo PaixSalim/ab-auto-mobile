@@ -64,9 +64,10 @@ Future<void> main() async {
       sound: true,
     );
     
-    // Souscrire au topic de promotions
+    // Souscrire au topic de promotions et au topic global
     await messaging.subscribeToTopic('promotions_topic');
-    print("Inscrit avec succès au topic des promotions");
+    await messaging.subscribeToTopic('all_users');
+    print("Inscrit avec succès aux topics des promotions et all_users");
 
     // Initialiser les notifications locales
     await NotificationService.init();
