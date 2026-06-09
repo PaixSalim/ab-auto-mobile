@@ -54,16 +54,16 @@ Future<void> main() async {
     await messaging.requestPermission(alert: true, badge: true, sound: true);
 
     // Autoriser spécifiquement l'affichage pour iOS (et certaines surcouches Android) au premier plan
-    await FirebaseMessaging.instance
-        .setForegroundNotificationPresentationOptions(
-          alert: true, // Required to display a heads up notification
-          badge: true,
-          sound: true,
-        );
-
-    // Souscrire au topic de promotions
+    await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+      alert: true, // Required to display a heads up notification
+      badge: true,
+      sound: true,
+    );
+    
+    // Souscrire au topic de promotions et au topic global
     await messaging.subscribeToTopic('promotions_topic');
-    print("Inscrit avec succès au topic des promotions");
+    await messaging.subscribeToTopic('all_users');
+    print("Inscrit avec succès aux topics des promotions et all_users");
 
     // Initialiser les notifications locales
     await NotificationService.init();
