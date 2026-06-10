@@ -20,9 +20,7 @@ class ProductCatalogPageState extends State<ProductCatalogPage> {
   final ScrollController _scrollController = ScrollController();
 
   // Variables pour les filtres et tri
-  String _selectedSortOption =
-      'name'; // 'name', 'price_low', 'price_high', 'newest'
-  bool _showFilters = false;
+  String _selectedSortOption = 'name';
 
   @override
   void initState() {
@@ -466,17 +464,5 @@ class ProductCatalogPageState extends State<ProductCatalogPage> {
         bloc.add(const SortByNewest());
         break;
     }
-  }
-
-  void _applyFilters(BuildContext context) {
-    setState(() {
-      _showFilters = false;
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Filtres appliqués avec succès'),
-        duration: Duration(seconds: 2),
-      ),
-    );
   }
 }

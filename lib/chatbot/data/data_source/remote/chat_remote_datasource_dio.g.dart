@@ -12,7 +12,7 @@ part of 'chat_remote_datasource_dio.dart';
 
 class _ChatRemoteDatasourceDio implements ChatRemoteDatasourceDio {
   _ChatRemoteDatasourceDio(this._dio, {this.baseUrl, this.errorLogger}) {
-    baseUrl ??= 'https://ab-autox.com/api/v1';
+    baseUrl ??= 'http://192.168.1.72:3333/api/v1';
   }
 
   final Dio _dio;

@@ -208,7 +208,7 @@ Future<void> initializeDependencies() async {
 
   // 📦 BLoCs
   sl.registerFactory<RemoteProductsBloc>(
-    () => RemoteProductsBloc(sl(), sl()),
+    () => RemoteProductsBloc(sl()),
   );
   sl.registerFactory<RemoteCategoryBloc>(() => RemoteCategoryBloc(sl()));
   sl.registerFactory<RemoteBannerBloc>(() => RemoteBannerBloc(sl()));

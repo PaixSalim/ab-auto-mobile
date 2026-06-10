@@ -78,3 +78,11 @@ class LoadMoreProducts extends RemoteProductsEvent {
 class RefreshProducts extends RemoteProductsEvent {
   const RefreshProducts();
 }
+
+class LoadModels extends RemoteProductsEvent {
+  const LoadModels();
+}
+
+class LoadYears extends RemoteProductsEvent {
+  const LoadYears();
+}

@@ -7,13 +7,11 @@ import 'package:bloc/bloc.dart';
 import 'remote_product_event.dart';
 
 class RemoteProductsBloc extends Bloc<RemoteProductsEvent, RemoteProductState> {
-  final GetProductUseCase _getProductUseCase;
   final GetProductsPaginatedUseCase _getProductsPaginatedUseCase;
   int _currentPage = 1;
   final int _limit = 20;
 
   RemoteProductsBloc(
-    this._getProductUseCase,
     this._getProductsPaginatedUseCase,
   ) : super(const RemoteProductsLoading()) {
     on<GetProducts>(onGetProducts);
@@ -148,10 +146,14 @@ class RemoteProductsBloc extends Bloc<RemoteProductsEvent, RemoteProductState> {
                 (product.brand != null && (event.selectedBrands.contains(product.brand!.id) || event.selectedBrands.contains(product.brand!.name)));
             final modelMatch =
                 event.selectedModels.isEmpty ||
-                (product.model != null && event.selectedModels.contains(product.model));
+                (product.model != null &&
+                    (event.selectedModels.contains(product.model!.id) ||
+                     event.selectedModels.contains(product.model!.name)));
             final yearMatch =
                 event.selectedYears.isEmpty ||
-                (product.year != null && event.selectedYears.contains(product.year));
+                (product.year != null &&
+                    (event.selectedYears.contains(product.year!.id) ||
+                     event.selectedYears.contains(product.year!.name)));
             final priceMatch =
                 product.price! >= event.minPrice &&
                 product.price! <= event.maxPrice;

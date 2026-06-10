@@ -1,7 +1,9 @@
 import 'package:auto/brands/data/models/brand_model.dart';
 import 'package:auto/categories/data/models/category_model.dart';
 import 'package:auto/core/utils/url_resolver.dart';
+import 'package:auto/products/domain/entities/model_entity.dart';
 import 'package:auto/products/domain/entities/product_entity.dart';
+import 'package:auto/products/domain/entities/year_entity.dart';
 
 class ProductModel extends ProductEntity {
   const ProductModel({
@@ -13,8 +15,8 @@ class ProductModel extends ProductEntity {
     super.state,
     super.validationStatus,
     super.description,
-    super.model,
-    super.year,
+    ModelEntity? super.model,
+    YearEntity? super.year,
     super.price,
     super.discount,
     CategoryModel? super.category,
@@ -48,8 +50,12 @@ class ProductModel extends ProductEntity {
       state: json['state'] ?? '',
       validationStatus: json['validationStatus'] ?? '',
       description: json['description'] ?? '',
-      model: json['model']?.toString() ?? '',
-      year: json['year']?.toString() ?? '',
+      model: json['model'] != null && json['model'] is Map<String, dynamic>
+          ? ModelEntity(id: (json['model'] as Map<String, dynamic>)['id']?.toString(), name: (json['model'] as Map<String, dynamic>)['name'] as String?)
+          : null,
+      year: json['year'] != null && json['year'] is Map<String, dynamic>
+          ? YearEntity(id: (json['year'] as Map<String, dynamic>)['id']?.toString(), name: (json['year'] as Map<String, dynamic>)['name'] as String?)
+          : null,
       price: double.tryParse(json['price']?.toString() ?? '0') ?? 0.0,
       discount: double.tryParse(json['discount']?.toString() ?? '0') ?? 0.0,
       category: json['category'] != null
@@ -60,8 +66,8 @@ class ProductModel extends ProductEntity {
           : null,
       subCategoryId: json['subCategoryId']?.toString(),
       brand: json['brand'] != null ? BrandModel.fromJson(json['brand']) : null,
-      features: json['features'] != null 
-          ? (json['features'] is String 
+      features: json['features'] != null
+          ? (json['features'] is String
               ? (json['features'] == '[]' || json['features'] == 'null' ? [] : [json['features'] as String])
               : List<String>.from(json['features'] ?? []))
           : [],

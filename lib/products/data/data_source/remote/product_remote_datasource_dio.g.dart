@@ -12,7 +12,7 @@ part of 'product_remote_datasource_dio.dart';
 
 class _ProductRemoteDatasourceDio implements ProductRemoteDatasourceDio {
   _ProductRemoteDatasourceDio(this._dio, {this.baseUrl, this.errorLogger}) {
-    baseUrl ??= 'https://ab-autox.com/api/v1';
+    baseUrl ??= 'http://192.168.1.72:3333/api/v1';
   }
 
   final Dio _dio;

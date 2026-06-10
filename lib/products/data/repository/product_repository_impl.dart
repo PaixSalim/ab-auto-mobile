@@ -1,11 +1,11 @@
-import 'dart:io';
-
 import 'package:auto/core/resources/data_state.dart';
 import 'package:auto/core/resources/network_info.dart';
 import 'package:auto/products/data/data_source/local/product_local_data_source.dart';
 import 'package:auto/products/data/data_source/remote/product_remote_datasource_dio.dart';
 import 'package:auto/products/data/models/product.model.dart';
+import 'package:auto/products/domain/entities/model_entity.dart';
 import 'package:auto/products/domain/entities/product_entity.dart';
+import 'package:auto/products/domain/entities/year_entity.dart';
 import 'package:auto/products/domain/entities/order_entity.dart';
 import 'package:auto/products/domain/repository/product_repository.dart';
 import 'package:dio/dio.dart';
@@ -16,26 +16,24 @@ class ProductRepositoryImpl implements ProductRepository {
   final NetworkInfo _networkInfo;
   final Dio _dio;
   ProductRepositoryImpl(this._remote, this._local, this._networkInfo, this._dio);
+
   @override
   Future<DataState<List<ProductEntity>>> getProducts() async {
     print('🔄 getProducts() called');
     if (await _networkInfo.isConnected) {
       try {
-        // Récupérer la liste des produits
         final httpResponse = await _remote.getProducts();
         
-        if (httpResponse.response.statusCode == HttpStatus.ok) {
+        if (httpResponse.response.statusCode == 200) {
           final productModels = httpResponse.data as List<dynamic>;
           print('🚀 getProducts: Received ${productModels.length} products from remote');
                     
-          // Les données sont déjà des ProductModel (converties par Retrofit)
-          // Il faut juste les convertir en ProductEntity
           final products = <ProductEntity>[];
           
           for (int i = 0; i < productModels.length; i++) {
             try {
-                            final model = productModels[i] as ProductModel;  // Changé ici
-                            
+                            final model = productModels[i] as ProductModel;
+                             
               final entity = ProductEntity(
                 id: model.id,
                 name: model.name ?? '',
@@ -44,6 +42,8 @@ class ProductRepositoryImpl implements ProductRepository {
                 warranty: model.warranty ?? '',
                 state: model.state ?? '',
                 description: model.description ?? '',
+                model: model.model,
+                year: model.year,
                 price: model.price,
                 discount: model.discount,
                 category: model.category,
@@ -59,10 +59,7 @@ class ProductRepositoryImpl implements ProductRepository {
             }
           }
           
-                    
-          // Pour l'instant, utilisons les produits sans détails supplémentaires
-          // pour vérifier si l'affichage fonctionne
-                    await _local.cacheProducts(products);
+          await _local.cacheProducts(products);
           return DataSuccess(products);
         } else {
           print('⚠️ getProducts: API returned status ${httpResponse.response.statusCode}');
@@ -101,31 +98,30 @@ class ProductRepositoryImpl implements ProductRepository {
         );
 
                 
-        if (response.statusCode == HttpStatus.ok) {
+        if (response.statusCode == 200) {
+          final responseData = response.data;
+
           List<dynamic> productModels = [];
-          Map<String, dynamic>? paginationInfo;
-          
-          if (response.data is List) {
-            productModels = response.data as List<dynamic>;
-          } else if (response.data is Map<String, dynamic>) {
-            final responseData = response.data as Map<String, dynamic>;
-            if (responseData.containsKey('data')) {
-              productModels = responseData['data'] as List<dynamic>;
+          if (responseData is List) {
+            productModels = responseData;
+          } else if (responseData is Map<String, dynamic>) {
+            if (responseData.containsKey('data') && responseData['data'] is List) {
+              productModels = responseData['data'];
+            } else if (responseData.containsKey('products') && responseData['products'] is List) {
+              productModels = responseData['products'];
             } else {
-              productModels = responseData.values.firstWhere((v) => v is List, orElse: () => []) as List<dynamic>;
+              final listValue = responseData.values.firstWhere((v) => v is List, orElse: () => []);
+              productModels = listValue as List<dynamic>;
             }
-            paginationInfo = responseData;
           }
-          print('🚀 getProductsPaginated: Received ${productModels.length} products from remote (page: $page, limit: $limit)');
+
           final products = <ProductEntity>[];
-          
+
           for (int i = 0; i < productModels.length; i++) {
             try {
               final json = productModels[i] as Map<String, dynamic>;
-                            
-              final model = ProductModel.fromJson(json);
-                            
-              final entity = ProductEntity(
+                            final model = ProductModel.fromJson(json);
+                            final entity = ProductEntity(
                 id: model.id,
                 name: model.name ?? '',
                 slug: model.slug ?? '',
@@ -133,6 +129,8 @@ class ProductRepositoryImpl implements ProductRepository {
                 warranty: model.warranty ?? '',
                 state: model.state ?? '',
                 description: model.description ?? '',
+                model: model.model,
+                year: model.year,
                 price: model.price,
                 discount: model.discount,
                 category: model.category,
@@ -150,17 +148,15 @@ class ProductRepositoryImpl implements ProductRepository {
               print('❌ getProductsPaginated: Error parsing product: $e\n$stackTrace');
             }
           }
-          
-                    
-          // Retourner les produits avec les métadonnées de pagination
+
           return DataSuccess({
             'products': products,
-            'total': paginationInfo?['total'] ?? products.length,
-            'page': paginationInfo?['page'] ?? 1,
-            'limit': paginationInfo?['limit'] ?? products.length,
-            'totalPages': paginationInfo?['totalPages'] ?? 1,
-            'hasNextPage': paginationInfo?['hasNextPage'] ?? false,
-            'hasPreviousPage': paginationInfo?['hasPreviousPage'] ?? false,
+            'total': (responseData is Map<String, dynamic>) ? (responseData['total'] ?? products.length) : products.length,
+            'page': (responseData is Map<String, dynamic>) ? (responseData['page'] ?? page) : page,
+            'limit': (responseData is Map<String, dynamic>) ? (responseData['limit'] ?? limit) : limit,
+            'totalPages': (responseData is Map<String, dynamic>) ? (responseData['totalPages'] ?? 1) : 1,
+            'hasNextPage': (responseData is Map<String, dynamic>) ? (responseData['hasNextPage'] ?? false) : false,
+            'hasPreviousPage': (responseData is Map<String, dynamic>) ? (responseData['hasPreviousPage'] ?? false) : false,
           });
         } else {
           print('⚠️ getProductsPaginated: API returned status ${response.statusCode}');
@@ -194,7 +190,7 @@ class ProductRepositoryImpl implements ProductRepository {
       try {
         final httpResponse = await _remote.getProductById(id);
 
-        if (httpResponse.response.statusCode == HttpStatus.ok) {
+        if (httpResponse.response.statusCode == 200) {
           return DataSuccess(httpResponse.data);
         } else {
           return DataFailed(
@@ -231,6 +227,34 @@ class ProductRepositoryImpl implements ProductRepository {
       return response.statusCode == 200;
     } catch (_) {
       return false;
+    }
+  }
+
+  @override
+  Future<DataState<List<ModelEntity>>> getModels() async {
+    try {
+      final response = await _dio.get('/models');
+      if (response.statusCode == 200) {
+        final items = (response.data as List).map((e) => ModelEntity(id: e['id']?.toString(), name: e['name'] as String?)).toList();
+        return DataSuccess(items);
+      }
+      return DataFailed(DioException(error: response.statusMessage, type: DioExceptionType.badResponse, requestOptions: response.requestOptions));
+    } on DioException catch (e) {
+      return DataFailed(e);
+    }
+  }
+
+  @override
+  Future<DataState<List<YearEntity>>> getYears() async {
+    try {
+      final response = await _dio.get('/years');
+      if (response.statusCode == 200) {
+        final items = (response.data as List).map((e) => YearEntity(id: e['id']?.toString(), name: e['name'] as String?)).toList();
+        return DataSuccess(items);
+      }
+      return DataFailed(DioException(error: response.statusMessage, type: DioExceptionType.badResponse, requestOptions: response.requestOptions));
+    } on DioException catch (e) {
+      return DataFailed(e);
     }
   }
 }

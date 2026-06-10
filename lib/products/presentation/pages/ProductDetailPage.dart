@@ -93,7 +93,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   }
 
   Future<void> _shareProduct() async {
-    final productUrl = 'https://ab-autox.com/products/${widget.product.id}';
+    final productUrl = 'http://192.168.1.72:3333/products/${widget.product.id}';
     final playStoreLink =
         'https://play.google.com/store/apps/details?id=com.abautoxapp.mobile&pcampaignid=web_share';
     final shareText =
@@ -825,15 +825,24 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   Widget _buildSpecsGrid() {
     final features = widget.product.features ?? [];
 
-    // Construction de la liste des caractéristiques
     final List<Widget> items = [
       _buildSpecItem(
         Icons.branding_watermark_rounded,
         'Marque',
         widget.product.brand?.name ?? 'Non spécifié',
       ),
+      _buildSpecItem(
+        Icons.directions_car_rounded,
+        'Modèle',
+        widget.product.model?.name ?? 'Non spécifié',
+      ),
+      _buildSpecItem(
+        Icons.event_rounded,
+        'Année',
+        widget.product.year?.name ?? 'Non spécifié',
+      ),
       if (features.isNotEmpty)
-        _buildSpecItem(Icons.directions_car_rounded, 'Détail', features.first)
+        _buildSpecItem(Icons.settings_suggest_rounded, 'Spécif.', features.first)
       else
         _buildSpecItem(
           Icons.category_rounded,
@@ -841,9 +850,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           widget.product.category?.name ?? 'Non spécifié',
         ),
       if (features.length > 1)
-        _buildSpecItem(Icons.settings_suggest_rounded, 'Spécif.', features[1]),
-      if (features.length > 2)
-        _buildSpecItem(Icons.info_rounded, 'Info', features[2]),
+        _buildSpecItem(Icons.info_rounded, 'Info', features[1]),
     ];
 
     // Affichage en colonnes sans contrainte de ratio pour éviter que le texte ne se coupe

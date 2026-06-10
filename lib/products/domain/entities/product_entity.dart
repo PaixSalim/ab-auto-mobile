@@ -1,5 +1,7 @@
 import 'package:auto/categories/domain/entities/category_entity.dart';
 import '../../../brands/domain/entities/brand_entity.dart';
+import 'model_entity.dart';
+import 'year_entity.dart';
 
 class SellerEntity {
   final String? id;
@@ -19,8 +21,8 @@ class ProductEntity {
   final String? state;
   final String? validationStatus;
   final String? description;
-  final String? model;
-  final String? year;
+  final ModelEntity? model;
+  final YearEntity? year;
   final double? price;
   final double? discount;
   final CategoryEntity? category;
