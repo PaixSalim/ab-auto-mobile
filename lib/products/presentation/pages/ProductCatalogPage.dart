@@ -2,6 +2,8 @@ import 'package:auto/products/presentation/bloc/remote/remote_product_bloc.dart'
 import 'package:auto/products/presentation/bloc/remote/remote_product_event.dart';
 import 'package:auto/products/presentation/bloc/remote/remote_product_state.dart';
 import 'package:auto/products/presentation/widgets/ProductGridCard.dart';
+import 'package:auto/products/presentation/widgets/MultiSelectFilterModal.dart';
+import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,9 +18,10 @@ class ProductCatalogPage extends StatefulWidget {
 class ProductCatalogPageState extends State<ProductCatalogPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final ScrollController _scrollController = ScrollController();
-  
+
   // Variables pour les filtres et tri
-  String _selectedSortOption = 'name'; // 'name', 'price_low', 'price_high', 'newest'
+  String _selectedSortOption =
+      'name'; // 'name', 'price_low', 'price_high', 'newest'
   bool _showFilters = false;
 
   @override
@@ -47,6 +50,7 @@ class ProductCatalogPageState extends State<ProductCatalogPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.transparent,
       key: _scaffoldKey,
       body: Column(
         children: [
@@ -67,41 +71,54 @@ class ProductCatalogPageState extends State<ProductCatalogPage> {
                 if (state is RemoteProductsDone) {
                   return state.displayedProducts!.isNotEmpty
                       ? RefreshIndicator(
-                          onRefresh: () async {
-                            context.read<RemoteProductsBloc>().add(const RefreshProducts());
-                          },
-                          child: GridView.builder(
-                            controller: _scrollController,
-                            padding: const EdgeInsets.all(12),
-                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 10,
-                              mainAxisSpacing: 10,
-                              childAspectRatio: 0.65,
-                            ),
-                            itemCount: state.displayedProducts!.length + (state.hasNextPage ? 1 : 0),
-                            itemBuilder: (context, index) {
-                              if (index >= state.displayedProducts!.length) {
-                                return Center(
-                                  child: state.isLoadingMore
+                        onRefresh: () async {
+                          context.read<RemoteProductsBloc>().add(
+                            const RefreshProducts(),
+                          );
+                        },
+                        child: GridView.builder(
+                          controller: _scrollController,
+                          padding: const EdgeInsets.all(12),
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                crossAxisSpacing: 10,
+                                mainAxisSpacing: 10,
+                                childAspectRatio: 0.90,
+                              ),
+                          itemCount:
+                              state.displayedProducts!.length +
+                              (state.hasNextPage ? 1 : 0),
+                          itemBuilder: (context, index) {
+                            if (index >= state.displayedProducts!.length) {
+                              return Center(
+                                child:
+                                    state.isLoadingMore
                                         ? const CupertinoActivityIndicator()
                                         : const SizedBox.shrink(),
-                                );
-                              }
-                              return ProductGridCard(
-                                product: state.displayedProducts![index],
-                                index: index, // Passer l'index pour le tag Hero unique
                               );
-                            },
-                          ),
-                        )
-                      : Center(child: const Text('Aucun produit ne correspond à ce filtre'));
+                            }
+                            return ProductGridCard(
+                              product: state.displayedProducts![index],
+                              index:
+                                  index, // Passer l'index pour le tag Hero unique
+                            );
+                          },
+                        ),
+                      )
+                      : Center(
+                        child: const Text(
+                          'Aucun produit ne correspond à ce filtre',
+                        ),
+                      );
                 }
                 if (state is RemoteProductsLoading) {
                   return Center(child: CupertinoActivityIndicator());
                 }
                 if (state is RemoteProductsError) {
-                  return Center(child: Text('Veuillez bien vouloir redémarrer l\'app svp'));
+                  return Center(
+                    child: Text('Veuillez bien vouloir redémarrer l\'app svp'),
+                  );
                 }
 
                 return const SizedBox();
@@ -113,203 +130,241 @@ class ProductCatalogPageState extends State<ProductCatalogPage> {
     );
   }
 
-  // Widget pour construire l'en-tête avec filtres et tri
+  // Widget pour construire l'en-tête avec filtres
   Widget _buildHeader(BuildContext context, RemoteProductsDone state) {
-    final hasActiveFilters = state.selectedCategories.isNotEmpty || 
-                           state.selectedSubCategories.isNotEmpty || 
-                           state.selectedBrands.isNotEmpty ||
-                           state.minPrice > 0 ||
-                           state.maxPrice < 50000000 ||
-                           state.isNew ||
-                           state.isUsed;
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 4,
-            offset: const Offset(0, 2),
+    return ClipRRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.7),
+            border: Border(
+              bottom: BorderSide(
+                color: Colors.white.withValues(alpha: 0.5),
+                width: 1,
+              ),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Titre et filtres actifs
-          Row(
+          padding: EdgeInsets.only(
+            top: MediaQuery.of(context).padding.top + 10,
+            bottom: 12,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              // Ligne des boutons déroulants (Filtres)
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
                   children: [
-                    Text(
-                      'Catalogue',
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
+                    _buildDropdownFilter(
+                      context,
+                      title: 'Marque',
+                      allOptions: state.availableBrands,
+                      selectedOptions: state.selectedBrands,
+                      onApply: (selected) {
+                        context.read<RemoteProductsBloc>().add(
+                          UpdateSpecificFilter(selectedBrands: selected),
+                        );
+                      },
                     ),
-                    const SizedBox(height: 4),
-                    if (hasActiveFilters)
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).primaryColor.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          'Filtres actifs',
-                          style: TextStyle(
-                            color: Theme.of(context).primaryColor,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
+                    const SizedBox(width: 8),
+                    _buildDropdownFilter(
+                      context,
+                      title: 'Modèle',
+                      allOptions: state.availableModels,
+                      selectedOptions: state.selectedModels,
+                      onApply: (selected) {
+                        context.read<RemoteProductsBloc>().add(
+                          UpdateSpecificFilter(selectedModels: selected),
+                        );
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    _buildDropdownFilter(
+                      context,
+                      title: 'Année',
+                      allOptions: state.availableYears,
+                      selectedOptions: state.selectedYears,
+                      onApply: (selected) {
+                        context.read<RemoteProductsBloc>().add(
+                          UpdateSpecificFilter(selectedYears: selected),
+                        );
+                      },
+                    ),
+                    // L'utilisateur avait d'autres filtres dans la maquette, on peut les ajouter plus tard si besoin
                   ],
                 ),
               ),
-              // Bouton pour afficher/cacher les filtres
-              IconButton(
-                onPressed: () {
-                  setState(() {
-                    _showFilters = !_showFilters;
-                  });
-                },
-                icon: Icon(
-                  _showFilters ? Icons.filter_list_off : Icons.filter_list,
-                  color: Theme.of(context).primaryColor,
-                ),
-              ),
-              // Bouton de rafraîchissement forcé
-              IconButton(
-                onPressed: () {
-                  context.read<RemoteProductsBloc>().add(const RefreshProducts());
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Actualisation des produits en cours...'),
-                      duration: Duration(seconds: 2),
-                    ),
-                  );
-                },
-                icon: Icon(
-                  Icons.refresh,
-                  color: Theme.of(context).primaryColor,
-                ),
-              ),
+
+              // Ligne des filtres actifs (Chips)
+              _buildActiveFilters(context, state),
             ],
           ),
-          
-          // Section des filtres (affichée si _showFilters est true)
-          if (_showFilters) ...[
-            const SizedBox(height: 16),
-            
-            // Filtres actifs
-            if (hasActiveFilters) ...[
-              _buildActiveFilters(context, state),
-              const SizedBox(height: 12),
-            ],
-            
-            // Options de tri
-            _buildSortOptions(context),
-            const SizedBox(height: 12),
-            
-            // Boutons d'action
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () {
-                      context.read<RemoteProductsBloc>().add(const ResetProductFilter());
-                      setState(() {
-                        _selectedSortOption = 'name';
-                      });
-                    },
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                    ),
-                    child: const Text('Réinitialiser'),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      _applyFilters(context);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).primaryColor,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                    ),
-                    child: const Text('Appliquer'),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ],
+        ),
       ),
     );
   }
 
-  // Widget pour afficher les filtres actifs
-  Widget _buildActiveFilters(BuildContext context, RemoteProductsDone state) {
-    final filters = <String>[];
-    
-    if (state.selectedCategories.isNotEmpty) {
-      filters.add('Catégories: ${state.selectedCategories.length}');
-    }
-    if (state.selectedSubCategories.isNotEmpty) {
-      filters.add('Sous-catégories: ${state.selectedSubCategories.length}');
-    }
-    if (state.selectedBrands.isNotEmpty) {
-      filters.add('Marques: ${state.selectedBrands.length}');
-    }
-    if (state.minPrice > 0 || state.maxPrice < 50000000) {
-      filters.add('Prix: ${state.minPrice.toInt()} - ${state.maxPrice.toInt()}');
-    }
-    if (state.isNew) { filters.add('Nouveaux'); }
-    if (state.isUsed) { filters.add('Occasions'); }
-
+  Widget _buildDropdownFilter(
+    BuildContext context, {
+    required String title,
+    required List<String> allOptions,
+    required List<String> selectedOptions,
+    required Function(List<String>) onApply,
+  }) {
+    final primaryColor = Theme.of(context).primaryColor;
     return Container(
-      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.grey.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Filtres actifs:',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: Colors.black87,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 8,
-            runSpacing: 4,
-            children: filters.map((filter) => Chip(
-              label: Text(
-                filter,
-                style: const TextStyle(fontSize: 12),
-              ),
-              backgroundColor: Theme.of(context).primaryColor.withOpacity(0.1),
-              deleteIcon: const Icon(Icons.close, size: 16),
-              onDeleted: () {
-                // TODO: Implémenter la suppression individuelle de filtres
-              },
-            )).toList(),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: primaryColor.withValues(alpha: 0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
           ),
         ],
+        border: Border.all(color: primaryColor.withValues(alpha: 0.2)),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(20),
+          onTap: () {
+            showDialog(
+              context: context,
+              builder:
+                  (context) => Dialog(
+                    backgroundColor: Colors.transparent,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: MultiSelectFilterModal(
+                      title: title,
+                      allOptions: allOptions,
+                      selectedOptions: selectedOptions,
+                      onApply: onApply,
+                    ),
+                  ),
+            );
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: primaryColor,
+                    letterSpacing: 0.3,
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Icon(
+                  Icons.keyboard_arrow_down_rounded,
+                  size: 20,
+                  color: primaryColor,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Widget pour afficher les filtres actifs sous forme de chips
+  Widget _buildActiveFilters(BuildContext context, RemoteProductsDone state) {
+    final activeFilters = <Map<String, String>>[];
+
+    for (var brand in state.selectedBrands) {
+      activeFilters.add({'type': 'brand', 'value': brand});
+    }
+    for (var model in state.selectedModels) {
+      activeFilters.add({'type': 'model', 'value': model});
+    }
+    for (var year in state.selectedYears) {
+      activeFilters.add({'type': 'year', 'value': year});
+    }
+
+    if (activeFilters.isEmpty) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.only(left: 16, right: 16, top: 12),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            Text(
+              'Suppri...',
+              style: TextStyle(
+                color: Theme.of(context).primaryColor,
+                fontWeight: FontWeight.bold,
+                fontSize: 13,
+              ),
+            ),
+            const SizedBox(width: 8),
+            ...activeFilters.map((filter) {
+              return Padding(
+                padding: const EdgeInsets.only(right: 8.0),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(
+                      color: Theme.of(
+                        context,
+                      ).primaryColor.withValues(alpha: 0.3),
+                    ),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        filter['value']!,
+                        style: TextStyle(
+                          color: Theme.of(context).primaryColor,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      InkWell(
+                        onTap: () {
+                          context.read<RemoteProductsBloc>().add(
+                            RemoveFilter(filter['type']!, filter['value']!),
+                          );
+                        },
+                        child: Icon(
+                          Icons.close,
+                          size: 16,
+                          color: Theme.of(context).primaryColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }).toList(),
+          ],
+        ),
       ),
     );
   }
@@ -338,9 +393,24 @@ class ProductCatalogPageState extends State<ProductCatalogPage> {
             spacing: 8,
             children: [
               _buildSortChip(context, 'name', 'Nom', Icons.sort_by_alpha),
-              _buildSortChip(context, 'price_low', 'Prix croissant', Icons.arrow_upward),
-              _buildSortChip(context, 'price_high', 'Prix décroissant', Icons.arrow_downward),
-              _buildSortChip(context, 'newest', 'Nouveautés', Icons.new_releases),
+              _buildSortChip(
+                context,
+                'price_low',
+                'Prix croissant',
+                Icons.arrow_upward,
+              ),
+              _buildSortChip(
+                context,
+                'price_high',
+                'Prix décroissant',
+                Icons.arrow_downward,
+              ),
+              _buildSortChip(
+                context,
+                'newest',
+                'Nouveautés',
+                Icons.new_releases,
+              ),
             ],
           ),
         ],
@@ -348,7 +418,12 @@ class ProductCatalogPageState extends State<ProductCatalogPage> {
     );
   }
 
-  Widget _buildSortChip(BuildContext context, String value, String label, IconData icon) {
+  Widget _buildSortChip(
+    BuildContext context,
+    String value,
+    String label,
+    IconData icon,
+  ) {
     final isSelected = _selectedSortOption == value;
     return FilterChip(
       label: Row(
@@ -376,7 +451,7 @@ class ProductCatalogPageState extends State<ProductCatalogPage> {
 
   void _applySorting(BuildContext context) {
     final bloc = context.read<RemoteProductsBloc>();
-    
+
     switch (_selectedSortOption) {
       case 'name':
         bloc.add(const SortByAlphabet(true));

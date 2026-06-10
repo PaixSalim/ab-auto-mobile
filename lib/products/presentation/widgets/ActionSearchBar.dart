@@ -7,6 +7,7 @@ import 'package:auto/products/presentation/pages/ProductDetailPage.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'dart:ui';
 
 class ActionSearchBar extends StatefulWidget {
   final List<ProductEntity> products;
@@ -173,18 +174,22 @@ class _ActionSearchBarState extends State<ActionSearchBar>
                     ? Container(
                       margin: EdgeInsets.all(0),
                       decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.grey[300]!),
+                        color: Colors.white.withOpacity(0.85),
+                        borderRadius: BorderRadius.circular(15),
+                        border: Border.all(color: Colors.white.withOpacity(0.8), width: 1.5),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.1),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 10,
+                            offset: const Offset(0, 5),
                           ),
                         ],
                       ),
-                      child: Column(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(15),
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                          child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           SizedBox(
@@ -336,8 +341,10 @@ class _ActionSearchBarState extends State<ActionSearchBar>
                           ),
                         ],
                       ),
-                    )
-                    : const SizedBox.shrink(),
+                    ),
+                  ),
+                )
+                : const SizedBox.shrink(),
           ),
         );
       },
@@ -350,51 +357,57 @@ class _ActionSearchBarState extends State<ActionSearchBar>
       link: _layerLink,
       child: SizedBox(
         width: widget.width,
-        child: TextField(
-          controller: _controller,
-          focusNode: _focusNode,
-          onChanged: _onQueryChanged,
-          decoration: InputDecoration(
-            hintText: "Rechercher une pièce",
-            hintStyle: TextStyle(color: Colors.grey, fontSize: 15),
-            enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide.none,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 8,
-            ),
-            fillColor: Colors.grey.withValues(alpha: 0.1),
-            focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(
-                color: Theme.of(context).primaryColor,
-                width: 2,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+            child: TextField(
+              controller: _controller,
+              focusNode: _focusNode,
+              onChanged: _onQueryChanged,
+              decoration: InputDecoration(
+                hintText: "Rechercher une pièce",
+                hintStyle: TextStyle(color: Colors.black54, fontSize: 14),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.white.withOpacity(0.6), width: 1.5),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
+                ),
+                fillColor: Colors.white.withOpacity(0.4),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Theme.of(context).primaryColor,
+                    width: 2,
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                filled: true,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  borderSide: BorderSide.none,
+                ),
+                prefixIcon: const Icon(Icons.search, size: 20, color: Colors.black87),
+                suffixIcon:
+                    _controller.text.isNotEmpty
+                        ? IconButton(
+                          onPressed: () {
+                            _controller.clear();
+                            _removeOverlay();
+                          },
+                          icon: Icon(
+                            Icons.close,
+                            size: 18,
+                            color: Theme.of(context).primaryColor,
+                          ),
+                        )
+                        : null,
               ),
-              borderRadius: BorderRadius.circular(8),
+              style: TextStyle(fontSize: 14, color: Colors.black87),
             ),
-            filled: true,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide.none,
-            ),
-            prefixIcon: Icon(Icons.search, size: 18, color: Colors.grey[600]),
-            suffixIcon:
-                _controller.text.isNotEmpty
-                    ? IconButton(
-                      onPressed: () {
-                        _controller.clear();
-                        _removeOverlay();
-                      },
-                      icon: Icon(
-                        Icons.close,
-                        size: 18,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                    )
-                    : null,
           ),
-          style: TextStyle(fontSize: 14, color: Colors.grey[900]),
         ),
       ),
     );

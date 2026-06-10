@@ -35,8 +35,7 @@ class NotificationService {
       initializationSettings,
       onDidReceiveNotificationResponse: (NotificationResponse details) {
         // Handle notification click
-        print("Notification clicked: ${details.payload}");
-      },
+              },
     );
 
     // Create the channel on Android

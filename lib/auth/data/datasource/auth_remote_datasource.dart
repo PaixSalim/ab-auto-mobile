@@ -8,8 +8,7 @@ class AuthRemoteDatasource {
     required String uid, // API attend "uid" au lieu de "email"
     required String password,
   }) async {
-    print('🔐 LOGIN ATTEMPT - uid: $uid, password: ${password.length > 0 ? "***" : "empty"}');
-    
+        
     final response = await _dio.post(
       '/auth/mobile/login',
       data: {'uid': uid, 'password': password},
@@ -20,9 +19,7 @@ class AuthRemoteDatasource {
       ),
     );
     
-    print('🔐 LOGIN RESPONSE - Status: ${response.statusCode}');
-    print('🔐 LOGIN RESPONSE - Data: ${response.data}');
-    
+            
     return response;
   }
 

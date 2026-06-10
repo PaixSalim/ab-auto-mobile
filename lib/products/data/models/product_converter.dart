@@ -103,8 +103,7 @@ class ProductObjectBox {
     try {
       return List<String>.from(jsonDecode(medias!));
     } catch (e) {
-      print('Erreur lors de la désérialisation des medias: $e');
-      return null;
+            return null;
     }
   }
 
@@ -113,8 +112,7 @@ class ProductObjectBox {
     try {
       return List<String>.from(jsonDecode(featuresJson!));
     } catch (e) {
-      print('Erreur lors de la désérialisation des features: $e');
-      return null;
+            return null;
     }
   }
 }

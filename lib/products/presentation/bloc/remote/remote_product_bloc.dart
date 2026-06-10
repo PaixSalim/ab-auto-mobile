@@ -25,6 +25,8 @@ class RemoteProductsBloc extends Bloc<RemoteProductsEvent, RemoteProductState> {
     on<SortByNewest>(_onSortByNewest);
     on<LoadMoreProducts>(_onLoadMoreProducts);
     on<RefreshProducts>(_onRefreshProducts);
+    on<UpdateSpecificFilter>(_onUpdateSpecificFilter);
+    on<RemoveFilter>(_onRemoveFilter);
   }
 
   Future<void> onGetProducts(
@@ -45,6 +47,8 @@ class RemoteProductsBloc extends Bloc<RemoteProductsEvent, RemoteProductState> {
           products,
           products,
           '',
+          [],
+          [],
           [],
           [],
           [],
@@ -88,6 +92,8 @@ class RemoteProductsBloc extends Bloc<RemoteProductsEvent, RemoteProductState> {
           [],
           [],
           [],
+          [],
+          [],
           0,
           50000000,
           false,
@@ -108,6 +114,8 @@ class RemoteProductsBloc extends Bloc<RemoteProductsEvent, RemoteProductState> {
           allProducts,
           allProducts,
           '',
+          [],
+          [],
           [],
           [],
           [],
@@ -137,7 +145,13 @@ class RemoteProductsBloc extends Bloc<RemoteProductsEvent, RemoteProductState> {
                 (product.subCategoryId != null && event.selectedSubCategories.contains(product.subCategoryId!));
             final brandMatch =
                 event.selectedBrands.isEmpty ||
-                (product.brand != null && event.selectedBrands.contains(product.brand!.id));
+                (product.brand != null && (event.selectedBrands.contains(product.brand!.id) || event.selectedBrands.contains(product.brand!.name)));
+            final modelMatch =
+                event.selectedModels.isEmpty ||
+                (product.model != null && event.selectedModels.contains(product.model));
+            final yearMatch =
+                event.selectedYears.isEmpty ||
+                (product.year != null && event.selectedYears.contains(product.year));
             final priceMatch =
                 product.price! >= event.minPrice &&
                 product.price! <= event.maxPrice;
@@ -146,7 +160,7 @@ class RemoteProductsBloc extends Bloc<RemoteProductsEvent, RemoteProductState> {
                 (event.isNew && (product.state == 'new') ||
                     (event.isUsed && !(product.state == 'new')));
 
-            return categoryMatch && subCategoryMatch && brandMatch && priceMatch && stateMatch;
+            return categoryMatch && subCategoryMatch && brandMatch && modelMatch && yearMatch && priceMatch && stateMatch;
           }).toList();
 
       emit(
@@ -155,10 +169,64 @@ class RemoteProductsBloc extends Bloc<RemoteProductsEvent, RemoteProductState> {
           selectedCategories: event.selectedCategories,
           selectedSubCategories: event.selectedSubCategories,
           selectedBrands: event.selectedBrands,
+          selectedModels: event.selectedModels,
+          selectedYears: event.selectedYears,
           minPrice: event.minPrice,
           maxPrice: event.maxPrice,
           isNew: event.isNew,
           isUsed: event.isUsed,
+        ),
+      );
+    }
+  }
+
+  void _onUpdateSpecificFilter(
+    UpdateSpecificFilter event,
+    Emitter<RemoteProductState> emit,
+  ) {
+    if (state is RemoteProductsDone) {
+      final currentState = state as RemoteProductsDone;
+      add(
+        FilterProducts(
+          selectedCategories: currentState.selectedCategories,
+          selectedSubCategories: currentState.selectedSubCategories,
+          selectedBrands: event.selectedBrands ?? currentState.selectedBrands,
+          selectedModels: event.selectedModels ?? currentState.selectedModels,
+          selectedYears: event.selectedYears ?? currentState.selectedYears,
+          minPrice: currentState.minPrice,
+          maxPrice: currentState.maxPrice,
+          isNew: currentState.isNew,
+          isUsed: currentState.isUsed,
+        ),
+      );
+    }
+  }
+
+  void _onRemoveFilter(
+    RemoveFilter event,
+    Emitter<RemoteProductState> emit,
+  ) {
+    if (state is RemoteProductsDone) {
+      final currentState = state as RemoteProductsDone;
+      final brands = List<String>.from(currentState.selectedBrands);
+      final models = List<String>.from(currentState.selectedModels);
+      final years = List<String>.from(currentState.selectedYears);
+
+      if (event.filterType == 'brand') brands.remove(event.value);
+      if (event.filterType == 'model') models.remove(event.value);
+      if (event.filterType == 'year') years.remove(event.value);
+
+      add(
+        FilterProducts(
+          selectedCategories: currentState.selectedCategories,
+          selectedSubCategories: currentState.selectedSubCategories,
+          selectedBrands: brands,
+          selectedModels: models,
+          selectedYears: years,
+          minPrice: currentState.minPrice,
+          maxPrice: currentState.maxPrice,
+          isNew: currentState.isNew,
+          isUsed: currentState.isUsed,
         ),
       );
     }
@@ -310,6 +378,8 @@ class RemoteProductsBloc extends Bloc<RemoteProductsEvent, RemoteProductState> {
             currentState.selectedCategories,
             currentState.selectedSubCategories ?? [],
             currentState.selectedBrands,
+            currentState.selectedModels,
+            currentState.selectedYears,
             currentState.minPrice,
             currentState.maxPrice,
             currentState.isNew,
@@ -345,6 +415,8 @@ class RemoteProductsBloc extends Bloc<RemoteProductsEvent, RemoteProductState> {
           products,
           products,
           '',
+          [],
+          [],
           [],
           [],
           [],

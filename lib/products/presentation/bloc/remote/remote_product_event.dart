@@ -15,6 +15,8 @@ class FilterProducts extends RemoteProductsEvent {
   final List<String> selectedCategories;
   final List<String> selectedSubCategories;
   final List<String> selectedBrands;
+  final List<String> selectedModels;
+  final List<String> selectedYears;
   final double minPrice;
   final double maxPrice;
   final bool isNew;
@@ -24,11 +26,31 @@ class FilterProducts extends RemoteProductsEvent {
     required this.selectedCategories,
     this.selectedSubCategories = const [],
     required this.selectedBrands,
+    this.selectedModels = const [],
+    this.selectedYears = const [],
     required this.minPrice,
     required this.maxPrice,
     required this.isNew,
     required this.isUsed,
   });
+}
+
+class UpdateSpecificFilter extends RemoteProductsEvent {
+  final List<String>? selectedBrands;
+  final List<String>? selectedModels;
+  final List<String>? selectedYears;
+  
+  const UpdateSpecificFilter({
+    this.selectedBrands,
+    this.selectedModels,
+    this.selectedYears,
+  });
+}
+
+class RemoveFilter extends RemoteProductsEvent {
+  final String filterType; // 'brand', 'model', 'year'
+  final String value;
+  const RemoveFilter(this.filterType, this.value);
 }
 
 class SortByAlphabet extends RemoteProductsEvent {

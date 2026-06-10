@@ -18,6 +18,7 @@ class ProductRepositoryImpl implements ProductRepository {
   ProductRepositoryImpl(this._remote, this._local, this._networkInfo, this._dio);
   @override
   Future<DataState<List<ProductEntity>>> getProducts() async {
+    print('🔄 getProducts() called');
     if (await _networkInfo.isConnected) {
       try {
         // Récupérer la liste des produits
@@ -25,18 +26,16 @@ class ProductRepositoryImpl implements ProductRepository {
         
         if (httpResponse.response.statusCode == HttpStatus.ok) {
           final productModels = httpResponse.data as List<dynamic>;
-          print('Received ${productModels.length} products from API');
-          
+          print('🚀 getProducts: Received ${productModels.length} products from remote');
+                    
           // Les données sont déjà des ProductModel (converties par Retrofit)
           // Il faut juste les convertir en ProductEntity
           final products = <ProductEntity>[];
           
           for (int i = 0; i < productModels.length; i++) {
             try {
-              print('Converting product $i...');
-              final model = productModels[i] as ProductModel;  // Changé ici
-              print('ProductModel received for: ${model.name}');
-              
+                            final model = productModels[i] as ProductModel;  // Changé ici
+                            
               final entity = ProductEntity(
                 id: model.id,
                 name: model.name ?? '',
@@ -54,22 +53,19 @@ class ProductRepositoryImpl implements ProductRepository {
                 seller: model.seller,
                 sellerId: model.sellerId,
               );
-              print('ProductEntity created for: ${entity.name}');
-              products.add(entity);
-            } catch (e) {
-              print('Error converting product $i: $e');
-              print('Product data: ${productModels[i]}');
+                            products.add(entity);
+            } catch (e, stackTrace) {
+              print('❌ getProducts: Error parsing product: $e\n$stackTrace');
             }
           }
           
-          print('Converted ${products.length} products to ProductEntity');
-          
+                    
           // Pour l'instant, utilisons les produits sans détails supplémentaires
           // pour vérifier si l'affichage fonctionne
-          print('Using products without seller details for now');
-          await _local.cacheProducts(products);
+                    await _local.cacheProducts(products);
           return DataSuccess(products);
         } else {
+          print('⚠️ getProducts: API returned status ${httpResponse.response.statusCode}');
           return DataFailed(
             DioException(
               error: httpResponse.response.statusMessage,
@@ -79,9 +75,11 @@ class ProductRepositoryImpl implements ProductRepository {
           );
         }
       } on DioException catch (e) {
+        print('❌ getProducts: DioException: ${e.message}');
         return DataFailed(e);
       }
     } else {
+      print('⚠️ getProducts: No internet connection. Fetching from local cache.');
       return DataSuccess(await _local.getProducts());
     }
   }
@@ -91,35 +89,42 @@ class ProductRepositoryImpl implements ProductRepository {
     int page = 1,
     int limit = 20,
   }) async {
-    if (await _networkInfo.isConnected) {
+    print('🔄 getProductsPaginated() called (page: $page, limit: $limit)');
+    bool isConnected = await _networkInfo.isConnected;
+    print('📡 getProductsPaginated: isConnected=$isConnected');
+    if (isConnected) {
       try {
-        print('📡 Fetching products from /products?page=$page&limit=$limit');
-        final response = await _dio.get(
+        print('🌐 getProductsPaginated: starting API request...');
+                final response = await _dio.get(
           '/products',
           queryParameters: {'page': page, 'limit': limit},
         );
 
-        print('📡 Response status: ${response.statusCode}');
-        print('📡 Response data: ${response.data}');
-
+                
         if (response.statusCode == HttpStatus.ok) {
-          final responseData = response.data as Map<String, dynamic>;
-          print('📡 Response keys: ${responseData.keys.toList()}');
+          List<dynamic> productModels = [];
+          Map<String, dynamic>? paginationInfo;
           
-          final productModels = responseData['data'] as List<dynamic>;
-          
-          print('✅ Received ${productModels.length} products from API (page $page)');
-          
+          if (response.data is List) {
+            productModels = response.data as List<dynamic>;
+          } else if (response.data is Map<String, dynamic>) {
+            final responseData = response.data as Map<String, dynamic>;
+            if (responseData.containsKey('data')) {
+              productModels = responseData['data'] as List<dynamic>;
+            } else {
+              productModels = responseData.values.firstWhere((v) => v is List, orElse: () => []) as List<dynamic>;
+            }
+            paginationInfo = responseData;
+          }
+          print('🚀 getProductsPaginated: Received ${productModels.length} products from remote (page: $page, limit: $limit)');
           final products = <ProductEntity>[];
           
           for (int i = 0; i < productModels.length; i++) {
             try {
               final json = productModels[i] as Map<String, dynamic>;
-              print('📦 Product $i JSON: ${json['name']} - validationStatus: ${json['validationStatus']}');
-              
+                            
               final model = ProductModel.fromJson(json);
-              print('📦 Product $i Model: ${model.name} - validationStatus: ${model.validationStatus}');
-              
+                            
               final entity = ProductEntity(
                 id: model.id,
                 name: model.name ?? '',
@@ -140,27 +145,25 @@ class ProductRepositoryImpl implements ProductRepository {
                 sellerId: model.sellerId,
                 validationStatus: model.validationStatus,
               );
-              print('✅ ProductEntity created: ${entity.name}');
-              products.add(entity);
-            } catch (e) {
-              print('❌ Error converting product $i: $e');
-              print('❌ Product data: ${productModels[i]}');
+                            products.add(entity);
+            } catch (e, stackTrace) {
+              print('❌ getProductsPaginated: Error parsing product: $e\n$stackTrace');
             }
           }
           
-          print('✅ Total converted products: ${products.length}');
-          
+                    
           // Retourner les produits avec les métadonnées de pagination
           return DataSuccess({
             'products': products,
-            'total': responseData['total'],
-            'page': responseData['page'],
-            'limit': responseData['limit'],
-            'totalPages': responseData['totalPages'],
-            'hasNextPage': responseData['hasNextPage'],
-            'hasPreviousPage': responseData['hasPreviousPage'],
+            'total': paginationInfo?['total'] ?? products.length,
+            'page': paginationInfo?['page'] ?? 1,
+            'limit': paginationInfo?['limit'] ?? products.length,
+            'totalPages': paginationInfo?['totalPages'] ?? 1,
+            'hasNextPage': paginationInfo?['hasNextPage'] ?? false,
+            'hasPreviousPage': paginationInfo?['hasPreviousPage'] ?? false,
           });
         } else {
+          print('⚠️ getProductsPaginated: API returned status ${response.statusCode}');
           return DataFailed(
             DioException(
               error: response.statusMessage,
@@ -170,11 +173,11 @@ class ProductRepositoryImpl implements ProductRepository {
           );
         }
       } on DioException catch (e) {
-        print('❌ DioException: ${e.message}');
-        print('❌ Error details: ${e.error}');
+        print('❌ getProductsPaginated: DioException: ${e.message}');
         return DataFailed(e);
       }
     } else {
+      print('⚠️ getProductsPaginated: No internet connection.');
       return DataFailed(
         DioException(
           error: 'No internet connection',

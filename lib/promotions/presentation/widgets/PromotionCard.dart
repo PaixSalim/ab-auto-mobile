@@ -79,17 +79,28 @@ class PromotionCard extends StatelessWidget {
           );
         }
       },
-      child: Card(
-        color: Colors.white,
-        elevation: 2,
-        shadowColor: Colors.black12,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        child: Column(
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.grey.withOpacity(0.1), width: 1),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 20,
+              spreadRadius: 0,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Image and Badges
             Expanded(
-              flex: 5,
+              flex: 4,
               child: Stack(
                 children: [
                   ClipRRect(
@@ -156,105 +167,121 @@ class PromotionCard extends StatelessWidget {
             
             // Info Section
             Expanded(
-              flex: 4,
+              flex: 5,
               child: Padding(
-                padding: const EdgeInsets.all(6.0),
+                padding: const EdgeInsets.all(8.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Title and Category
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          product?.category?.name ?? 'Catégorie',
-                          style: TextStyle(
-                            color: Colors.grey[600],
-                            fontSize: 9,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const SizedBox(height: 1),
-                        Text(
-                          product?.name ?? 'Produit',
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black87,
-                          ),
-                        ),
-                        if (promotion.promoLabel != null) ...[
-                          const SizedBox(height: 1),
-                          Text(
-                            promotion.promoLabel!,
-                            style: TextStyle(
-                              color: Colors.red[600],
-                              fontSize: 9,
-                              fontWeight: FontWeight.w500,
+                    // Title and Promo Label
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              product?.name ?? 'Produit',
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black87,
+                              ),
                             ),
                           ),
+                          if (promotion.promoLabel != null) ...[
+                            const SizedBox(height: 2),
+                            Text(
+                              promotion.promoLabel!,
+                              style: TextStyle(
+                                color: Colors.red[600],
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
                         ],
-                      ],
+                      ),
                     ),
                     
-                    // Price Section
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    // Price Section with Add to Cart Button
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        // Original Price (crossed out)
-                        if (product?.price != null)
-                          Text(
-                            "${getProductPrice(double.tryParse(product!.price!) ?? 0, 0)} Fcfa",
-                            style: const TextStyle(
-                              decoration: TextDecoration.lineThrough,
-                              color: Colors.grey,
-                              fontSize: 9,
-                            ),
-                          ),
-                        // Promo Price
-                        if (product?.price != null && promotion.discountPercent != null)
-                          Text(
-                            "${getProductPrice(calculatePromoPrice(product!.price, promotion.discountPercent) ?? 0, 0)} Fcfa",
-                            style: TextStyle(
-                              color: Theme.of(context).primaryColor,
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        const SizedBox(height: 2),
-                        // Warranty info if available
-                        if (product?.warranty != null) ...[
-                          Row(
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Icon(
-                                Icons.verified_outlined,
-                                size: 10,
-                                color: Colors.green[600],
-                              ),
-                              const SizedBox(width: 2),
-                              Expanded(
-                                child: Text(
-                                  "Garantie: ${product!.warranty}",
-                                  style: TextStyle(
-                                    color: Colors.green[600],
-                                    fontSize: 9,
+                              // Original Price (crossed out)
+                              if (product?.price != null)
+                                Text(
+                                  "${getProductPrice(double.tryParse(product!.price!) ?? 0, 0)} Fcfa",
+                                  style: const TextStyle(
+                                    decoration: TextDecoration.lineThrough,
+                                    color: Colors.grey,
+                                    fontSize: 10,
                                   ),
-                                  overflow: TextOverflow.ellipsis,
                                 ),
-                              ),
+                              // Promo Price
+                              if (product?.price != null && promotion.discountPercent != null)
+                                Text(
+                                  "${getProductPrice(calculatePromoPrice(product!.price, promotion.discountPercent) ?? 0, 0)} Fcfa",
+                                  style: TextStyle(
+                                    color: Theme.of(context).primaryColor,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              const SizedBox(height: 2),
+                              // Warranty info if available
+                              if (product?.warranty != null) ...[
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.verified_outlined,
+                                      size: 10,
+                                      color: Colors.green[600],
+                                    ),
+                                    const SizedBox(width: 2),
+                                    Expanded(
+                                      child: Text(
+                                        "Garantie: ${product!.warranty}",
+                                        style: TextStyle(
+                                          color: Colors.green[600],
+                                          fontSize: 9,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ],
                           ),
-                        ],
+                        ),
+                        // Add to cart button
+                        Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).primaryColor.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Icon(
+                            Icons.add_shopping_cart_rounded,
+                            size: 16,
+                            color: Theme.of(context).primaryColor,
+                          ),
+                        ),
                       ],
                     ),
                   ],
                 ),
               ),
             ),
-          ],
+            ],
+          ),
         ),
       ),
     );

@@ -1,0 +1,30 @@
+﻿commit d0ae0d62125d080a4d73dc94d297d94e36c7ee31
+Merge: ab2416b a94f5c8
+Author: Tiama01 <tiama.barkley@gmail.com>
+Date:   Tue Jun 9 15:30:39 2026 +0000
+
+    Merge dev into main: Subscribe to all_users topic
+
+commit a94f5c8899161d5d3d4f365c00c025fcabf2f927
+Author: Tiama01 <tiama.barkley@gmail.com>
+Date:   Tue Jun 9 15:28:22 2026 +0000
+
+    notif
+
+diff --git a/lib/main.dart b/lib/main.dart
+index ba32f98..ff5951a 100644
+--- a/lib/main.dart
++++ b/lib/main.dart
+@@ -64,9 +64,10 @@ Future<void> main() async {
+       sound: true,
+     );
+     
+-    // Souscrire au topic de promotions
++    // Souscrire au topic de promotions et au topic global
+     await messaging.subscribeToTopic('promotions_topic');
+-    print("Inscrit avec succ├¿s au topic des promotions");
++    await messaging.subscribeToTopic('all_users');
++    print("Inscrit avec succ├¿s aux topics des promotions et all_users");
+ 
+     // Initialiser les notifications locales
+     await NotificationService.init();

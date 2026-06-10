@@ -29,7 +29,10 @@ Widget CategorySection() {
             }
             if (state is RemoteCategoryDone) {
               // Filtrer pour n'afficher que les catégories principales (parentId: null)
-              final mainCategories = state.categories!.where((category) => category.parentId == null).toList();
+              final mainCategories =
+                  state.categories!
+                      .where((category) => category.parentId == null)
+                      .toList();
               return ListView.builder(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 12),

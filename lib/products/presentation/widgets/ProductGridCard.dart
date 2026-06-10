@@ -4,7 +4,10 @@ import 'package:auto/products/domain/entities/product_entity.dart';
 import 'package:auto/products/presentation/pages/ProductDetailPage.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:auto/promotions/presentation/bloc/remote/remote_promoted_product_bloc.dart';
 import 'package:lottie/lottie.dart';
+import 'dart:ui';
 
 // Résolution des URLs relatives (conservée pour compatibilité)
 String resolveMediaUrl(String url) {
@@ -14,11 +17,13 @@ String resolveMediaUrl(String url) {
 class ProductGridCard extends StatelessWidget {
   final ProductEntity product;
   final int? index; // Index pour créer un tag unique
+  final String heroTagPrefix;
   
   const ProductGridCard({
     super.key, 
     required this.product,
     this.index,
+    this.heroTagPrefix = 'home-product',
   });
 
   String getStateText(String? state) {
@@ -49,29 +54,56 @@ class ProductGridCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double activeDiscount = product.discount ?? 0.0;
+    try {
+      final promoState = context.watch<RemotePromotedProductBloc>().state;
+      if (promoState is RemotePromotedProductDone && promoState.promotedProducts != null) {
+        final activePromo = promoState.promotedProducts!.cast<dynamic>().firstWhere(
+          (promo) => promo.productId == product.id,
+          orElse: () => null,
+        );
+        if (activePromo != null && activePromo.discountPercent != null) {
+          activeDiscount = double.tryParse(activePromo.discountPercent!) ?? activeDiscount;
+        }
+      }
+    } catch (_) {
+      // Ignorer si pas de promo active ou si le bloc n'est pas fourni
+    }
+
     return GestureDetector(
       onTap: () {
         goTo(context, ProductDetailPage(product: product), AnimationType.fade);
       },
-      child: Card(
-        color: Colors.white,
-        elevation: 2,
-        shadowColor: Colors.black12,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        child: Column(
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.grey.withOpacity(0.1), width: 1),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 20,
+              spreadRadius: 0,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Image Section
             Expanded(
-              flex: 5,
+              flex: 4,
               child: Stack(
                 children: [
                   ClipRRect(
                     borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
                     child: Hero(
                       tag: index != null 
-                          ? 'home-product-${product.id}-$index'
-                          : 'home-product-${product.id}',
+                          ? '$heroTagPrefix-${product.id}-$index'
+                          : '$heroTagPrefix-${product.id}',
                       child: product.medias != null && product.medias!.isNotEmpty
                           ? CachedNetworkImage(
                               width: double.infinity,
@@ -109,7 +141,7 @@ class ProductGridCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                  if (product.discount != null && product.discount! > 0)
+                  if (activeDiscount > 0)
                     Positioned(
                       top: 8,
                       right: 8,
@@ -120,7 +152,7 @@ class ProductGridCard extends StatelessWidget {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
-                          "-${product.discount}%",
+                          "-${activeDiscount.toInt()}%",
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 10,
@@ -135,102 +167,135 @@ class ProductGridCard extends StatelessWidget {
             
             // Info Section
             Expanded(
-              flex: 4,
+              flex: 5,
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Title and Category
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          product.category?.name ?? 'Catégorie',
-                          style: TextStyle(
-                            color: Colors.grey[600],
-                            fontSize: 10,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          product.name ?? 'Produit',
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black87,
-                          ),
-                        ),
-                      ],
-                    ),
-                    
-                    // Price and Seller
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (product.discount != null && product.discount! > 0)
-                          Text(
-                            "${getProductPrice(double.tryParse(product.price?.toString() ?? '0') ?? 0, 0)} Fcfa",
-                            style: const TextStyle(
-                              decoration: TextDecoration.lineThrough,
-                              color: Colors.grey,
-                              fontSize: 10,
-                            ),
-                          ),
-                        Text(
-                          "${getProductPrice(double.tryParse(product.price?.toString() ?? '0') ?? 0, product.discount!)} Fcfa",
-                          style: TextStyle(
-                            color: Theme.of(context).primaryColor,
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        // Seller info
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.store_outlined,
-                              size: 12,
-                              color: Colors.grey[600],
-                            ),
-                            const SizedBox(width: 4),
-                            Expanded(
-                              child: Text(
-                                product.seller?.fullName ?? 'Vendeur',
-                                style: TextStyle(
-                                  color: Colors.grey[600],
-                                  fontSize: 10,
-                                ),
-                                overflow: TextOverflow.ellipsis,
+                    // Title
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              product.name ?? 'Produit',
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black87,
                               ),
                             ),
-                          ],
-                        ),
-                        if (product.warranty != null) ...[
-                          const SizedBox(height: 2),
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.verified_outlined,
-                                size: 12,
-                                color: Colors.green[600],
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                "Garantie: ${product.warranty}",
-                                style: TextStyle(
-                                  color: Colors.green[600],
-                                  fontSize: 10,
-                                ),
-                              ),
-                            ],
                           ),
                         ],
+                      ),
+                    ),
+                    
+                    // Price and Seller with Add to Cart Button
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (activeDiscount > 0)
+                                Wrap(
+                                  crossAxisAlignment: WrapCrossAlignment.end,
+                                  spacing: 4,
+                                  children: [
+                                    Text(
+                                      "${getProductPrice(double.tryParse(product.price?.toString() ?? '0') ?? 0, activeDiscount)} Fcfa",
+                                      style: TextStyle(
+                                        color: Theme.of(context).primaryColor,
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(bottom: 1.0),
+                                      child: Text(
+                                        "${getProductPrice(double.tryParse(product.price?.toString() ?? '0') ?? 0, 0)}",
+                                        style: const TextStyle(
+                                          decoration: TextDecoration.lineThrough,
+                                          color: Colors.grey,
+                                          fontSize: 10,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              else
+                                Text(
+                                  "${getProductPrice(double.tryParse(product.price?.toString() ?? '0') ?? 0, 0)} Fcfa",
+                                  style: TextStyle(
+                                    color: Theme.of(context).primaryColor,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              const SizedBox(height: 4),
+                              // Seller info
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.store_outlined,
+                                    size: 12,
+                                    color: Colors.grey[600],
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Expanded(
+                                    child: Text(
+                                      product.seller?.fullName ?? 'Vendeur',
+                                      style: TextStyle(
+                                        color: Colors.grey[600],
+                                        fontSize: 10,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              if (product.warranty != null) ...[
+                                const SizedBox(height: 2),
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.verified_outlined,
+                                      size: 12,
+                                      color: Colors.green[600],
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      "Garantie: ${product.warranty}",
+                                      style: TextStyle(
+                                        color: Colors.green[600],
+                                        fontSize: 10,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                        // Add to cart button
+                        Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).primaryColor.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Icon(
+                            Icons.add_shopping_cart_rounded,
+                            size: 16,
+                            color: Theme.of(context).primaryColor,
+                          ),
+                        ),
                       ],
                     ),
                   ],
@@ -240,6 +305,7 @@ class ProductGridCard extends StatelessWidget {
           ],
         ),
       ),
-    );
+    ),
+  );
   }
 }

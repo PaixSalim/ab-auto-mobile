@@ -15,16 +15,12 @@ class ObjectBoxService {
   static Future<void> init() async {
     if (_initialized) return;
     try {
-      print('Attempting to open ObjectBox store...');
-      _storeInstance = await openStore();
+            _storeInstance = await openStore();
       _initialized = true;
-      print('ObjectBox store opened successfully');
-    } catch (e) {
-      print('Error opening store: $e');
-      // If schema mismatch, delete old database and recreate
+          } catch (e) {
+            // If schema mismatch, delete old database and recreate
       if (e.toString().contains('not compatible')) {
-        print('Schema incompatibility detected, deleting old database...');
-        try {
+                try {
           // Try multiple common database locations
           final possiblePaths = [
             Directory.current.path + '/objectbox',
@@ -35,33 +31,25 @@ class ObjectBoxService {
           bool deleted = false;
           for (final path in possiblePaths) {
             final dbDir = Directory(path);
-            print('Checking database path: ${dbDir.path}');
-            
+                        
             if (await dbDir.exists()) {
-              print('Database directory exists, deleting...');
-              await dbDir.delete(recursive: true);
-              print('Database directory deleted');
-              deleted = true;
+                            await dbDir.delete(recursive: true);
+                            deleted = true;
               break;
             }
           }
           
           if (!deleted) {
-            print('No database directory found to delete');
-          }
+                      }
           
           // Try to open again with new schema
-          print('Attempting to open store with new schema...');
-          _storeInstance = await openStore();
+                    _storeInstance = await openStore();
           _initialized = true;
-          print('Store opened with new schema successfully');
-        } catch (deleteError) {
-          print('Error during database deletion/recreation: $deleteError');
-          rethrow;
+                  } catch (deleteError) {
+                    rethrow;
         }
       } else {
-        print('Different error, rethrowing...');
-        rethrow;
+                rethrow;
       }
     }
   }

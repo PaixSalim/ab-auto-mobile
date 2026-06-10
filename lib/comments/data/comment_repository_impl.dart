@@ -26,21 +26,17 @@ class CommentRepositoryImpl implements CommentRepository {
   Future<DataState<List<CommentModel>>> getComments(String productId) async {
     if (await _networkInfo.isConnected) {
       try {
-        print('🌐 Fetching comments for product: $productId');
-        final httpResponse = await _remoteDatasourceDio.getComments(
+                final httpResponse = await _remoteDatasourceDio.getComments(
           productId: productId,
         );
-        print('🌐 Response status: ${httpResponse.response.statusCode}');
-        
+                
         if (httpResponse.response.statusCode == HttpStatus.ok) {
-          print('🌐 Comments loaded: ${httpResponse.data.length} items');
-          return DataSuccess(httpResponse.data);
+                    return DataSuccess(httpResponse.data);
         } else {
           final errorMsg = httpResponse.response.data?['message'] ?? 
                           httpResponse.response.statusMessage ?? 
                           'Erreur serveur';
-          print('❌ API error: $errorMsg');
-          return DataFailed(
+                    return DataFailed(
             DioException(
               requestOptions: httpResponse.response.requestOptions,
               error: errorMsg,
@@ -50,12 +46,9 @@ class CommentRepositoryImpl implements CommentRepository {
           );
         }
       } on DioException catch (e) {
-        print('❌ DioException: ${e.message}');
-        print('❌ Response: ${e.response?.data}');
-        return DataFailed(e);
+                        return DataFailed(e);
       } catch (e) {
-        print('❌ Unexpected error: $e');
-        return DataFailed(
+                return DataFailed(
           DioException(
             requestOptions: RequestOptions(),
             error: e.toString(),
@@ -84,15 +77,12 @@ class CommentRepositoryImpl implements CommentRepository {
           comment: comment.comment,
           userId: comment.userId,
         );
-        print('🌐 Posting comment to API: ${commentModel.toString()}');
-        
+                
         final httpResponse = await _postRemoteDatasourceDio.postComment(
           commentModel,
         );
         
-        print('🌐 Response status: ${httpResponse.response.statusCode}');
-        print('🌐 Response data: ${httpResponse.data}');
-        
+                        
         if (httpResponse.response.statusCode == HttpStatus.ok || 
             httpResponse.response.statusCode == HttpStatus.created) {
           return DataSuccess(httpResponse.data);
@@ -102,8 +92,7 @@ class CommentRepositoryImpl implements CommentRepository {
                           httpResponse.response.data?['error'] ?? 
                           httpResponse.response.statusMessage ?? 
                           'Erreur serveur';
-          print('❌ API error: $errorMsg');
-          return DataFailed(
+                    return DataFailed(
             DioException(
               requestOptions: httpResponse.response.requestOptions,
               error: errorMsg,
@@ -113,12 +102,9 @@ class CommentRepositoryImpl implements CommentRepository {
           );
         }
       } on DioException catch (e) {
-        print('❌ DioException: ${e.message}');
-        print('❌ Response: ${e.response?.data}');
-        return DataFailed(e);
+                        return DataFailed(e);
       } catch (e) {
-        print('❌ Unexpected error: $e');
-        return DataFailed(
+                return DataFailed(
           DioException(
             requestOptions: RequestOptions(),
             error: e.toString(),

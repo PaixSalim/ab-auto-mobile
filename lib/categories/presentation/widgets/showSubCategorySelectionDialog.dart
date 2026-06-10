@@ -17,12 +17,14 @@ void showSubCategorySelectionDialog(
     barrierDismissible: true,
     builder: (context) {
       return BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5), // Effet de flou
+        filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8), // Effet de flou accentué
         child: Dialog(
-          backgroundColor: Colors.white,
-          insetPadding: EdgeInsets.symmetric(horizontal: 20),
+          backgroundColor: Colors.white.withValues(alpha: 0.85),
+          elevation: 0,
+          insetPadding: const EdgeInsets.symmetric(horizontal: 20),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(24),
+            side: const BorderSide(color: Colors.white, width: 1.5),
           ),
           child: SubCategorySelectionModal(category: category, bloc: bloc),
         ),

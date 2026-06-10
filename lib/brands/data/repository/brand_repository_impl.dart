@@ -12,7 +12,7 @@ class BrandRepositoryImpl implements BrandRepository {
   @override
   Future<DataState<List<BrandEntity>>> getBrands() async {
     try {
-      var url = Uri.parse('https://auto-pro.uvatis.com/api/v1/brands');
+      var url = Uri.parse('https://ab-autox.com/api/v1/brands');
       final httpResponse = await http.get(url);
 
       if (httpResponse.statusCode == 200) {
@@ -21,7 +21,6 @@ class BrandRepositoryImpl implements BrandRepository {
         List<BrandModel> brands =
             decodedResponse.map((json) => BrandModel.fromJson(json)).toList();
 
-        //print(products);
         return DataSuccess(brands);
       } else {
         throw Exception('Erreur HTTP : ${httpResponse.statusCode}');

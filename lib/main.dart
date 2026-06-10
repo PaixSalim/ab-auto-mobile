@@ -35,7 +35,6 @@ import 'injection_container.dart';
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
-  print("Handling a background message: ${message.messageId}");
 }
 
 Future<void> main() async {
@@ -54,32 +53,25 @@ Future<void> main() async {
     await messaging.requestPermission(alert: true, badge: true, sound: true);
 
     // Autoriser spécifiquement l'affichage pour iOS (et certaines surcouches Android) au premier plan
-    await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
-      alert: true, // Required to display a heads up notification
-      badge: true,
-      sound: true,
-    );
-    
+    await FirebaseMessaging.instance
+        .setForegroundNotificationPresentationOptions(
+          alert: true, // Required to display a heads up notification
+          badge: true,
+          sound: true,
+        );
+
     // Souscrire au topic de promotions et au topic global
     await messaging.subscribeToTopic('promotions_topic');
     await messaging.subscribeToTopic('all_users');
-    print("Inscrit avec succès aux topics des promotions et all_users");
 
     // Initialiser les notifications locales
     await NotificationService.init();
 
     // Écoute locale pour afficher la notif en mode premier plan
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print(
-        '🔥 INFO: Notif reçue en mode ouvert: ${message.notification?.title}',
-      );
       NotificationService.showNotification(message);
     });
-  } catch (e) {
-    print(
-      "Erreur d'initialisation Firebase (vérifiez google-services.json): $e",
-    );
-  }
+  } catch (e) {}
 
   await LocalStorageService.init();
   await ObjectBoxService.init();
@@ -178,7 +170,14 @@ class _HomePageState extends State<HomePage> {
           children: [
             CustomScrollView(
               slivers: [
-                const SliverToBoxAdapter(child: CarouselWithIndicator()),
+                SliverPadding(
+                  padding: EdgeInsets.only(
+                    top: MediaQuery.of(context).padding.top,
+                  ),
+                  sliver: const SliverToBoxAdapter(
+                    child: CarouselWithIndicator(),
+                  ),
+                ),
                 SliverToBoxAdapter(child: CategorySection()),
                 const SliverToBoxAdapter(child: PromotionsSection()),
                 const SliverToBoxAdapter(
@@ -195,8 +194,10 @@ class _HomePageState extends State<HomePage> {
                         Text(
                           "Suggestions pour vous",
                           style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: -0.5,
+                            color: Colors.black87,
                           ),
                         ),
                       ],
@@ -215,13 +216,13 @@ class _HomePageState extends State<HomePage> {
                   SliverPadding(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     sliver: SliverGrid(
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 10,
-                            mainAxisSpacing: 10,
-                            childAspectRatio: 0.65,
-                          ),
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 10,
+                        mainAxisSpacing: 10,
+                        childAspectRatio:
+                            0.90, // Modifié: 0.78 -> 0.90 pour des cartes encore moins hautes
+                      ),
                       delegate: SliverChildBuilderDelegate((context, index) {
                         return ProductGridCard(
                           product: displayList[index],
@@ -280,6 +281,9 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                 ],
+
+                // Espacement final pour pouvoir scroller tout en bas sous la barre de navigation flottante
+                const SliverToBoxAdapter(child: SizedBox(height: 120)),
               ],
             ),
 

@@ -13,6 +13,8 @@ class ProductModel extends ProductEntity {
     super.state,
     super.validationStatus,
     super.description,
+    super.model,
+    super.year,
     super.price,
     super.discount,
     CategoryModel? super.category,
@@ -46,6 +48,8 @@ class ProductModel extends ProductEntity {
       state: json['state'] ?? '',
       validationStatus: json['validationStatus'] ?? '',
       description: json['description'] ?? '',
+      model: json['model']?.toString() ?? '',
+      year: json['year']?.toString() ?? '',
       price: double.tryParse(json['price']?.toString() ?? '0') ?? 0.0,
       discount: double.tryParse(json['discount']?.toString() ?? '0') ?? 0.0,
       category: json['category'] != null

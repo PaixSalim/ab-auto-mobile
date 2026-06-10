@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:auto/auth/presentation/bloc/auth_bloc.dart';
 import 'package:flutter/services.dart';
@@ -13,6 +14,7 @@ import 'package:auto/products/presentation/bloc/remote/remote_product_bloc.dart'
 import 'package:auto/products/presentation/bloc/remote/remote_product_state.dart';
 import 'package:auto/comments/presentation/widgets/CommentWidget.dart';
 import 'package:auto/products/presentation/widgets/similar/SimilarProductsSection.dart';
+import 'package:auto/promotions/presentation/bloc/remote/remote_promoted_product_bloc.dart';
 
 class ProductDetailPage extends StatefulWidget {
   final ProductEntity product;
@@ -113,12 +115,24 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   @override
   Widget build(BuildContext context) {
     final medias = widget.product.medias ?? [];
-    final hasDiscount =
-        widget.product.discount != null && widget.product.discount! > 0;
-    final realPrice = _getRealPrice(
-      widget.product.price ?? 0,
-      widget.product.discount ?? 0,
-    );
+
+    double activeDiscount = widget.product.discount ?? 0.0;
+    try {
+      final promoState = context.watch<RemotePromotedProductBloc>().state;
+      if (promoState is RemotePromotedProductDone &&
+          promoState.promotedProducts != null) {
+        final activePromo = promoState.promotedProducts!.firstWhere(
+          (promo) => promo.productId == widget.product.id,
+        );
+        if (activePromo.discountPercent != null) {
+          activeDiscount =
+              double.tryParse(activePromo.discountPercent!) ?? activeDiscount;
+        }
+      }
+    } catch (_) {}
+
+    final hasDiscount = activeDiscount > 0;
+    final realPrice = _getRealPrice(widget.product.price ?? 0, activeDiscount);
     final hasCta = _isValidCta(widget.product.cta);
     final isUsed = widget.product.state == 'used';
 
@@ -158,7 +172,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           // 1. Galerie d'images dans un container stylisé (BoxAdapter)
           SliverToBoxAdapter(
             child: Container(
-              height: 320,
+              height: 240,
               margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -172,7 +186,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 ],
               ),
               clipBehavior: Clip.antiAlias,
-              child: _buildImageGallery(medias, hasDiscount),
+              child: _buildImageGallery(medias, hasDiscount, activeDiscount),
             ),
           ),
 
@@ -208,13 +222,15 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                           color:
                               isUsed
                                   ? const Color(0xFFFFF7ED)
-                                  : const Color(0xFFEFF6FF),
+                                  : Theme.of(
+                                    context,
+                                  ).primaryColor.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
                             color:
                                 isUsed
                                     ? const Color(0xFFF97316)
-                                    : const Color(0xFF3B82F6),
+                                    : Theme.of(context).primaryColor,
                             width: 1.5,
                           ),
                         ),
@@ -224,7 +240,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                             color:
                                 isUsed
                                     ? const Color(0xFFC2410C)
-                                    : const Color(0xFF1D4ED8),
+                                    : Theme.of(context).primaryColor,
                             fontWeight: FontWeight.w700,
                             fontSize: 12,
                           ),
@@ -280,10 +296,10 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   if (hasCta)
                     Text(
                       widget.product.cta!,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 26,
                         fontWeight: FontWeight.w900,
-                        color: Color(0xFF2563EB),
+                        color: Theme.of(context).primaryColor,
                       ),
                     )
                   else
@@ -295,10 +311,10 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                       children: [
                         Text(
                           _formatPrice(realPrice),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 26,
                             fontWeight: FontWeight.w900,
-                            color: Color(0xFF2563EB),
+                            color: Theme.of(context).primaryColor,
                             letterSpacing: -0.5,
                           ),
                         ),
@@ -438,12 +454,14 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                         leading: Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFEFF6FF),
+                            color: Theme.of(
+                              context,
+                            ).primaryColor.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.storefront_rounded,
-                            color: Color(0xFF2563EB),
+                            color: Theme.of(context).primaryColor,
                             size: 20,
                           ),
                         ),
@@ -460,63 +478,6 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                       indent: 24,
                       endIndent: 24,
                       color: Color(0xFFE5E7EB),
-                    ),
-                    Theme(
-                      data: Theme.of(
-                        context,
-                      ).copyWith(dividerColor: Colors.transparent),
-                      child: ExpansionTile(
-                        tilePadding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 8,
-                        ),
-                        title: const Text(
-                          'Livraison & Retours',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 16,
-                            color: Color(0xFF111827),
-                          ),
-                        ),
-                        leading: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF3E8FF),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: const Icon(
-                            Icons.local_shipping_rounded,
-                            color: Color(0xFF9333EA),
-                            size: 20,
-                          ),
-                        ),
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Icon(
-                                  Icons.info_outline_rounded,
-                                  color: Color(0xFF9CA3AF),
-                                  size: 20,
-                                ),
-                                const SizedBox(width: 12),
-                                const Expanded(
-                                  child: Text(
-                                    'Pour plus d\'informations sur la livraison et les modalités de retour, veuillez contacter directement le vendeur.',
-                                    style: TextStyle(
-                                      color: Color(0xFF4B5563),
-                                      height: 1.5,
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
                     ),
                   ],
                 ),
@@ -579,7 +540,11 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
 
   // ==== Widgets Extrait ====
 
-  Widget _buildImageGallery(List<String> medias, bool hasDiscount) {
+  Widget _buildImageGallery(
+    List<String> medias,
+    bool hasDiscount,
+    double activeDiscount,
+  ) {
     if (medias.isEmpty) {
       return Container(
         color: const Color(0xFFF3F4F6),
@@ -701,7 +666,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    '-${widget.product.discount!.toInt()}%',
+                    '-${activeDiscount.toInt()}%',
                     style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w900,
@@ -717,122 +682,141 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   }
 
   Widget _buildBottomNavigationBar(bool hasCta, double realPrice) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(30),
-          topRight: Radius.circular(30),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 20,
-            offset: const Offset(0, -5),
-          ),
-        ],
+    return ClipRRect(
+      borderRadius: const BorderRadius.only(
+        topLeft: Radius.circular(30),
+        topRight: Radius.circular(30),
       ),
-      child: SafeArea(
-        child: Row(
-          children: [
-            // Affichage du prix dans la navbar
-            Expanded(
-              flex: 3, // Moins de place pour le prix
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Total à payer',
-                    style: TextStyle(
-                      color: Color(0xFF6B7280),
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  hasCta
-                      ? Text(
-                        widget.product.cta!,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w900,
-                          color: Color(0xFF111827),
-                          fontSize: 16,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      )
-                      : FittedBox(
-                        // Empêche le prix d'être coupé
-                        fit: BoxFit.scaleDown,
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          _formatPrice(realPrice),
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w900,
-                            fontSize: 20,
-                            color: Color(0xFF111827),
-                          ),
-                        ),
-                      ),
-                ],
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.8),
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(30),
+              topRight: Radius.circular(30),
+            ),
+            border: Border(
+              top: BorderSide(
+                color: Colors.white.withValues(alpha: 0.4),
+                width: 1,
               ),
             ),
-            const SizedBox(width: 12),
-            // Bouton WhatsApp géant amélioré
-            Expanded(
-              flex: 4, // Plus de place pour le bouton
-              child: Container(
-                height: 56,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF25D366), Color(0xFF128C7E)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFF25D366).withOpacity(0.4),
-                      blurRadius: 12,
-                      offset: const Offset(0, 6),
-                    ),
-                  ],
-                ),
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(16),
-                    onTap: _handleDiscuss,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Icon(Bootstrap.whatsapp, color: Colors.white, size: 22),
-                          SizedBox(width: 6),
-                          Expanded(
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 20,
+                offset: const Offset(0, -5),
+              ),
+            ],
+          ),
+          child: SafeArea(
+            child: Row(
+              children: [
+                // Affichage du prix dans la navbar
+                Expanded(
+                  flex: 3, // Moins de place pour le prix
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Total à payer',
+                        style: TextStyle(
+                          color: Color(0xFF6B7280),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      hasCta
+                          ? Text(
+                            widget.product.cta!,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w900,
+                              color: Color(0xFF111827),
+                              fontSize: 16,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          )
+                          : FittedBox(
+                            // Empêche le prix d'être coupé
+                            fit: BoxFit.scaleDown,
+                            alignment: Alignment.centerLeft,
                             child: Text(
-                              'Discuter avec le vendeur',
-                              textAlign: TextAlign.center,
-                              maxLines: 2,
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 13,
-                                fontWeight: FontWeight.w800,
-                                height: 1.2,
+                              _formatPrice(realPrice),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w900,
+                                fontSize: 20,
+                                color: Color(0xFF111827),
                               ),
                             ),
                           ),
-                        ],
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12),
+                // Bouton WhatsApp géant amélioré
+                Expanded(
+                  flex: 4, // Plus de place pour le bouton
+                  child: Container(
+                    height: 56,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF25D366), Color(0xFF128C7E)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF25D366).withOpacity(0.4),
+                          blurRadius: 12,
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(16),
+                        onTap: _handleDiscuss,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: const [
+                              Icon(
+                                Bootstrap.whatsapp,
+                                color: Colors.white,
+                                size: 22,
+                              ),
+                              SizedBox(width: 6),
+                              Expanded(
+                                child: Text(
+                                  'Discuter avec le vendeur',
+                                  textAlign: TextAlign.center,
+                                  maxLines: 2,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w800,
+                                    height: 1.2,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -939,15 +923,18 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           width: 50,
           height: 50,
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Color(0xFF3B82F6), Color(0xFF1D4ED8)],
+            gradient: LinearGradient(
+              colors: [
+                Theme.of(context).primaryColor.withValues(alpha: 0.8),
+                Theme.of(context).primaryColor,
+              ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF3B82F6).withOpacity(0.3),
+                color: Theme.of(context).primaryColor.withValues(alpha: 0.3),
                 blurRadius: 8,
                 offset: const Offset(0, 4),
               ),

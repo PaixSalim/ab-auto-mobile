@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../bloc/remote/remote_product_event.dart';
-import 'SimilarProductItem.dart';
+import '../ProductGridCard.dart';
 
 class SimilarProductsSection extends StatelessWidget {
   final List<ProductEntity> similarProducts;
@@ -45,7 +45,7 @@ class SimilarProductsSection extends StatelessWidget {
 
         // Contenu de la section
         SizedBox(
-          height: 220, // Hauteur fixe pour la liste horizontale
+          height: 260, // Augmenté pour correspondre à la hauteur de la carte ProductGridCard
           child: _buildContent(context, similarProducts),
         ),
       ],
@@ -63,15 +63,16 @@ class SimilarProductsSection extends StatelessWidget {
       itemCount: products.length,
       itemBuilder: (context, index) {
         final product = products[index];
-        return SimilarProductItem(
-          product: product,
-          onTap: () {
-            goTo(
-              context,
-              ProductDetailPage(product: product),
-              AnimationType.fade,
-            );
-          },
+        return Padding(
+          padding: const EdgeInsets.only(right: 12.0),
+          child: AspectRatio(
+            aspectRatio: 0.90,
+            child: ProductGridCard(
+              product: product,
+              index: index,
+              heroTagPrefix: 'similar-product',
+            ),
+          ),
         );
       },
     );

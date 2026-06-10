@@ -14,6 +14,8 @@ import 'package:auto/products/presentation/widgets/search.index.bar.dart';
 // import '../../injection_container.dart';
 import '../../../main.dart';
 
+import 'dart:ui';
+
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
 
@@ -29,6 +31,7 @@ class _MainNavigationState extends State<MainNavigation> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           title: const Row(
             children: [
               Icon(Icons.logout, color: Colors.red),
@@ -50,6 +53,7 @@ class _MainNavigationState extends State<MainNavigation> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
                 foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
               ),
               child: const Text('Se déconnecter'),
             ),
@@ -59,26 +63,14 @@ class _MainNavigationState extends State<MainNavigation> {
     );
   }
 
-  // Widget _buildOrdersTab() {
-  //   if (LocalStorageService.isLoggedIn) {
-  //     return BlocProvider(
-  //       create: (_) => sl<MyOrdersBloc>(),
-  //       child: const MyOrdersPage(),
-  //     );
-  //   }
-  //   return const _LoginPromptPage();
-  // }
-
   @override
   Widget build(BuildContext context) {
     final primary = Theme.of(context).primaryColor;
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
-        // Rafraîchir la page commandes après login/logout
         if (state is AuthAuthenticated || state is AuthInitial) {
           setState(() {});
         }
-        // Show success message after logout
         if (state is AuthInitial) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -89,39 +81,78 @@ class _MainNavigationState extends State<MainNavigation> {
           );
         }
       },
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Padding(
-            padding: EdgeInsets.all(1),
-            child: HomeSearchbar(),
+      child: Container(
+        // Fond dégradé subtil pour révéler le glassmorphism
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFFE0EAFC), // Bleu clair vibrant
+              Color(0xFFCFDEF3), // Bleu ciel doux
+              Color(0xFFE2D4F0), // Touche violet pastel
+            ],
+            stops: [0.0, 0.5, 1.0],
           ),
-          actions: [
-            IconButton(
-              icon: const Icon(LucideIcons.bell, size: 24),
-              onPressed: () {
-                Navigator.of(context)
-                    .push(
-                      MaterialPageRoute(
-                        builder: (_) => const NotificationCenterPage(),
-                      ),
-                    )
-                    .then(
-                      (_) => setState(() {}),
-                    ); // Refresh unread count on return
-              },
+        ),
+        child: Scaffold(
+          backgroundColor: Colors.transparent, // Important pour voir le dégradé
+          extendBodyBehindAppBar: true,
+          extendBody: true, // Pour que le contenu glisse sous la nav bar
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            flexibleSpace: ClipRect(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                child: Container(
+                  color: Colors.white.withOpacity(0.6),
+                ),
+              ),
             ),
-            BlocBuilder<AuthBloc, AuthState>(
-              builder: (context, state) {
-                if (state is AuthAuthenticated) {
-                  return PopupMenuButton<String>(
-                    icon: const Icon(Icons.account_circle, size: 28),
-                    onSelected: (value) async {
-                      if (value == 'logout') {
-                        _showLogoutDialog(context);
-                      }
-                    },
-                    itemBuilder:
-                        (_) => [
+            title: const Padding(
+              padding: EdgeInsets.all(1),
+              child: HomeSearchbar(),
+            ),
+            actions: [
+              Container(
+                margin: const EdgeInsets.only(right: 8),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.5),
+                  shape: BoxShape.circle,
+                ),
+                child: IconButton(
+                  icon: const Icon(LucideIcons.bell, size: 22, color: Colors.black87),
+                  onPressed: () {
+                    Navigator.of(context)
+                        .push(
+                          MaterialPageRoute(
+                            builder: (_) => const NotificationCenterPage(),
+                          ),
+                        )
+                        .then((_) => setState(() {}));
+                  },
+                ),
+              ),
+              BlocBuilder<AuthBloc, AuthState>(
+                builder: (context, state) {
+                  if (state is AuthAuthenticated) {
+                    return Container(
+                      margin: const EdgeInsets.only(right: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.5),
+                        shape: BoxShape.circle,
+                      ),
+                      child: PopupMenuButton<String>(
+                        icon: const Icon(Icons.account_circle, size: 26, color: Colors.black87),
+                        offset: const Offset(0, 50),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                        onSelected: (value) async {
+                          if (value == 'logout') {
+                            _showLogoutDialog(context);
+                          }
+                        },
+                        itemBuilder: (_) => [
                           PopupMenuItem(
                             enabled: false,
                             child: Column(
@@ -149,54 +180,82 @@ class _MainNavigationState extends State<MainNavigation> {
                             value: 'logout',
                             child: Row(
                               children: [
-                                Icon(
-                                  Icons.logout_rounded,
-                                  size: 22,
-                                  color: Colors.redAccent,
-                                ),
+                                Icon(Icons.logout_rounded, size: 22, color: Colors.redAccent),
                                 SizedBox(width: 12),
                                 Text(
                                   'Se déconnecter',
-                                  style: TextStyle(
-                                    color: Colors.redAccent,
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                                  style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.w600),
                                 ),
                               ],
                             ),
                           ),
                         ],
-                  );
-                }
-                return const SizedBox();
-              },
+                      ),
+                    );
+                  }
+                  return const SizedBox();
+                },
+              ),
+            ],
+          ),
+          body: IndexedStack(
+            index: _currentIndex,
+            children: [
+              const HomePage(),
+              const ProductCatalogPage(),
+            ],
+          ),
+          bottomNavigationBar: SafeArea(
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.7),
+                borderRadius: BorderRadius.circular(30),
+                border: Border.all(color: Colors.white.withOpacity(0.8), width: 1.5),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 20,
+                    spreadRadius: 0,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(30),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    child: BottomNavigationBar(
+                      elevation: 0,
+                      backgroundColor: Colors.transparent,
+                      currentIndex: _currentIndex,
+                      onTap: (index) => setState(() => _currentIndex = index),
+                      selectedItemColor: primary,
+                      unselectedItemColor: Colors.grey.shade600,
+                      showUnselectedLabels: true,
+                      showSelectedLabels: true,
+                      selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                      unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500, fontSize: 11),
+                      items: const [
+                        BottomNavigationBarItem(
+                          icon: Icon(LucideIcons.home),
+                          activeIcon: Icon(Icons.home_rounded),
+                          label: 'Accueil',
+                        ),
+                        BottomNavigationBarItem(
+                          icon: Icon(LucideIcons.shoppingBag),
+                          activeIcon: Icon(Icons.shopping_bag_rounded),
+                          label: 'Recherche par marque',
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ),
-          ],
-        ),
-        body: IndexedStack(
-          index: _currentIndex,
-          children: [
-            const HomePage(),
-            const ProductCatalogPage(),
-            // _buildOrdersTab(), // Temporairement désactivé
-          ],
-        ),
-        bottomNavigationBar: BottomNavigationBar(
-          currentIndex: _currentIndex,
-          onTap: (index) => setState(() => _currentIndex = index),
-          selectedItemColor: primary,
-          unselectedItemColor: Colors.grey,
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(LucideIcons.home),
-              label: 'Accueil',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(LucideIcons.shoppingBag),
-              label: 'Recherche par marque',
-            ),
-            // BottomNavigationBarItem(icon: Icon(LucideIcons.clipboardList), label: 'Commandes'), // Temporairement désactivé
-          ],
+          ),
         ),
       ),
     );
@@ -227,15 +286,12 @@ class _MainNavigationState extends State<MainNavigation> {
 //               const SizedBox(height: 24),
 //               ElevatedButton(
 //                 onPressed: () {
-//                   print('🔗 NAVIGATION - Attempting to navigate to LoginPage');
-//                   try {
+//                   //                   try {
 //                     Navigator.of(context).push(
 //                       MaterialPageRoute(builder: (_) => const LoginPage()),
 //                     );
-//                     print('🔗 NAVIGATION - Navigation successful');
-//                   } catch (e) {
-//                     print('🔗 NAVIGATION - Navigation failed: $e');
-//                   }
+//                     //                   } catch (e) {
+//                     //                   }
 //                 },
 //                 style: ElevatedButton.styleFrom(
 //                   backgroundColor: primary,

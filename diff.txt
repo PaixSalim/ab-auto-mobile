@@ -1,0 +1,1920 @@
+﻿diff --git a/lib/app_database.dart b/lib/app_database.dart
+index 97eaf2b..e86227e 100644
+--- a/lib/app_database.dart
++++ b/lib/app_database.dart
+@@ -15,16 +15,12 @@ class ObjectBoxService {
+   static Future<void> init() async {
+     if (_initialized) return;
+     try {
+-      print('Attempting to open ObjectBox store...');
+-      _storeInstance = await openStore();
++            _storeInstance = await openStore();
+       _initialized = true;
+-      print('ObjectBox store opened successfully');
+-    } catch (e) {
+-      print('Error opening store: $e');
+-      // If schema mismatch, delete old database and recreate
++          } catch (e) {
++            // If schema mismatch, delete old database and recreate
+       if (e.toString().contains('not compatible')) {
+-        print('Schema incompatibility detected, deleting old database...');
+-        try {
++                try {
+           // Try multiple common database locations
+           final possiblePaths = [
+             Directory.current.path + '/objectbox',
+@@ -35,33 +31,25 @@ class ObjectBoxService {
+           bool deleted = false;
+           for (final path in possiblePaths) {
+             final dbDir = Directory(path);
+-            print('Checking database path: ${dbDir.path}');
+-            
++                        
+             if (await dbDir.exists()) {
+-              print('Database directory exists, deleting...');
+-              await dbDir.delete(recursive: true);
+-              print('Database directory deleted');
+-              deleted = true;
++                            await dbDir.delete(recursive: true);
++                            deleted = true;
+               break;
+             }
+           }
+           
+           if (!deleted) {
+-            print('No database directory found to delete');
+-          }
++                      }
+           
+           // Try to open again with new schema
+-          print('Attempting to open store with new schema...');
+-          _storeInstance = await openStore();
++                    _storeInstance = await openStore();
+           _initialized = true;
+-          print('Store opened with new schema successfully');
+-        } catch (deleteError) {
+-          print('Error during database deletion/recreation: $deleteError');
+-          rethrow;
++                  } catch (deleteError) {
++                    rethrow;
+         }
+       } else {
+-        print('Different error, rethrowing...');
+-        rethrow;
++                rethrow;
+       }
+     }
+   }
+diff --git a/lib/auth/data/datasource/auth_remote_datasource.dart b/lib/auth/data/datasource/auth_remote_datasource.dart
+index 0616290..de47e63 100644
+--- a/lib/auth/data/datasource/auth_remote_datasource.dart
++++ b/lib/auth/data/datasource/auth_remote_datasource.dart
+@@ -8,8 +8,7 @@ class AuthRemoteDatasource {
+     required String uid, // API attend "uid" au lieu de "email"
+     required String password,
+   }) async {
+-    print('≡ƒöÉ LOGIN ATTEMPT - uid: $uid, password: ${password.length > 0 ? "***" : "empty"}');
+-    
++        
+     final response = await _dio.post(
+       '/auth/mobile/login',
+       data: {'uid': uid, 'password': password},
+@@ -20,9 +19,7 @@ class AuthRemoteDatasource {
+       ),
+     );
+     
+-    print('≡ƒöÉ LOGIN RESPONSE - Status: ${response.statusCode}');
+-    print('≡ƒöÉ LOGIN RESPONSE - Data: ${response.data}');
+-    
++            
+     return response;
+   }
+ 
+diff --git a/lib/auth/data/repository/auth_repository_impl.dart b/lib/auth/data/repository/auth_repository_impl.dart
+index 7a574ec..0774297 100644
+--- a/lib/auth/data/repository/auth_repository_impl.dart
++++ b/lib/auth/data/repository/auth_repository_impl.dart
+@@ -15,19 +15,15 @@ class AuthRepositoryImpl implements AuthRepository {
+     required String password,
+   }) async {
+     try {
+-      print('≡ƒöÉ Login attempt with uid: $uid');
+-      final response = await _datasource.login(uid: uid, password: password);
+-      
+-      print('≡ƒöÉ Login response status: ${response.statusCode}');
+-      print('≡ƒöÉ Login response data: ${response.data}');
++            final response = await _datasource.login(uid: uid, password: password);
+       
++                  
+       if (response.statusCode == 200 || response.statusCode == 201) {
+         final data = response.data as Map<String, dynamic>;
+         
+         // Check if login was successful
+         if (data['success'] == false) {
+-          print('Γ¥î Login failed: ${data['message']}');
+-          return DataFailed(
++                    return DataFailed(
+             DioException(
+               requestOptions: response.requestOptions,
+               message: data['message'] ?? 'Identifiants invalides',
+@@ -44,8 +40,7 @@ class AuthRepositoryImpl implements AuthRepository {
+           phone: user.phone,
+           userId: user.id,
+         );
+-        print('Γ£à Login successful for: ${user.fullName}');
+-        return DataSuccess(user);
++                return DataSuccess(user);
+       }
+       return DataFailed(
+         DioException(
+@@ -55,8 +50,7 @@ class AuthRepositoryImpl implements AuthRepository {
+         ),
+       );
+     } on DioException catch (e) {
+-      print('Γ¥î Login DioException: ${e.message}');
+-      return DataFailed(e);
++            return DataFailed(e);
+     }
+   }
+ 
+@@ -71,8 +65,7 @@ class AuthRepositoryImpl implements AuthRepository {
+     required bool isSeller,
+   }) async {
+     try {
+-      print('≡ƒô¥ Registering user: $fullName, phone: $phone');
+-      final response = await _datasource.register(
++            final response = await _datasource.register(
+         fullName: fullName,
+         email: email,
+         password: password,
+@@ -82,9 +75,7 @@ class AuthRepositoryImpl implements AuthRepository {
+         isSeller: isSeller,
+       );
+       
+-      print('≡ƒô¥ Response status: ${response.statusCode}');
+-      print('≡ƒô¥ Response data: ${response.data}');
+-      
++                  
+       if (response.statusCode == 200 || response.statusCode == 201) {
+         final data = response.data as Map<String, dynamic>;
+         final user = _parseUser(data);
+@@ -95,16 +86,14 @@ class AuthRepositoryImpl implements AuthRepository {
+           phone: user.phone,
+           userId: user.id,
+         );
+-        print('Γ£à Registration successful');
+-        return DataSuccess(user);
++                return DataSuccess(user);
+       }
+       
+       // Extract error message from response
+       final errorMsg = (response.data as Map?)?['message'] ?? 
+                       (response.data as Map?)?['error'] ?? 
+                       'Erreur lors de l\'inscription';
+-      print('Γ¥î Registration failed: $errorMsg');
+-      
++            
+       return DataFailed(
+         DioException(
+           requestOptions: response.requestOptions,
+@@ -113,9 +102,7 @@ class AuthRepositoryImpl implements AuthRepository {
+         ),
+       );
+     } on DioException catch (e) {
+-      print('Γ¥î DioException during registration: ${e.message}');
+-      print('Γ¥î Response: ${e.response?.data}');
+-      
++                  
+       // Try to extract error message from response
+       String errorMsg = 'Erreur lors de l\'inscription';
+       if (e.response?.data != null) {
+@@ -134,8 +121,7 @@ class AuthRepositoryImpl implements AuthRepository {
+         ),
+       );
+     } catch (e) {
+-      print('Γ¥î Unexpected error during registration: $e');
+-      return DataFailed(
++            return DataFailed(
+         DioException(
+           requestOptions: RequestOptions(),
+           message: e.toString(),
+diff --git a/lib/auth/presentation/bloc/auth_bloc.dart b/lib/auth/presentation/bloc/auth_bloc.dart
+index 5efb594..68ff3a0 100644
+--- a/lib/auth/presentation/bloc/auth_bloc.dart
++++ b/lib/auth/presentation/bloc/auth_bloc.dart
+@@ -22,10 +22,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
+   }
+ 
+   Future<void> _onAppStarted(AppStarted event, Emitter<AuthState> emit) async {
+-    print('≡ƒÜÇ AUTH BLOC - App started, checking login status');
+-    if (LocalStorageService.isLoggedIn) {
+-      print('≡ƒÜÇ AUTH BLOC - User is logged in, restoring session');
+-      emit(AuthAuthenticated(UserEntity(
++        if (LocalStorageService.isLoggedIn) {
++            emit(AuthAuthenticated(UserEntity(
+         token: LocalStorageService.token ?? 'session',
+         fullName: LocalStorageService.userFullName ?? '',
+         email: LocalStorageService.userEmail ?? '',
+@@ -33,21 +31,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
+         role: 'customer',
+       )));
+     } else {
+-      print('≡ƒÜÇ AUTH BLOC - User not logged in');
+-    }
++          }
+   }
+ 
+   Future<void> _onLogin(LoginRequested event, Emitter<AuthState> emit) async {
+-    print('≡ƒöÉ AUTH BLOC - Login attempt with uid: ${event.uid}');
+-    emit(AuthLoading());
++        emit(AuthLoading());
+     final result = await _loginUseCase(uid: event.uid, password: event.password);
+     
+     if (result is DataSuccess<UserEntity>) {
+-      print('≡ƒöÉ AUTH BLOC - Login success');
+-      emit(AuthAuthenticated(result.data!));
++            emit(AuthAuthenticated(result.data!));
+     } else {
+-      print('≡ƒöÉ AUTH BLOC - Login failed: ${result.error?.message}');
+-      emit(AuthError(result.error?.message ?? 'Identifiants invalides'));
++            emit(AuthError(result.error?.message ?? 'Identifiants invalides'));
+     }
+   }
+ 
+diff --git a/lib/brands/data/repository/brand_repository_impl.dart b/lib/brands/data/repository/brand_repository_impl.dart
+index fd40087..ec2d362 100644
+--- a/lib/brands/data/repository/brand_repository_impl.dart
++++ b/lib/brands/data/repository/brand_repository_impl.dart
+@@ -12,7 +12,7 @@ class BrandRepositoryImpl implements BrandRepository {
+   @override
+   Future<DataState<List<BrandEntity>>> getBrands() async {
+     try {
+-      var url = Uri.parse('https://auto-pro.uvatis.com/api/v1/brands');
++      var url = Uri.parse('https://ab-autox.com/api/v1/brands');
+       final httpResponse = await http.get(url);
+ 
+       if (httpResponse.statusCode == 200) {
+@@ -21,7 +21,6 @@ class BrandRepositoryImpl implements BrandRepository {
+         List<BrandModel> brands =
+             decodedResponse.map((json) => BrandModel.fromJson(json)).toList();
+ 
+-        //print(products);
+         return DataSuccess(brands);
+       } else {
+         throw Exception('Erreur HTTP : ${httpResponse.statusCode}');
+diff --git a/lib/comments/data/comment_repository_impl.dart b/lib/comments/data/comment_repository_impl.dart
+index 3ae44cb..8e9bd0e 100644
+--- a/lib/comments/data/comment_repository_impl.dart
++++ b/lib/comments/data/comment_repository_impl.dart
+@@ -26,21 +26,17 @@ class CommentRepositoryImpl implements CommentRepository {
+   Future<DataState<List<CommentModel>>> getComments(String productId) async {
+     if (await _networkInfo.isConnected) {
+       try {
+-        print('≡ƒîÉ Fetching comments for product: $productId');
+-        final httpResponse = await _remoteDatasourceDio.getComments(
++                final httpResponse = await _remoteDatasourceDio.getComments(
+           productId: productId,
+         );
+-        print('≡ƒîÉ Response status: ${httpResponse.response.statusCode}');
+-        
++                
+         if (httpResponse.response.statusCode == HttpStatus.ok) {
+-          print('≡ƒîÉ Comments loaded: ${httpResponse.data.length} items');
+-          return DataSuccess(httpResponse.data);
++                    return DataSuccess(httpResponse.data);
+         } else {
+           final errorMsg = httpResponse.response.data?['message'] ?? 
+                           httpResponse.response.statusMessage ?? 
+                           'Erreur serveur';
+-          print('Γ¥î API error: $errorMsg');
+-          return DataFailed(
++                    return DataFailed(
+             DioException(
+               requestOptions: httpResponse.response.requestOptions,
+               error: errorMsg,
+@@ -50,12 +46,9 @@ class CommentRepositoryImpl implements CommentRepository {
+           );
+         }
+       } on DioException catch (e) {
+-        print('Γ¥î DioException: ${e.message}');
+-        print('Γ¥î Response: ${e.response?.data}');
+-        return DataFailed(e);
++                        return DataFailed(e);
+       } catch (e) {
+-        print('Γ¥î Unexpected error: $e');
+-        return DataFailed(
++                return DataFailed(
+           DioException(
+             requestOptions: RequestOptions(),
+             error: e.toString(),
+@@ -84,15 +77,12 @@ class CommentRepositoryImpl implements CommentRepository {
+           comment: comment.comment,
+           userId: comment.userId,
+         );
+-        print('≡ƒîÉ Posting comment to API: ${commentModel.toString()}');
+-        
++                
+         final httpResponse = await _postRemoteDatasourceDio.postComment(
+           commentModel,
+         );
+         
+-        print('≡ƒîÉ Response status: ${httpResponse.response.statusCode}');
+-        print('≡ƒîÉ Response data: ${httpResponse.data}');
+-        
++                        
+         if (httpResponse.response.statusCode == HttpStatus.ok || 
+             httpResponse.response.statusCode == HttpStatus.created) {
+           return DataSuccess(httpResponse.data);
+@@ -102,8 +92,7 @@ class CommentRepositoryImpl implements CommentRepository {
+                           httpResponse.response.data?['error'] ?? 
+                           httpResponse.response.statusMessage ?? 
+                           'Erreur serveur';
+-          print('Γ¥î API error: $errorMsg');
+-          return DataFailed(
++                    return DataFailed(
+             DioException(
+               requestOptions: httpResponse.response.requestOptions,
+               error: errorMsg,
+@@ -113,12 +102,9 @@ class CommentRepositoryImpl implements CommentRepository {
+           );
+         }
+       } on DioException catch (e) {
+-        print('Γ¥î DioException: ${e.message}');
+-        print('Γ¥î Response: ${e.response?.data}');
+-        return DataFailed(e);
++                        return DataFailed(e);
+       } catch (e) {
+-        print('Γ¥î Unexpected error: $e');
+-        return DataFailed(
++                return DataFailed(
+           DioException(
+             requestOptions: RequestOptions(),
+             error: e.toString(),
+diff --git a/lib/comments/presentation/bloc/comment_bloc.dart b/lib/comments/presentation/bloc/comment_bloc.dart
+index 7ea8352..883d00f 100644
+--- a/lib/comments/presentation/bloc/comment_bloc.dart
++++ b/lib/comments/presentation/bloc/comment_bloc.dart
+@@ -25,11 +25,9 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
+   ) async {
+     emit(CommentsLoading());
+     try {
+-      print('≡ƒôÑ Fetching comments for product: ${event.productId}');
+-      final dataState = await _getCommentUseCase(params: event.productId);
++            final dataState = await _getCommentUseCase(params: event.productId);
+       if (dataState is DataSuccess) {
+-        print('Γ£à Loaded ${dataState.data!.length} comments');
+-        final comments =
++                final comments =
+             dataState.data!
+                 .map<CommentModel>((e) => CommentDto.getToModel(e))
+                 .toList();
+@@ -38,12 +36,10 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
+       }
+       if (dataState is DataFailed) {
+         final errorMsg = dataState.error?.message ?? 'Erreur inconnue';
+-        print('Γ¥î Failed to fetch comments: $errorMsg');
+-        emit(CommentsError('Erreur lors du chargement des commentaires: $errorMsg'));
++                emit(CommentsError('Erreur lors du chargement des commentaires: $errorMsg'));
+       }
+     } catch (e) {
+-      print('Γ¥î Exception fetching comments: $e');
+-      emit(CommentsError('Erreur lors du chargement des commentaires: ${e.toString()}'));
++            emit(CommentsError('Erreur lors du chargement des commentaires: ${e.toString()}'));
+     }
+   }
+ 
+@@ -52,25 +48,21 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
+     Emitter<CommentState> emit,
+   ) async {
+     try {
+-      print('≡ƒô¥ Submitting comment for product: ${event.productId}');
+-      
++            
+       // Get userId from local storage (should be UUID, not phone/email)
+       final userId = LocalStorageService.userId;
+-      print('≡ƒô¥ User ID from storage: $userId');
+-      
++            
+       final newComment = CommentPostEntity(
+         productId: event.productId,
+         user: event.user,
+         comment: event.comment,
+         userId: userId, // Now using actual UUID
+       );
+-      print('≡ƒô¥ Comment data: ${newComment.toString()}');
+-      
++            
+       final dataState = await _postCommentUseCase(params: newComment);
+ 
+       if (dataState is DataSuccess) {
+-        print('Γ£à Comment submitted successfully');
+-        final returnComment = CommentDto.getToModel(dataState.data!);
++                final returnComment = CommentDto.getToModel(dataState.data!);
+         final currentComments = (state as CommentsLoaded).comments;
+         final updatedComments =
+             [
+@@ -82,12 +74,10 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
+       }
+       if (dataState is DataFailed) {
+         final errorMsg = dataState.error?.message ?? 'Erreur inconnue';
+-        print('Γ¥î Failed to add comment: $errorMsg');
+-        emit(CommentsError('Erreur lors de l\'ajout du commentaire: $errorMsg'));
++                emit(CommentsError('Erreur lors de l\'ajout du commentaire: $errorMsg'));
+       }
+     } catch (e) {
+-      print('Γ¥î Exception adding comment: $e');
+-      emit(
++            emit(
+         CommentsError(
+           'Erreur lors de l\'ajout du commentaire: ${e.toString()}',
+         ),
+diff --git a/lib/config/navigation/main_navigation.dart b/lib/config/navigation/main_navigation.dart
+index eb2f87b..c64c4fd 100644
+--- a/lib/config/navigation/main_navigation.dart
++++ b/lib/config/navigation/main_navigation.dart
+@@ -227,15 +227,12 @@ class _MainNavigationState extends State<MainNavigation> {
+ //               const SizedBox(height: 24),
+ //               ElevatedButton(
+ //                 onPressed: () {
+-//                   print('≡ƒöù NAVIGATION - Attempting to navigate to LoginPage');
+-//                   try {
++//                   //                   try {
+ //                     Navigator.of(context).push(
+ //                       MaterialPageRoute(builder: (_) => const LoginPage()),
+ //                     );
+-//                     print('≡ƒöù NAVIGATION - Navigation successful');
+-//                   } catch (e) {
+-//                     print('≡ƒöù NAVIGATION - Navigation failed: $e');
+-//                   }
++//                     //                   } catch (e) {
++//                     //                   }
+ //                 },
+ //                 style: ElevatedButton.styleFrom(
+ //                   backgroundColor: primary,
+diff --git a/lib/core/constants/constants.dart b/lib/core/constants/constants.dart
+index 6eb40c3..ee0b5e9 100644
+--- a/lib/core/constants/constants.dart
++++ b/lib/core/constants/constants.dart
+@@ -1,2 +1,2 @@
+ const String localAPIBaseUrl = 'https://ab-autox.com/api/v1';
+-// const String apiBaseUrl = 'http://192.168.11.107:3333/api/v1'; 
+\ No newline at end of file
++// const String apiBaseUrl = 'http://192.168.11.107:3333/api/v1';
+diff --git a/lib/core/resources/network_info.dart b/lib/core/resources/network_info.dart
+index 8b284aa..95d21f9 100644
+--- a/lib/core/resources/network_info.dart
++++ b/lib/core/resources/network_info.dart
+@@ -7,8 +7,10 @@ class NetworkInfo {
+   const NetworkInfo(this._connection);
+ 
+   Future<bool> get isConnected async {
++    print('≡ƒôí NetworkInfo: checking connection...');
+     // Tente d'abord un ping direct vers le serveur API local
+     try {
++      print('≡ƒôí NetworkInfo: trying direct ping to health endpoint...');
+       final dio = Dio();
+       final response = await dio
+           .get(
+@@ -20,15 +22,16 @@ class NetworkInfo {
+           )
+           .timeout(const Duration(seconds: 3));
+       if (response.statusCode != null) {
+-        print('[NetworkInfo] Γ£à Serveur local accessible: ${response.statusCode}');
++        print('≡ƒôí NetworkInfo: API ping success (status: ${response.statusCode})');
+         return true;
+       }
+     } catch (e) {
+-      print('[NetworkInfo] Γ¥î Serveur local inaccessible: $e');
++      print('≡ƒôí NetworkInfo: API ping failed: $e');
+     }
+     // Fallback : v├⌐rification internet classique
++    print('≡ƒôí NetworkInfo: falling back to connection checker...');
+     final result = await _connection.hasInternetAccess;
+-    print('[NetworkInfo] ≡ƒîÉ Internet classique: $result');
++    print('≡ƒôí NetworkInfo: connection checker result = $result');
+     return result;
+   }
+ }
+diff --git a/lib/injection_container.dart b/lib/injection_container.dart
+index 54e019e..42aec97 100644
+--- a/lib/injection_container.dart
++++ b/lib/injection_container.dart
+@@ -95,7 +95,11 @@ Future<void> initializeDependencies() async {
+   final cookieJar = PersistCookieJar(
+     storage: FileStorage('${appDir.path}/.cookies/'),
+   );
+-  final dio = Dio(BaseOptions(baseUrl: localAPIBaseUrl));
++  final dio = Dio(BaseOptions(
++    baseUrl: localAPIBaseUrl,
++    connectTimeout: const Duration(seconds: 10),
++    receiveTimeout: const Duration(seconds: 10),
++  ));
+   dio.interceptors.add(CookieManager(cookieJar));
+   // Add authentication token to requests
+   dio.interceptors.add(
+@@ -112,29 +116,13 @@ Future<void> initializeDependencies() async {
+   dio.interceptors.add(
+     InterceptorsWrapper(
+       onRequest: (options, handler) {
+-        print('ΓöîΓöÇΓöÇ REQUEST ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ');
+-        print('Γöé ${options.method} ${options.uri}');
+-        print('Γöé Headers: ${options.headers}');
+-        if (options.data != null) print('Γöé Body: ${options.data}');
+-        print('ΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ');
+-        return handler.next(options);
++                                if (options.data != null)                 return handler.next(options);
+       },
+       onResponse: (response, handler) {
+-        print('ΓöîΓöÇΓöÇ RESPONSE ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ');
+-        print('Γöé Status: ${response.statusCode}');
+-        print('Γöé URL: ${response.requestOptions.uri}');
+-        print('Γöé Data: ${response.data.toString().substring(0, response.data.toString().length.clamp(0, 300))}...');
+-        print('ΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ');
+-        return handler.next(response);
++                                                return handler.next(response);
+       },
+       onError: (DioException e, handler) async {
+-        print('ΓöîΓöÇΓöÇ ERROR ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ');
+-        print('Γöé URL: ${e.requestOptions.uri}');
+-        print('Γöé Type: ${e.type}');
+-        print('Γöé Message: ${e.message}');
+-        print('Γöé Response: ${e.response?.data}');
+-        print('ΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ');
+-        if (e.response?.statusCode == 401) {
++                                                        if (e.response?.statusCode == 401) {
+           await LocalStorageService.clearAuth();
+           await cookieJar.deleteAll();
+           sl<AuthBloc>().add(const SessionExpired());
+diff --git a/lib/main.dart b/lib/main.dart
+index 253d3f3..e323bb2 100644
+--- a/lib/main.dart
++++ b/lib/main.dart
+@@ -35,8 +35,7 @@ import 'injection_container.dart';
+ @pragma('vm:entry-point')
+ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+   await Firebase.initializeApp();
+-  print("Handling a background message: ${message.messageId}");
+-}
++  }
+ 
+ Future<void> main() async {
+   WidgetsFlutterBinding.ensureInitialized();
+@@ -63,23 +62,16 @@ Future<void> main() async {
+     // Souscrire au topic de promotions et au topic global
+     await messaging.subscribeToTopic('promotions_topic');
+     await messaging.subscribeToTopic('all_users');
+-    print("Inscrit avec succ├¿s aux topics des promotions et all_users");
+-
++    
+     // Initialiser les notifications locales
+     await NotificationService.init();
+ 
+     // ├ëcoute locale pour afficher la notif en mode premier plan
+     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+-      print(
+-        '≡ƒöÑ INFO: Notif re├ºue en mode ouvert: ${message.notification?.title}',
+-      );
+-      NotificationService.showNotification(message);
++            NotificationService.showNotification(message);
+     });
+   } catch (e) {
+-    print(
+-      "Erreur d'initialisation Firebase (v├⌐rifiez google-services.json): $e",
+-    );
+-  }
++      }
+ 
+   await LocalStorageService.init();
+   await ObjectBoxService.init();
+diff --git a/lib/notifications/data/notification_service.dart b/lib/notifications/data/notification_service.dart
+index 6ae4ce6..a0cc914 100644
+--- a/lib/notifications/data/notification_service.dart
++++ b/lib/notifications/data/notification_service.dart
+@@ -35,8 +35,7 @@ class NotificationService {
+       initializationSettings,
+       onDidReceiveNotificationResponse: (NotificationResponse details) {
+         // Handle notification click
+-        print("Notification clicked: ${details.payload}");
+-      },
++              },
+     );
+ 
+     // Create the channel on Android
+diff --git a/lib/orders/data/repository/my_order_repository_impl.dart b/lib/orders/data/repository/my_order_repository_impl.dart
+index 43fb105..57e9f26 100644
+--- a/lib/orders/data/repository/my_order_repository_impl.dart
++++ b/lib/orders/data/repository/my_order_repository_impl.dart
+@@ -15,22 +15,16 @@ class MyOrderRepositoryImpl implements MyOrderRepository {
+       final response = await _datasource.getMyOrders();
+       
+       // Debug: Afficher la r├⌐ponse brute du backend
+-      print('DEBUG: Response status: ${response.statusCode}');
+-      print('DEBUG: Response data type: ${response.data.runtimeType}');
+-      print('DEBUG: Response data: ${response.data}');
+-      
++                        
+       if (response.statusCode == 200) {
+         final raw = response.data;
+         final List data = raw is List ? raw : (raw['data'] ?? raw['orders'] ?? []) as List;
+-        print('DEBUG: Extracted list length: ${data.length}');
+-        print('DEBUG: First item: ${data.isNotEmpty ? data[0] : 'No data'}');
+-        
++                        
+         final orders = data
+             .whereType<Map<String, dynamic>>()
+             .map((e) => _fromJson(e))
+             .toList();
+-        print('DEBUG: Orders created: ${orders.length}');
+-        return DataSuccess(orders);
++                return DataSuccess(orders);
+       }
+       return DataFailed(
+         DioException(
+@@ -39,12 +33,9 @@ class MyOrderRepositoryImpl implements MyOrderRepository {
+         ),
+       );
+     } on DioException catch (e) {
+-      print('DEBUG: DioException: ${e.message}');
+-      print('DEBUG: DioException response: ${e.response?.data}');
+-      return DataFailed(e);
++                  return DataFailed(e);
+     } catch (e) {
+-      print('DEBUG: General exception: $e');
+-      return DataFailed(
++            return DataFailed(
+         DioException(
+           requestOptions: RequestOptions(path: '$localAPIBaseUrl/my-orders'),
+           message: e.toString(),
+@@ -65,22 +56,18 @@ class MyOrderRepositoryImpl implements MyOrderRepository {
+   MyOrderEntity _fromJson(Map<String, dynamic> json) {
+     try {
+       // Debug: Afficher les donn├⌐es brutes re├ºues
+-      print('DEBUG: Order JSON re├ºu: $json');
+-      
++            
+       final product = json['product'] as Map<String, dynamic>? ?? {};
+-      print('DEBUG: Product data: $product');
+-      
++            
+       final medias = product['medias'] as List?;
+-      print('DEBUG: Medias: $medias');
+-      
++            
+       String imageUrl = '';
+       if (medias != null && medias.isNotEmpty) {
+         final first = medias[0];
+         final raw = first is Map ? (first['url'] ?? '').toString() : first.toString();
+         imageUrl = raw.startsWith('http') ? raw : '$localAPIBaseUrl$raw';
+       }
+-      print('DEBUG: Final image URL: $imageUrl');
+-      
++            
+       final orderEntity = MyOrderEntity(
+         id: json['id'] ?? 0,
+         productName: product['name']?.toString() ?? 'Produit',
+@@ -95,11 +82,9 @@ class MyOrderRepositoryImpl implements MyOrderRepository {
+         productPrice: _parsePrice(product['price']),
+       );
+       
+-      print('DEBUG: OrderEntity cr├⌐├⌐: ${orderEntity.id} - ${orderEntity.productName}');
+-      return orderEntity;
++            return orderEntity;
+     } catch (e) {
+-      print('DEBUG: Erreur dans _fromJson: $e');
+-      return MyOrderEntity(
++            return MyOrderEntity(
+         id: json['id'] ?? 0,
+         productName: 'Produit',
+         productImage: '',
+diff --git a/lib/orders/presentation/pages/order_detail_page.dart b/lib/orders/presentation/pages/order_detail_page.dart
+index b0852f2..de13752 100644
+--- a/lib/orders/presentation/pages/order_detail_page.dart
++++ b/lib/orders/presentation/pages/order_detail_page.dart
+@@ -144,15 +144,7 @@ Widget _buildImagePlaceholder() {
+     final statusColor = _statusColor(order.status);
+ 
+     // Debug: Afficher les donn├⌐es de la commande
+-    print('DEBUG: OrderDetailPage - Order ID: ${order.id}');
+-    print('DEBUG: OrderDetailPage - Product Name: ${order.productName}');
+-    print('DEBUG: OrderDetailPage - Product Price: ${order.productPrice}');
+-    print('DEBUG: OrderDetailPage - Customer Name: ${order.customerName}');
+-    print('DEBUG: OrderDetailPage - Phone: ${order.phoneNumber}');
+-    print('DEBUG: OrderDetailPage - City: ${order.city}');
+-    print('DEBUG: OrderDetailPage - Status: ${order.status}');
+-    print('DEBUG: OrderDetailPage - Created At: ${order.createdAt}');
+-
++                                
+     return Scaffold(
+       backgroundColor: Colors.grey[100],
+       appBar: AppBar(
+diff --git a/lib/products/data/models/product.model.dart b/lib/products/data/models/product.model.dart
+index 55b5e1c..627f800 100644
+--- a/lib/products/data/models/product.model.dart
++++ b/lib/products/data/models/product.model.dart
+@@ -13,6 +13,8 @@ class ProductModel extends ProductEntity {
+     super.state,
+     super.validationStatus,
+     super.description,
++    super.model,
++    super.year,
+     super.price,
+     super.discount,
+     CategoryModel? super.category,
+@@ -46,6 +48,8 @@ class ProductModel extends ProductEntity {
+       state: json['state'] ?? '',
+       validationStatus: json['validationStatus'] ?? '',
+       description: json['description'] ?? '',
++      model: json['model']?.toString() ?? '',
++      year: json['year']?.toString() ?? '',
+       price: double.tryParse(json['price']?.toString() ?? '0') ?? 0.0,
+       discount: double.tryParse(json['discount']?.toString() ?? '0') ?? 0.0,
+       category: json['category'] != null
+diff --git a/lib/products/data/models/product_converter.dart b/lib/products/data/models/product_converter.dart
+index 6ba9544..a23c770 100644
+--- a/lib/products/data/models/product_converter.dart
++++ b/lib/products/data/models/product_converter.dart
+@@ -103,8 +103,7 @@ class ProductObjectBox {
+     try {
+       return List<String>.from(jsonDecode(medias!));
+     } catch (e) {
+-      print('Erreur lors de la d├⌐s├⌐rialisation des medias: $e');
+-      return null;
++            return null;
+     }
+   }
+ 
+@@ -113,8 +112,7 @@ class ProductObjectBox {
+     try {
+       return List<String>.from(jsonDecode(featuresJson!));
+     } catch (e) {
+-      print('Erreur lors de la d├⌐s├⌐rialisation des features: $e');
+-      return null;
++            return null;
+     }
+   }
+ }
+diff --git a/lib/products/data/repository/product_repository_impl.dart b/lib/products/data/repository/product_repository_impl.dart
+index 74ff7be..3dd4b55 100644
+--- a/lib/products/data/repository/product_repository_impl.dart
++++ b/lib/products/data/repository/product_repository_impl.dart
+@@ -18,6 +18,7 @@ class ProductRepositoryImpl implements ProductRepository {
+   ProductRepositoryImpl(this._remote, this._local, this._networkInfo, this._dio);
+   @override
+   Future<DataState<List<ProductEntity>>> getProducts() async {
++    print('≡ƒöä getProducts() called');
+     if (await _networkInfo.isConnected) {
+       try {
+         // R├⌐cup├⌐rer la liste des produits
+@@ -25,18 +26,16 @@ class ProductRepositoryImpl implements ProductRepository {
+         
+         if (httpResponse.response.statusCode == HttpStatus.ok) {
+           final productModels = httpResponse.data as List<dynamic>;
+-          print('Received ${productModels.length} products from API');
+-          
++          print('≡ƒÜÇ getProducts: Received ${productModels.length} products from remote');
++                    
+           // Les donn├⌐es sont d├⌐j├á des ProductModel (converties par Retrofit)
+           // Il faut juste les convertir en ProductEntity
+           final products = <ProductEntity>[];
+           
+           for (int i = 0; i < productModels.length; i++) {
+             try {
+-              print('Converting product $i...');
+-              final model = productModels[i] as ProductModel;  // Chang├⌐ ici
+-              print('ProductModel received for: ${model.name}');
+-              
++                            final model = productModels[i] as ProductModel;  // Chang├⌐ ici
++                            
+               final entity = ProductEntity(
+                 id: model.id,
+                 name: model.name ?? '',
+@@ -54,22 +53,19 @@ class ProductRepositoryImpl implements ProductRepository {
+                 seller: model.seller,
+                 sellerId: model.sellerId,
+               );
+-              print('ProductEntity created for: ${entity.name}');
+-              products.add(entity);
+-            } catch (e) {
+-              print('Error converting product $i: $e');
+-              print('Product data: ${productModels[i]}');
++                            products.add(entity);
++            } catch (e, stackTrace) {
++              print('Γ¥î getProducts: Error parsing product: $e\n$stackTrace');
+             }
+           }
+           
+-          print('Converted ${products.length} products to ProductEntity');
+-          
++                    
+           // Pour l'instant, utilisons les produits sans d├⌐tails suppl├⌐mentaires
+           // pour v├⌐rifier si l'affichage fonctionne
+-          print('Using products without seller details for now');
+-          await _local.cacheProducts(products);
++                    await _local.cacheProducts(products);
+           return DataSuccess(products);
+         } else {
++          print('ΓÜá∩╕Å getProducts: API returned status ${httpResponse.response.statusCode}');
+           return DataFailed(
+             DioException(
+               error: httpResponse.response.statusMessage,
+@@ -79,9 +75,11 @@ class ProductRepositoryImpl implements ProductRepository {
+           );
+         }
+       } on DioException catch (e) {
++        print('Γ¥î getProducts: DioException: ${e.message}');
+         return DataFailed(e);
+       }
+     } else {
++      print('ΓÜá∩╕Å getProducts: No internet connection. Fetching from local cache.');
+       return DataSuccess(await _local.getProducts());
+     }
+   }
+@@ -91,35 +89,42 @@ class ProductRepositoryImpl implements ProductRepository {
+     int page = 1,
+     int limit = 20,
+   }) async {
+-    if (await _networkInfo.isConnected) {
++    print('≡ƒöä getProductsPaginated() called (page: $page, limit: $limit)');
++    bool isConnected = await _networkInfo.isConnected;
++    print('≡ƒôí getProductsPaginated: isConnected=$isConnected');
++    if (isConnected) {
+       try {
+-        print('≡ƒôí Fetching products from /products?page=$page&limit=$limit');
+-        final response = await _dio.get(
++        print('≡ƒîÉ getProductsPaginated: starting API request...');
++                final response = await _dio.get(
+           '/products',
+           queryParameters: {'page': page, 'limit': limit},
+         );
+ 
+-        print('≡ƒôí Response status: ${response.statusCode}');
+-        print('≡ƒôí Response data: ${response.data}');
+-
++                
+         if (response.statusCode == HttpStatus.ok) {
+-          final responseData = response.data as Map<String, dynamic>;
+-          print('≡ƒôí Response keys: ${responseData.keys.toList()}');
+-          
+-          final productModels = responseData['data'] as List<dynamic>;
+-          
+-          print('Γ£à Received ${productModels.length} products from API (page $page)');
++          List<dynamic> productModels = [];
++          Map<String, dynamic>? paginationInfo;
+           
++          if (response.data is List) {
++            productModels = response.data as List<dynamic>;
++          } else if (response.data is Map<String, dynamic>) {
++            final responseData = response.data as Map<String, dynamic>;
++            if (responseData.containsKey('data')) {
++              productModels = responseData['data'] as List<dynamic>;
++            } else {
++              productModels = responseData.values.firstWhere((v) => v is List, orElse: () => []) as List<dynamic>;
++            }
++            paginationInfo = responseData;
++          }
++          print('≡ƒÜÇ getProductsPaginated: Received ${productModels.length} products from remote (page: $page, limit: $limit)');
+           final products = <ProductEntity>[];
+           
+           for (int i = 0; i < productModels.length; i++) {
+             try {
+               final json = productModels[i] as Map<String, dynamic>;
+-              print('≡ƒôª Product $i JSON: ${json['name']} - validationStatus: ${json['validationStatus']}');
+-              
++                            
+               final model = ProductModel.fromJson(json);
+-              print('≡ƒôª Product $i Model: ${model.name} - validationStatus: ${model.validationStatus}');
+-              
++                            
+               final entity = ProductEntity(
+                 id: model.id,
+                 name: model.name ?? '',
+@@ -140,27 +145,25 @@ class ProductRepositoryImpl implements ProductRepository {
+                 sellerId: model.sellerId,
+                 validationStatus: model.validationStatus,
+               );
+-              print('Γ£à ProductEntity created: ${entity.name}');
+-              products.add(entity);
+-            } catch (e) {
+-              print('Γ¥î Error converting product $i: $e');
+-              print('Γ¥î Product data: ${productModels[i]}');
++                            products.add(entity);
++            } catch (e, stackTrace) {
++              print('Γ¥î getProductsPaginated: Error parsing product: $e\n$stackTrace');
+             }
+           }
+           
+-          print('Γ£à Total converted products: ${products.length}');
+-          
++                    
+           // Retourner les produits avec les m├⌐tadonn├⌐es de pagination
+           return DataSuccess({
+             'products': products,
+-            'total': responseData['total'],
+-            'page': responseData['page'],
+-            'limit': responseData['limit'],
+-            'totalPages': responseData['totalPages'],
+-            'hasNextPage': responseData['hasNextPage'],
+-            'hasPreviousPage': responseData['hasPreviousPage'],
++            'total': paginationInfo?['total'] ?? products.length,
++            'page': paginationInfo?['page'] ?? 1,
++            'limit': paginationInfo?['limit'] ?? products.length,
++            'totalPages': paginationInfo?['totalPages'] ?? 1,
++            'hasNextPage': paginationInfo?['hasNextPage'] ?? false,
++            'hasPreviousPage': paginationInfo?['hasPreviousPage'] ?? false,
+           });
+         } else {
++          print('ΓÜá∩╕Å getProductsPaginated: API returned status ${response.statusCode}');
+           return DataFailed(
+             DioException(
+               error: response.statusMessage,
+@@ -170,11 +173,11 @@ class ProductRepositoryImpl implements ProductRepository {
+           );
+         }
+       } on DioException catch (e) {
+-        print('Γ¥î DioException: ${e.message}');
+-        print('Γ¥î Error details: ${e.error}');
++        print('Γ¥î getProductsPaginated: DioException: ${e.message}');
+         return DataFailed(e);
+       }
+     } else {
++      print('ΓÜá∩╕Å getProductsPaginated: No internet connection.');
+       return DataFailed(
+         DioException(
+           error: 'No internet connection',
+diff --git a/lib/products/domain/entities/product_entity.dart b/lib/products/domain/entities/product_entity.dart
+index 9afafde..f1e5141 100644
+--- a/lib/products/domain/entities/product_entity.dart
++++ b/lib/products/domain/entities/product_entity.dart
+@@ -19,6 +19,8 @@ class ProductEntity {
+   final String? state;
+   final String? validationStatus;
+   final String? description;
++  final String? model;
++  final String? year;
+   final double? price;
+   final double? discount;
+   final CategoryEntity? category;
+@@ -39,6 +41,8 @@ class ProductEntity {
+     this.state,
+     this.validationStatus,
+     this.description,
++    this.model,
++    this.year,
+     this.price,
+     this.discount,
+     this.category,
+diff --git a/lib/products/presentation/bloc/remote/remote_product_bloc.dart b/lib/products/presentation/bloc/remote/remote_product_bloc.dart
+index 6f5af09..cf18e21 100644
+--- a/lib/products/presentation/bloc/remote/remote_product_bloc.dart
++++ b/lib/products/presentation/bloc/remote/remote_product_bloc.dart
+@@ -25,6 +25,8 @@ class RemoteProductsBloc extends Bloc<RemoteProductsEvent, RemoteProductState> {
+     on<SortByNewest>(_onSortByNewest);
+     on<LoadMoreProducts>(_onLoadMoreProducts);
+     on<RefreshProducts>(_onRefreshProducts);
++    on<UpdateSpecificFilter>(_onUpdateSpecificFilter);
++    on<RemoveFilter>(_onRemoveFilter);
+   }
+ 
+   Future<void> onGetProducts(
+@@ -48,6 +50,8 @@ class RemoteProductsBloc extends Bloc<RemoteProductsEvent, RemoteProductState> {
+           [],
+           [],
+           [],
++          [],
++          [],
+           0,
+           50000000,
+           false,
+@@ -88,6 +92,8 @@ class RemoteProductsBloc extends Bloc<RemoteProductsEvent, RemoteProductState> {
+           [],
+           [],
+           [],
++          [],
++          [],
+           0,
+           50000000,
+           false,
+@@ -111,6 +117,8 @@ class RemoteProductsBloc extends Bloc<RemoteProductsEvent, RemoteProductState> {
+           [],
+           [],
+           [],
++          [],
++          [],
+           0,
+           50000000,
+           false,
+@@ -137,7 +145,13 @@ class RemoteProductsBloc extends Bloc<RemoteProductsEvent, RemoteProductState> {
+                 (product.subCategoryId != null && event.selectedSubCategories.contains(product.subCategoryId!));
+             final brandMatch =
+                 event.selectedBrands.isEmpty ||
+-                (product.brand != null && event.selectedBrands.contains(product.brand!.id));
++                (product.brand != null && (event.selectedBrands.contains(product.brand!.id) || event.selectedBrands.contains(product.brand!.name)));
++            final modelMatch =
++                event.selectedModels.isEmpty ||
++                (product.model != null && event.selectedModels.contains(product.model));
++            final yearMatch =
++                event.selectedYears.isEmpty ||
++                (product.year != null && event.selectedYears.contains(product.year));
+             final priceMatch =
+                 product.price! >= event.minPrice &&
+                 product.price! <= event.maxPrice;
+@@ -146,7 +160,7 @@ class RemoteProductsBloc extends Bloc<RemoteProductsEvent, RemoteProductState> {
+                 (event.isNew && (product.state == 'new') ||
+                     (event.isUsed && !(product.state == 'new')));
+ 
+-            return categoryMatch && subCategoryMatch && brandMatch && priceMatch && stateMatch;
++            return categoryMatch && subCategoryMatch && brandMatch && modelMatch && yearMatch && priceMatch && stateMatch;
+           }).toList();
+ 
+       emit(
+@@ -155,6 +169,8 @@ class RemoteProductsBloc extends Bloc<RemoteProductsEvent, RemoteProductState> {
+           selectedCategories: event.selectedCategories,
+           selectedSubCategories: event.selectedSubCategories,
+           selectedBrands: event.selectedBrands,
++          selectedModels: event.selectedModels,
++          selectedYears: event.selectedYears,
+           minPrice: event.minPrice,
+           maxPrice: event.maxPrice,
+           isNew: event.isNew,
+@@ -164,6 +180,58 @@ class RemoteProductsBloc extends Bloc<RemoteProductsEvent, RemoteProductState> {
+     }
+   }
+ 
++  void _onUpdateSpecificFilter(
++    UpdateSpecificFilter event,
++    Emitter<RemoteProductState> emit,
++  ) {
++    if (state is RemoteProductsDone) {
++      final currentState = state as RemoteProductsDone;
++      add(
++        FilterProducts(
++          selectedCategories: currentState.selectedCategories,
++          selectedSubCategories: currentState.selectedSubCategories,
++          selectedBrands: event.selectedBrands ?? currentState.selectedBrands,
++          selectedModels: event.selectedModels ?? currentState.selectedModels,
++          selectedYears: event.selectedYears ?? currentState.selectedYears,
++          minPrice: currentState.minPrice,
++          maxPrice: currentState.maxPrice,
++          isNew: currentState.isNew,
++          isUsed: currentState.isUsed,
++        ),
++      );
++    }
++  }
++
++  void _onRemoveFilter(
++    RemoveFilter event,
++    Emitter<RemoteProductState> emit,
++  ) {
++    if (state is RemoteProductsDone) {
++      final currentState = state as RemoteProductsDone;
++      final brands = List<String>.from(currentState.selectedBrands);
++      final models = List<String>.from(currentState.selectedModels);
++      final years = List<String>.from(currentState.selectedYears);
++
++      if (event.filterType == 'brand') brands.remove(event.value);
++      if (event.filterType == 'model') models.remove(event.value);
++      if (event.filterType == 'year') years.remove(event.value);
++
++      add(
++        FilterProducts(
++          selectedCategories: currentState.selectedCategories,
++          selectedSubCategories: currentState.selectedSubCategories,
++          selectedBrands: brands,
++          selectedModels: models,
++          selectedYears: years,
++          minPrice: currentState.minPrice,
++          maxPrice: currentState.maxPrice,
++          isNew: currentState.isNew,
++          isUsed: currentState.isUsed,
++        ),
++      );
++    }
++  }
++
+   void _onSortByAlphabet(
+     SortByAlphabet event,
+     Emitter<RemoteProductState> emit,
+@@ -310,6 +378,8 @@ class RemoteProductsBloc extends Bloc<RemoteProductsEvent, RemoteProductState> {
+             currentState.selectedCategories,
+             currentState.selectedSubCategories ?? [],
+             currentState.selectedBrands,
++            currentState.selectedModels,
++            currentState.selectedYears,
+             currentState.minPrice,
+             currentState.maxPrice,
+             currentState.isNew,
+@@ -348,6 +418,8 @@ class RemoteProductsBloc extends Bloc<RemoteProductsEvent, RemoteProductState> {
+           [],
+           [],
+           [],
++          [],
++          [],
+           0,
+           50000000,
+           false,
+diff --git a/lib/products/presentation/bloc/remote/remote_product_event.dart b/lib/products/presentation/bloc/remote/remote_product_event.dart
+index 4060399..7e6a1e9 100644
+--- a/lib/products/presentation/bloc/remote/remote_product_event.dart
++++ b/lib/products/presentation/bloc/remote/remote_product_event.dart
+@@ -15,6 +15,8 @@ class FilterProducts extends RemoteProductsEvent {
+   final List<String> selectedCategories;
+   final List<String> selectedSubCategories;
+   final List<String> selectedBrands;
++  final List<String> selectedModels;
++  final List<String> selectedYears;
+   final double minPrice;
+   final double maxPrice;
+   final bool isNew;
+@@ -24,6 +26,8 @@ class FilterProducts extends RemoteProductsEvent {
+     required this.selectedCategories,
+     this.selectedSubCategories = const [],
+     required this.selectedBrands,
++    this.selectedModels = const [],
++    this.selectedYears = const [],
+     required this.minPrice,
+     required this.maxPrice,
+     required this.isNew,
+@@ -31,6 +35,24 @@ class FilterProducts extends RemoteProductsEvent {
+   });
+ }
+ 
++class UpdateSpecificFilter extends RemoteProductsEvent {
++  final List<String>? selectedBrands;
++  final List<String>? selectedModels;
++  final List<String>? selectedYears;
++  
++  const UpdateSpecificFilter({
++    this.selectedBrands,
++    this.selectedModels,
++    this.selectedYears,
++  });
++}
++
++class RemoveFilter extends RemoteProductsEvent {
++  final String filterType; // 'brand', 'model', 'year'
++  final String value;
++  const RemoveFilter(this.filterType, this.value);
++}
++
+ class SortByAlphabet extends RemoteProductsEvent {
+   final bool ascending;
+   const SortByAlphabet(this.ascending);
+diff --git a/lib/products/presentation/bloc/remote/remote_product_state.dart b/lib/products/presentation/bloc/remote/remote_product_state.dart
+index b407f33..7f78268 100644
+--- a/lib/products/presentation/bloc/remote/remote_product_state.dart
++++ b/lib/products/presentation/bloc/remote/remote_product_state.dart
+@@ -29,6 +29,8 @@ class RemoteProductsDone extends RemoteProductState {
+   final List<String> selectedCategories;
+   final List<String> selectedSubCategories;
+   final List<String> selectedBrands;
++  final List<String> selectedModels;
++  final List<String> selectedYears;
+   final double minPrice;
+   final double maxPrice;
+   final bool isNew;
+@@ -45,6 +47,8 @@ class RemoteProductsDone extends RemoteProductState {
+     this.selectedCategories,
+     this.selectedSubCategories,
+     this.selectedBrands,
++    this.selectedModels,
++    this.selectedYears,
+     this.minPrice,
+     this.maxPrice,
+     this.isNew,
+@@ -59,6 +63,24 @@ class RemoteProductsDone extends RemoteProductState {
+         query: query,
+       );
+ 
++  List<String> get availableModels {
++    final models = allProducts?.map((p) => p.model).where((m) => m != null && m.isNotEmpty).map((m) => m!).toSet().toList() ?? [];
++    models.sort();
++    return models;
++  }
++
++  List<String> get availableYears {
++    final years = allProducts?.map((p) => p.year).where((y) => y != null && y.isNotEmpty).map((y) => y!).toSet().toList() ?? [];
++    years.sort((a, b) => b.compareTo(a));
++    return years;
++  }
++
++  List<String> get availableBrands {
++    final brands = allProducts?.map((p) => p.brand?.name).where((b) => b != null && b.isNotEmpty).map((b) => b!).toSet().toList() ?? [];
++    brands.sort();
++    return brands;
++  }
++
+   RemoteProductsDone copyWith({
+     List<ProductEntity>? allProduct,
+     List<ProductEntity>? displayedProducts,
+@@ -66,6 +88,8 @@ class RemoteProductsDone extends RemoteProductState {
+     List<String>? selectedCategories,
+     List<String>? selectedSubCategories,
+     List<String>? selectedBrands,
++    List<String>? selectedModels,
++    List<String>? selectedYears,
+     double? minPrice,
+     double? maxPrice,
+     bool? isNew,
+@@ -82,6 +106,8 @@ class RemoteProductsDone extends RemoteProductState {
+       selectedCategories ?? this.selectedCategories,
+       selectedSubCategories ?? this.selectedSubCategories,
+       selectedBrands ?? this.selectedBrands,
++      selectedModels ?? this.selectedModels,
++      selectedYears ?? this.selectedYears,
+       minPrice ?? this.minPrice,
+       maxPrice ?? this.maxPrice,
+       isNew ?? this.isNew,
+diff --git a/lib/products/presentation/pages/ProductCatalogPage.dart b/lib/products/presentation/pages/ProductCatalogPage.dart
+index 6040ba2..dc9069a 100644
+--- a/lib/products/presentation/pages/ProductCatalogPage.dart
++++ b/lib/products/presentation/pages/ProductCatalogPage.dart
+@@ -2,6 +2,8 @@ import 'package:auto/products/presentation/bloc/remote/remote_product_bloc.dart'
+ import 'package:auto/products/presentation/bloc/remote/remote_product_event.dart';
+ import 'package:auto/products/presentation/bloc/remote/remote_product_state.dart';
+ import 'package:auto/products/presentation/widgets/ProductGridCard.dart';
++import 'package:auto/products/presentation/widgets/MultiSelectFilterModal.dart';
++import 'dart:ui';
+ import 'package:flutter/cupertino.dart';
+ import 'package:flutter/material.dart';
+ import 'package:flutter_bloc/flutter_bloc.dart';
+@@ -113,203 +115,193 @@ class ProductCatalogPageState extends State<ProductCatalogPage> {
+     );
+   }
+ 
+-  // Widget pour construire l'en-t├¬te avec filtres et tri
++  // Widget pour construire l'en-t├¬te avec filtres
+   Widget _buildHeader(BuildContext context, RemoteProductsDone state) {
+-    final hasActiveFilters = state.selectedCategories.isNotEmpty || 
+-                           state.selectedSubCategories.isNotEmpty || 
+-                           state.selectedBrands.isNotEmpty ||
+-                           state.minPrice > 0 ||
+-                           state.maxPrice < 50000000 ||
+-                           state.isNew ||
+-                           state.isUsed;
+-
+-    return Container(
+-      padding: const EdgeInsets.all(16),
+-      decoration: BoxDecoration(
+-        color: Colors.white,
+-        boxShadow: [
+-          BoxShadow(
+-            color: Colors.grey.withOpacity(0.1),
+-            spreadRadius: 1,
+-            blurRadius: 4,
+-            offset: const Offset(0, 2),
+-          ),
+-        ],
+-      ),
+-      child: Column(
+-        crossAxisAlignment: CrossAxisAlignment.start,
+-        children: [
+-          // Titre et filtres actifs
+-          Row(
+-            children: [
+-              Expanded(
+-                child: Column(
+-                  crossAxisAlignment: CrossAxisAlignment.start,
+-                  children: [
+-                    Text(
+-                      'Catalogue',
+-                      style: const TextStyle(
+-                        fontSize: 24,
+-                        fontWeight: FontWeight.bold,
+-                        color: Colors.black87,
+-                      ),
+-                    ),
+-                    const SizedBox(height: 4),
+-                    if (hasActiveFilters)
+-                      Container(
+-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+-                        decoration: BoxDecoration(
+-                          color: Theme.of(context).primaryColor.withOpacity(0.1),
+-                          borderRadius: BorderRadius.circular(20),
+-                        ),
+-                        child: Text(
+-                          'Filtres actifs',
+-                          style: TextStyle(
+-                            color: Theme.of(context).primaryColor,
+-                            fontSize: 12,
+-                            fontWeight: FontWeight.w500,
+-                          ),
+-                        ),
+-                      ),
+-                  ],
+-                ),
++    return ClipRRect(
++      child: BackdropFilter(
++        filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
++        child: Container(
++          decoration: BoxDecoration(
++            color: Colors.white.withValues(alpha: 0.7),
++            border: Border(
++              bottom: BorderSide(
++                color: Colors.white.withValues(alpha: 0.5),
++                width: 1,
+               ),
+-              // Bouton pour afficher/cacher les filtres
+-              IconButton(
+-                onPressed: () {
+-                  setState(() {
+-                    _showFilters = !_showFilters;
+-                  });
+-                },
+-                icon: Icon(
+-                  _showFilters ? Icons.filter_list_off : Icons.filter_list,
+-                  color: Theme.of(context).primaryColor,
+-                ),
+-              ),
+-              // Bouton de rafra├«chissement forc├⌐
+-              IconButton(
+-                onPressed: () {
+-                  context.read<RemoteProductsBloc>().add(const RefreshProducts());
+-                  ScaffoldMessenger.of(context).showSnackBar(
+-                    const SnackBar(
+-                      content: Text('Actualisation des produits en cours...'),
+-                      duration: Duration(seconds: 2),
+-                    ),
+-                  );
+-                },
+-                icon: Icon(
+-                  Icons.refresh,
+-                  color: Theme.of(context).primaryColor,
+-                ),
++            ),
++            boxShadow: [
++              BoxShadow(
++                color: Colors.black.withValues(alpha: 0.05),
++                blurRadius: 8,
++                offset: const Offset(0, 2),
+               ),
+             ],
+           ),
+-          
+-          // Section des filtres (affich├⌐e si _showFilters est true)
+-          if (_showFilters) ...[
+-            const SizedBox(height: 16),
+-            
+-            // Filtres actifs
+-            if (hasActiveFilters) ...[
+-              _buildActiveFilters(context, state),
+-              const SizedBox(height: 12),
+-            ],
+-            
+-            // Options de tri
+-            _buildSortOptions(context),
+-            const SizedBox(height: 12),
+-            
+-            // Boutons d'action
+-            Row(
++          padding: const EdgeInsets.symmetric(vertical: 12),
++          child: Column(
++        mainAxisSize: MainAxisSize.min,
++        crossAxisAlignment: CrossAxisAlignment.start,
++        children: [
++          // Ligne des boutons d├⌐roulants (Filtres)
++          SingleChildScrollView(
++            scrollDirection: Axis.horizontal,
++            padding: const EdgeInsets.symmetric(horizontal: 16),
++            child: Row(
+               children: [
+-                Expanded(
+-                  child: OutlinedButton(
+-                    onPressed: () {
+-                      context.read<RemoteProductsBloc>().add(const ResetProductFilter());
+-                      setState(() {
+-                        _selectedSortOption = 'name';
+-                      });
+-                    },
+-                    style: OutlinedButton.styleFrom(
+-                      padding: const EdgeInsets.symmetric(vertical: 12),
+-                    ),
+-                    child: const Text('R├⌐initialiser'),
+-                  ),
++                _buildDropdownFilter(
++                  context,
++                  title: 'Marque',
++                  allOptions: state.availableBrands,
++                  selectedOptions: state.selectedBrands,
++                  onApply: (selected) {
++                    context.read<RemoteProductsBloc>().add(
++                          UpdateSpecificFilter(selectedBrands: selected),
++                        );
++                  },
+                 ),
+-                const SizedBox(width: 12),
+-                Expanded(
+-                  child: ElevatedButton(
+-                    onPressed: () {
+-                      _applyFilters(context);
+-                    },
+-                    style: ElevatedButton.styleFrom(
+-                      backgroundColor: Theme.of(context).primaryColor,
+-                      padding: const EdgeInsets.symmetric(vertical: 12),
+-                    ),
+-                    child: const Text('Appliquer'),
+-                  ),
++                const SizedBox(width: 8),
++                _buildDropdownFilter(
++                  context,
++                  title: 'Mod├¿le',
++                  allOptions: state.availableModels,
++                  selectedOptions: state.selectedModels,
++                  onApply: (selected) {
++                    context.read<RemoteProductsBloc>().add(
++                          UpdateSpecificFilter(selectedModels: selected),
++                        );
++                  },
+                 ),
++                const SizedBox(width: 8),
++                _buildDropdownFilter(
++                  context,
++                  title: 'Ann├⌐e',
++                  allOptions: state.availableYears,
++                  selectedOptions: state.selectedYears,
++                  onApply: (selected) {
++                    context.read<RemoteProductsBloc>().add(
++                          UpdateSpecificFilter(selectedYears: selected),
++                        );
++                  },
++                ),
++                // L'utilisateur avait d'autres filtres dans la maquette, on peut les ajouter plus tard si besoin
+               ],
+             ),
+-          ],
++          ),
++          
++          // Ligne des filtres actifs (Chips)
++          _buildActiveFilters(context, state),
+         ],
+       ),
++        ),
++      ),
+     );
+   }
+ 
+-  // Widget pour afficher les filtres actifs
++  Widget _buildDropdownFilter(
++    BuildContext context, {
++    required String title,
++    required List<String> allOptions,
++    required List<String> selectedOptions,
++    required Function(List<String>) onApply,
++  }) {
++    return InkWell(
++      onTap: () {
++        showDialog(
++          context: context,
++          builder: (context) => Dialog(
++            backgroundColor: Colors.transparent,
++            elevation: 0,
++            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
++            child: MultiSelectFilterModal(
++              title: title,
++              allOptions: allOptions,
++              selectedOptions: selectedOptions,
++              onApply: onApply,
++            ),
++          ),
++        );
++      },
++      child: Container(
++        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
++        decoration: BoxDecoration(
++          border: Border.all(color: Colors.grey[300]!),
++          borderRadius: BorderRadius.circular(8),
++        ),
++        child: Row(
++          mainAxisSize: MainAxisSize.min,
++          children: [
++            Text(
++              title,
++              style: const TextStyle(fontWeight: FontWeight.w500),
++            ),
++            const SizedBox(width: 4),
++            const Icon(Icons.keyboard_arrow_down, size: 18),
++          ],
++        ),
++      ),
++    );
++  }
++
++  // Widget pour afficher les filtres actifs sous forme de chips
+   Widget _buildActiveFilters(BuildContext context, RemoteProductsDone state) {
+-    final filters = <String>[];
++    final activeFilters = <Map<String, String>>[];
+     
+-    if (state.selectedCategories.isNotEmpty) {
+-      filters.add('Cat├⌐gories: ${state.selectedCategories.length}');
+-    }
+-    if (state.selectedSubCategories.isNotEmpty) {
+-      filters.add('Sous-cat├⌐gories: ${state.selectedSubCategories.length}');
++    for (var brand in state.selectedBrands) {
++      activeFilters.add({'type': 'brand', 'value': brand});
+     }
+-    if (state.selectedBrands.isNotEmpty) {
+-      filters.add('Marques: ${state.selectedBrands.length}');
++    for (var model in state.selectedModels) {
++      activeFilters.add({'type': 'model', 'value': model});
+     }
+-    if (state.minPrice > 0 || state.maxPrice < 50000000) {
+-      filters.add('Prix: ${state.minPrice.toInt()} - ${state.maxPrice.toInt()}');
++    for (var year in state.selectedYears) {
++      activeFilters.add({'type': 'year', 'value': year});
+     }
+-    if (state.isNew) { filters.add('Nouveaux'); }
+-    if (state.isUsed) { filters.add('Occasions'); }
+ 
+-    return Container(
+-      padding: const EdgeInsets.all(12),
+-      decoration: BoxDecoration(
+-        color: Colors.grey.withOpacity(0.05),
+-        borderRadius: BorderRadius.circular(8),
+-      ),
+-      child: Column(
+-        crossAxisAlignment: CrossAxisAlignment.start,
+-        children: [
+-          const Text(
+-            'Filtres actifs:',
+-            style: TextStyle(
+-              fontSize: 14,
+-              fontWeight: FontWeight.w600,
+-              color: Colors.black87,
++    if (activeFilters.isEmpty) return const SizedBox.shrink();
++
++    return Padding(
++      padding: const EdgeInsets.only(left: 16, right: 16, top: 12),
++      child: SingleChildScrollView(
++        scrollDirection: Axis.horizontal,
++        child: Row(
++          children: [
++            const Text(
++              'Suppri...',
++              style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 13),
+             ),
+-          ),
+-          const SizedBox(height: 8),
+-          Wrap(
+-            spacing: 8,
+-            runSpacing: 4,
+-            children: filters.map((filter) => Chip(
+-              label: Text(
+-                filter,
+-                style: const TextStyle(fontSize: 12),
+-              ),
+-              backgroundColor: Theme.of(context).primaryColor.withOpacity(0.1),
+-              deleteIcon: const Icon(Icons.close, size: 16),
+-              onDeleted: () {
+-                // TODO: Impl├⌐menter la suppression individuelle de filtres
+-              },
+-            )).toList(),
+-          ),
+-        ],
++            const SizedBox(width: 8),
++            ...activeFilters.map((filter) {
++              return Padding(
++                padding: const EdgeInsets.only(right: 8.0),
++                child: Container(
++                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
++                  decoration: BoxDecoration(
++                    color: Colors.white,
++                    border: Border.all(color: Colors.blue[200]!),
++                    borderRadius: BorderRadius.circular(20),
++                  ),
++                  child: Row(
++                    mainAxisSize: MainAxisSize.min,
++                    children: [
++                      Text(
++                        filter['value']!,
++                        style: const TextStyle(color: Colors.blue, fontSize: 13, fontWeight: FontWeight.w500),
++                      ),
++                      const SizedBox(width: 4),
++                      InkWell(
++                        onTap: () {
++                          context.read<RemoteProductsBloc>().add(
++                            RemoveFilter(filter['type']!, filter['value']!),
++                          );
++                        },
++                        child: const Icon(Icons.close, size: 16, color: Colors.orange),
++                      ),
++                    ],
++                  ),
++                ),
++              );
++            }).toList(),
++          ],
++        ),
+       ),
+     );
+   }
+diff --git a/lib/products/presentation/pages/ProductDetailPage.dart b/lib/products/presentation/pages/ProductDetailPage.dart
+index 7f4671c..744b0c8 100644
+--- a/lib/products/presentation/pages/ProductDetailPage.dart
++++ b/lib/products/presentation/pages/ProductDetailPage.dart
+@@ -1,3 +1,4 @@
++import 'dart:ui';
+ import 'package:flutter/material.dart';
+ import 'package:auto/auth/presentation/bloc/auth_bloc.dart';
+ import 'package:flutter/services.dart';
+@@ -13,6 +14,7 @@ import 'package:auto/products/presentation/bloc/remote/remote_product_bloc.dart'
+ import 'package:auto/products/presentation/bloc/remote/remote_product_state.dart';
+ import 'package:auto/comments/presentation/widgets/CommentWidget.dart';
+ import 'package:auto/products/presentation/widgets/similar/SimilarProductsSection.dart';
++import 'package:auto/promotions/presentation/bloc/remote/remote_promoted_product_bloc.dart';
+ 
+ class ProductDetailPage extends StatefulWidget {
+   final ProductEntity product;
+@@ -113,11 +115,24 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
+   @override
+   Widget build(BuildContext context) {
+     final medias = widget.product.medias ?? [];
+-    final hasDiscount =
+-        widget.product.discount != null && widget.product.discount! > 0;
++    
++    double activeDiscount = widget.product.discount ?? 0.0;
++    try {
++      final promoState = context.watch<RemotePromotedProductBloc>().state;
++      if (promoState is RemotePromotedProductDone && promoState.promotedProducts != null) {
++        final activePromo = promoState.promotedProducts!.firstWhere(
++          (promo) => promo.productId == widget.product.id,
++        );
++        if (activePromo.discountPercent != null) {
++          activeDiscount = double.tryParse(activePromo.discountPercent!) ?? activeDiscount;
++        }
++      }
++    } catch (_) {}
++
++    final hasDiscount = activeDiscount > 0;
+     final realPrice = _getRealPrice(
+       widget.product.price ?? 0,
+-      widget.product.discount ?? 0,
++      activeDiscount,
+     );
+     final hasCta = _isValidCta(widget.product.cta);
+     final isUsed = widget.product.state == 'used';
+@@ -172,7 +187,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
+                 ],
+               ),
+               clipBehavior: Clip.antiAlias,
+-              child: _buildImageGallery(medias, hasDiscount),
++              child: _buildImageGallery(medias, hasDiscount, activeDiscount),
+             ),
+           ),
+ 
+@@ -579,7 +594,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
+ 
+   // ==== Widgets Extrait ====
+ 
+-  Widget _buildImageGallery(List<String> medias, bool hasDiscount) {
++  Widget _buildImageGallery(List<String> medias, bool hasDiscount, double activeDiscount) {
+     if (medias.isEmpty) {
+       return Container(
+         color: const Color(0xFFF3F4F6),
+@@ -701,7 +716,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
+                   ),
+                   const SizedBox(width: 4),
+                   Text(
+-                    '-${widget.product.discount!.toInt()}%',
++                    '-${activeDiscount.toInt()}%',
+                     style: const TextStyle(
+                       color: Colors.white,
+                       fontWeight: FontWeight.w900,
+@@ -717,23 +732,36 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
+   }
+ 
+   Widget _buildBottomNavigationBar(bool hasCta, double realPrice) {
+-    return Container(
+-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+-      decoration: BoxDecoration(
+-        color: Colors.white,
+-        borderRadius: const BorderRadius.only(
+-          topLeft: Radius.circular(30),
+-          topRight: Radius.circular(30),
+-        ),
+-        boxShadow: [
+-          BoxShadow(
+-            color: Colors.black.withOpacity(0.06),
+-            blurRadius: 20,
+-            offset: const Offset(0, -5),
+-          ),
+-        ],
++    return ClipRRect(
++      borderRadius: const BorderRadius.only(
++        topLeft: Radius.circular(30),
++        topRight: Radius.circular(30),
+       ),
+-      child: SafeArea(
++      child: BackdropFilter(
++        filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
++        child: Container(
++          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
++          decoration: BoxDecoration(
++            color: Colors.white.withValues(alpha: 0.8),
++            borderRadius: const BorderRadius.only(
++              topLeft: Radius.circular(30),
++              topRight: Radius.circular(30),
++            ),
++            border: Border(
++              top: BorderSide(
++                color: Colors.white.withValues(alpha: 0.4),
++                width: 1,
++              ),
++            ),
++            boxShadow: [
++              BoxShadow(
++                color: Colors.black.withValues(alpha: 0.05),
++                blurRadius: 20,
++                offset: const Offset(0, -5),
++              ),
++            ],
++          ),
++          child: SafeArea(
+         child: Row(
+           children: [
+             // Affichage du prix dans la navbar
+@@ -835,6 +863,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
+           ],
+         ),
+       ),
++        ),
++      ),
+     );
+   }
+ 
+diff --git a/lib/products/presentation/widgets/ProductCard.dart b/lib/products/presentation/widgets/ProductCard.dart
+index ec7008b..5955d4b 100644
+--- a/lib/products/presentation/widgets/ProductCard.dart
++++ b/lib/products/presentation/widgets/ProductCard.dart
+@@ -4,6 +4,8 @@ import 'package:auto/products/domain/entities/product_entity.dart';
+ import 'package:auto/products/presentation/pages/ProductDetailPage.dart';
+ import 'package:cached_network_image/cached_network_image.dart';
+ import 'package:flutter/material.dart';
++import 'package:flutter_bloc/flutter_bloc.dart';
++import 'package:auto/promotions/presentation/bloc/remote/remote_promoted_product_bloc.dart';
+ import 'package:lottie/lottie.dart';
+ 
+ // R├⌐solution des URLs relatives (conserv├⌐e pour compatibilit├⌐)
+@@ -18,6 +20,19 @@ class ProductCard extends StatelessWidget {
+ 
+   @override
+   Widget build(BuildContext context) {
++    double activeDiscount = product.discount ?? 0.0;
++    try {
++      final promoState = context.watch<RemotePromotedProductBloc>().state;
++      if (promoState is RemotePromotedProductDone && promoState.promotedProducts != null) {
++        final activePromo = promoState.promotedProducts!.firstWhere(
++          (promo) => promo.productId == product.id,
++        );
++        if (activePromo.discountPercent != null) {
++          activeDiscount = double.tryParse(activePromo.discountPercent!) ?? activeDiscount;
++        }
++      }
++    } catch (_) {}
++
+     return Container(
+       margin: const EdgeInsets.symmetric(vertical: 8),
+       color: Colors.white,
+@@ -106,7 +121,7 @@ class ProductCard extends StatelessWidget {
+                         color: Colors.grey[200],
+                         child: const Icon(Icons.image_not_supported, size: 48, color: Colors.grey),
+                       ),
+-                if (product.discount! > 0)
++                if (activeDiscount > 0)
+                   Positioned(
+                     top: 12,
+                     left: 12,
+@@ -117,7 +132,7 @@ class ProductCard extends StatelessWidget {
+                         borderRadius: BorderRadius.circular(4),
+                       ),
+                       child: Text(
+-                        "-${product.discount}%",
++                        "-${activeDiscount.toInt()}%",
+                         style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                       ),
+                     ),
+@@ -139,7 +154,7 @@ class ProductCard extends StatelessWidget {
+                 Column(
+                   crossAxisAlignment: CrossAxisAlignment.start,
+                   children: [
+-                    if (product.discount! > 0)
++                    if (activeDiscount > 0)
+                       Text(
+                         "${getProductPrice(product.price!, 0)} Fcfa",
+                         style: const TextStyle(
+@@ -149,7 +164,7 @@ class ProductCard extends StatelessWidget {
+                         ),
+                       ),
+                     Text(
+-                      "${getProductPrice(product.price!, product.discount!)} Fcfa",
++                      "${getProductPrice(product.price!, activeDiscount)} Fcfa",
+                       style: const TextStyle(
+                         fontWeight: FontWeight.bold,
+                         fontSize: 18,
+diff --git a/lib/products/presentation/widgets/ProductGridCard.dart b/lib/products/presentation/widgets/ProductGridCard.dart
+index 3376892..a50c6c4 100644
+--- a/lib/products/presentation/widgets/ProductGridCard.dart
++++ b/lib/products/presentation/widgets/ProductGridCard.dart
+@@ -4,6 +4,8 @@ import 'package:auto/products/domain/entities/product_entity.dart';
+ import 'package:auto/products/presentation/pages/ProductDetailPage.dart';
+ import 'package:cached_network_image/cached_network_image.dart';
+ import 'package:flutter/material.dart';
++import 'package:flutter_bloc/flutter_bloc.dart';
++import 'package:auto/promotions/presentation/bloc/remote/remote_promoted_product_bloc.dart';
+ import 'package:lottie/lottie.dart';
+ 
+ // R├⌐solution des URLs relatives (conserv├⌐e pour compatibilit├⌐)
+@@ -49,6 +51,21 @@ class ProductGridCard extends StatelessWidget {
+ 
+   @override
+   Widget build(BuildContext context) {
++    double activeDiscount = product.discount ?? 0.0;
++    try {
++      final promoState = context.watch<RemotePromotedProductBloc>().state;
++      if (promoState is RemotePromotedProductDone && promoState.promotedProducts != null) {
++        final activePromo = promoState.promotedProducts!.firstWhere(
++          (promo) => promo.productId == product.id,
++        );
++        if (activePromo.discountPercent != null) {
++          activeDiscount = double.tryParse(activePromo.discountPercent!) ?? activeDiscount;
++        }
++      }
++    } catch (_) {
++      // Ignorer si pas de promo active ou si le bloc n'est pas fourni
++    }
++
+     return GestureDetector(
+       onTap: () {
+         goTo(context, ProductDetailPage(product: product), AnimationType.fade);
+@@ -109,7 +126,7 @@ class ProductGridCard extends StatelessWidget {
+                       ),
+                     ),
+                   ),
+-                  if (product.discount != null && product.discount! > 0)
++                  if (activeDiscount > 0)
+                     Positioned(
+                       top: 8,
+                       right: 8,
+@@ -120,7 +137,7 @@ class ProductGridCard extends StatelessWidget {
+                           borderRadius: BorderRadius.circular(8),
+                         ),
+                         child: Text(
+-                          "-${product.discount}%",
++                          "-${activeDiscount.toInt()}%",
+                           style: const TextStyle(
+                             color: Colors.white,
+                             fontSize: 10,
+@@ -172,23 +189,41 @@ class ProductGridCard extends StatelessWidget {
+                     Column(
+                       crossAxisAlignment: CrossAxisAlignment.start,
+                       children: [
+-                        if (product.discount != null && product.discount! > 0)
++                        if (activeDiscount > 0)
++                          Wrap(
++                            crossAxisAlignment: WrapCrossAlignment.end,
++                            spacing: 4,
++                            children: [
++                              Text(
++                                "${getProductPrice(double.tryParse(product.price?.toString() ?? '0') ?? 0, activeDiscount)} Fcfa",
++                                style: TextStyle(
++                                  color: Theme.of(context).primaryColor,
++                                  fontSize: 13,
++                                  fontWeight: FontWeight.bold,
++                                ),
++                              ),
++                              Padding(
++                                padding: const EdgeInsets.only(bottom: 1.0),
++                                child: Text(
++                                  "${getProductPrice(double.tryParse(product.price?.toString() ?? '0') ?? 0, 0)}",
++                                  style: const TextStyle(
++                                    decoration: TextDecoration.lineThrough,
++                                    color: Colors.grey,
++                                    fontSize: 10,
++                                  ),
++                                ),
++                              ),
++                            ],
++                          )
++                        else
+                           Text(
+                             "${getProductPrice(double.tryParse(product.price?.toString() ?? '0') ?? 0, 0)} Fcfa",
+-                            style: const TextStyle(
+-                              decoration: TextDecoration.lineThrough,
+-                              color: Colors.grey,
+-                              fontSize: 10,
++                            style: TextStyle(
++                              color: Theme.of(context).primaryColor,
++                              fontSize: 13,
++                              fontWeight: FontWeight.bold,
+                             ),
+                           ),
+-                        Text(
+-                          "${getProductPrice(double.tryParse(product.price?.toString() ?? '0') ?? 0, product.discount!)} Fcfa",
+-                          style: TextStyle(
+-                            color: Theme.of(context).primaryColor,
+-                            fontSize: 14,
+-                            fontWeight: FontWeight.bold,
+-                          ),
+-                        ),
+                         const SizedBox(height: 4),
+                         // Seller info
+                         Row(

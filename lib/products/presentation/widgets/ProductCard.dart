@@ -4,6 +4,8 @@ import 'package:auto/products/domain/entities/product_entity.dart';
 import 'package:auto/products/presentation/pages/ProductDetailPage.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:auto/promotions/presentation/bloc/remote/remote_promoted_product_bloc.dart';
 import 'package:lottie/lottie.dart';
 
 // Résolution des URLs relatives (conservée pour compatibilité)
@@ -18,6 +20,19 @@ class ProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double activeDiscount = product.discount ?? 0.0;
+    try {
+      final promoState = context.watch<RemotePromotedProductBloc>().state;
+      if (promoState is RemotePromotedProductDone && promoState.promotedProducts != null) {
+        final activePromo = promoState.promotedProducts!.firstWhere(
+          (promo) => promo.productId == product.id,
+        );
+        if (activePromo.discountPercent != null) {
+          activeDiscount = double.tryParse(activePromo.discountPercent!) ?? activeDiscount;
+        }
+      }
+    } catch (_) {}
+
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
       color: Colors.white,
@@ -106,7 +121,7 @@ class ProductCard extends StatelessWidget {
                         color: Colors.grey[200],
                         child: const Icon(Icons.image_not_supported, size: 48, color: Colors.grey),
                       ),
-                if (product.discount! > 0)
+                if (activeDiscount > 0)
                   Positioned(
                     top: 12,
                     left: 12,
@@ -117,7 +132,7 @@ class ProductCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
-                        "-${product.discount}%",
+                        "-${activeDiscount.toInt()}%",
                         style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -139,7 +154,7 @@ class ProductCard extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (product.discount! > 0)
+                    if (activeDiscount > 0)
                       Text(
                         "${getProductPrice(product.price!, 0)} Fcfa",
                         style: const TextStyle(
@@ -149,7 +164,7 @@ class ProductCard extends StatelessWidget {
                         ),
                       ),
                     Text(
-                      "${getProductPrice(product.price!, product.discount!)} Fcfa",
+                      "${getProductPrice(product.price!, activeDiscount)} Fcfa",
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 18,

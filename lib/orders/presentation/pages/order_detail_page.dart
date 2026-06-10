@@ -144,15 +144,7 @@ Widget _buildImagePlaceholder() {
     final statusColor = _statusColor(order.status);
 
     // Debug: Afficher les données de la commande
-    print('DEBUG: OrderDetailPage - Order ID: ${order.id}');
-    print('DEBUG: OrderDetailPage - Product Name: ${order.productName}');
-    print('DEBUG: OrderDetailPage - Product Price: ${order.productPrice}');
-    print('DEBUG: OrderDetailPage - Customer Name: ${order.customerName}');
-    print('DEBUG: OrderDetailPage - Phone: ${order.phoneNumber}');
-    print('DEBUG: OrderDetailPage - City: ${order.city}');
-    print('DEBUG: OrderDetailPage - Status: ${order.status}');
-    print('DEBUG: OrderDetailPage - Created At: ${order.createdAt}');
-
+                                
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(

@@ -95,7 +95,11 @@ Future<void> initializeDependencies() async {
   final cookieJar = PersistCookieJar(
     storage: FileStorage('${appDir.path}/.cookies/'),
   );
-  final dio = Dio(BaseOptions(baseUrl: localAPIBaseUrl));
+  final dio = Dio(BaseOptions(
+    baseUrl: localAPIBaseUrl,
+    connectTimeout: const Duration(seconds: 10),
+    receiveTimeout: const Duration(seconds: 10),
+  ));
   dio.interceptors.add(CookieManager(cookieJar));
   // Add authentication token to requests
   dio.interceptors.add(
@@ -112,29 +116,13 @@ Future<void> initializeDependencies() async {
   dio.interceptors.add(
     InterceptorsWrapper(
       onRequest: (options, handler) {
-        print('┌── REQUEST ──────────────────────────────');
-        print('│ ${options.method} ${options.uri}');
-        print('│ Headers: ${options.headers}');
-        if (options.data != null) print('│ Body: ${options.data}');
-        print('└─────────────────────────────────────────');
         return handler.next(options);
       },
       onResponse: (response, handler) {
-        print('┌── RESPONSE ─────────────────────────────');
-        print('│ Status: ${response.statusCode}');
-        print('│ URL: ${response.requestOptions.uri}');
-        print('│ Data: ${response.data.toString().substring(0, response.data.toString().length.clamp(0, 300))}...');
-        print('└─────────────────────────────────────────');
-        return handler.next(response);
+                                                return handler.next(response);
       },
       onError: (DioException e, handler) async {
-        print('┌── ERROR ────────────────────────────────');
-        print('│ URL: ${e.requestOptions.uri}');
-        print('│ Type: ${e.type}');
-        print('│ Message: ${e.message}');
-        print('│ Response: ${e.response?.data}');
-        print('└─────────────────────────────────────────');
-        if (e.response?.statusCode == 401) {
+                                                        if (e.response?.statusCode == 401) {
           await LocalStorageService.clearAuth();
           await cookieJar.deleteAll();
           sl<AuthBloc>().add(const SessionExpired());

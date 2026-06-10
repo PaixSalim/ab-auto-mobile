@@ -17,7 +17,8 @@ class SubCategorySelectionModal extends StatefulWidget {
   });
 
   @override
-  State<SubCategorySelectionModal> createState() => _SubCategorySelectionModalState();
+  State<SubCategorySelectionModal> createState() =>
+      _SubCategorySelectionModalState();
 }
 
 class _SubCategorySelectionModalState extends State<SubCategorySelectionModal> {
@@ -36,9 +37,13 @@ class _SubCategorySelectionModalState extends State<SubCategorySelectionModal> {
       if (query.isEmpty) {
         filteredSubCategories = List.from(widget.category.subCategories ?? []);
       } else {
-        filteredSubCategories = widget.category.subCategories!
-            .where((sub) => sub.name!.toLowerCase().contains(query.toLowerCase()))
-            .toList();
+        filteredSubCategories =
+            widget.category.subCategories!
+                .where(
+                  (sub) =>
+                      sub.name!.toLowerCase().contains(query.toLowerCase()),
+                )
+                .toList();
       }
     });
   }
@@ -112,13 +117,11 @@ class _SubCategorySelectionModalState extends State<SubCategorySelectionModal> {
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    widget.category.subCategories == null || widget.category.subCategories!.isEmpty
+                    widget.category.subCategories == null ||
+                            widget.category.subCategories!.isEmpty
                         ? "Aucune sous-catégorie disponible"
                         : "Aucune sous-catégorie trouvée",
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 16,
-                    ),
+                    style: TextStyle(color: Colors.grey[600], fontSize: 16),
                     textAlign: TextAlign.center,
                   ),
                 ],
@@ -132,27 +135,27 @@ class _SubCategorySelectionModalState extends State<SubCategorySelectionModal> {
                   filteredSubCategories.map((subCategory) {
                     return GestureDetector(
                       onTap: () {
-                            // Appliquer le filtre
-                            widget.bloc.add(
-                              FilterProducts(
-                                selectedCategories: [],
-                                selectedSubCategories: [subCategory.id!],
-                                selectedBrands: [],
-                                minPrice: 0,
-                                maxPrice: 50000000,
-                                isNew: false,
-                                isUsed: false,
-                              ),
-                            );
-                            // Fermer le modal et revenir à la page principale
-                            Navigator.of(context).pop();
-                            // Naviguer vers la page catalogue en remplaçant la route actuelle
-                            Navigator.of(context).pushReplacement(
-                              MaterialPageRoute(
-                                builder: (context) => const ProductCatalogPage(),
-                              ),
-                            );
-                          },
+                        // Appliquer le filtre
+                        widget.bloc.add(
+                          FilterProducts(
+                            selectedCategories: [],
+                            selectedSubCategories: [subCategory.id!],
+                            selectedBrands: [],
+                            minPrice: 0,
+                            maxPrice: 50000000,
+                            isNew: false,
+                            isUsed: false,
+                          ),
+                        );
+                        // Fermer le modal et revenir à la page principale
+                        Navigator.of(context).pop();
+                        // Naviguer vers la page catalogue en remplaçant la route actuelle
+                        Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(
+                            builder: (context) => const ProductCatalogPage(),
+                          ),
+                        );
+                      },
                       child: Column(
                         children: [
                           Container(
@@ -161,7 +164,9 @@ class _SubCategorySelectionModalState extends State<SubCategorySelectionModal> {
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: Theme.of(context).primaryColor.withValues(alpha: 0.3),
+                                color: Theme.of(
+                                  context,
+                                ).primaryColor.withValues(alpha: 0.3),
                                 width: 1,
                               ),
                             ),
@@ -172,7 +177,11 @@ class _SubCategorySelectionModalState extends State<SubCategorySelectionModal> {
                                 height: 48,
                                 fit: BoxFit.cover,
                                 progressIndicatorBuilder:
-                                    (context, url, downloadProgress) => Lottie.asset(
+                                    (
+                                      context,
+                                      url,
+                                      downloadProgress,
+                                    ) => Lottie.asset(
                                       'assets/animations/lottie/loading-image.json',
                                       width: 15,
                                     ),

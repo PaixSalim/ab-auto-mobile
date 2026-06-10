@@ -87,7 +87,7 @@ class _RegisterPageState extends State<RegisterPage> {
           }
           if (state is AuthAuthenticated) {
             // If there's a return route, go back instead of navigating to main
-            if (widget.returnRoute == 'comments' && Navigator.canPop(context)) {
+            if (widget.returnRoute != null && Navigator.canPop(context)) {
               Navigator.of(context).pop(true); // Return true to indicate successful registration
             } else {
               Navigator.of(context).pushAndRemoveUntil(
@@ -224,7 +224,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       const Text('Déjà un compte ? '),
                       GestureDetector(
                         onTap: () => Navigator.of(context).pushReplacement(
-                          MaterialPageRoute(builder: (_) => const LoginPage()),
+                          MaterialPageRoute(builder: (_) => LoginPage(returnRoute: widget.returnRoute)),
                         ),
                         child: Text(
                           'Se connecter',

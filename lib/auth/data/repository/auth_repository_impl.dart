@@ -15,19 +15,15 @@ class AuthRepositoryImpl implements AuthRepository {
     required String password,
   }) async {
     try {
-      print('🔐 Login attempt with uid: $uid');
-      final response = await _datasource.login(uid: uid, password: password);
+            final response = await _datasource.login(uid: uid, password: password);
       
-      print('🔐 Login response status: ${response.statusCode}');
-      print('🔐 Login response data: ${response.data}');
-      
+                  
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = response.data as Map<String, dynamic>;
         
         // Check if login was successful
         if (data['success'] == false) {
-          print('❌ Login failed: ${data['message']}');
-          return DataFailed(
+                    return DataFailed(
             DioException(
               requestOptions: response.requestOptions,
               message: data['message'] ?? 'Identifiants invalides',
@@ -44,8 +40,7 @@ class AuthRepositoryImpl implements AuthRepository {
           phone: user.phone,
           userId: user.id,
         );
-        print('✅ Login successful for: ${user.fullName}');
-        return DataSuccess(user);
+                return DataSuccess(user);
       }
       return DataFailed(
         DioException(
@@ -55,8 +50,7 @@ class AuthRepositoryImpl implements AuthRepository {
         ),
       );
     } on DioException catch (e) {
-      print('❌ Login DioException: ${e.message}');
-      return DataFailed(e);
+            return DataFailed(e);
     }
   }
 
@@ -71,8 +65,7 @@ class AuthRepositoryImpl implements AuthRepository {
     required bool isSeller,
   }) async {
     try {
-      print('📝 Registering user: $fullName, phone: $phone');
-      final response = await _datasource.register(
+            final response = await _datasource.register(
         fullName: fullName,
         email: email,
         password: password,
@@ -82,9 +75,7 @@ class AuthRepositoryImpl implements AuthRepository {
         isSeller: isSeller,
       );
       
-      print('📝 Response status: ${response.statusCode}');
-      print('📝 Response data: ${response.data}');
-      
+                  
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = response.data as Map<String, dynamic>;
         final user = _parseUser(data);
@@ -95,16 +86,14 @@ class AuthRepositoryImpl implements AuthRepository {
           phone: user.phone,
           userId: user.id,
         );
-        print('✅ Registration successful');
-        return DataSuccess(user);
+                return DataSuccess(user);
       }
       
       // Extract error message from response
       final errorMsg = (response.data as Map?)?['message'] ?? 
                       (response.data as Map?)?['error'] ?? 
                       'Erreur lors de l\'inscription';
-      print('❌ Registration failed: $errorMsg');
-      
+            
       return DataFailed(
         DioException(
           requestOptions: response.requestOptions,
@@ -113,9 +102,7 @@ class AuthRepositoryImpl implements AuthRepository {
         ),
       );
     } on DioException catch (e) {
-      print('❌ DioException during registration: ${e.message}');
-      print('❌ Response: ${e.response?.data}');
-      
+                  
       // Try to extract error message from response
       String errorMsg = 'Erreur lors de l\'inscription';
       if (e.response?.data != null) {
@@ -134,8 +121,7 @@ class AuthRepositoryImpl implements AuthRepository {
         ),
       );
     } catch (e) {
-      print('❌ Unexpected error during registration: $e');
-      return DataFailed(
+            return DataFailed(
         DioException(
           requestOptions: RequestOptions(),
           message: e.toString(),

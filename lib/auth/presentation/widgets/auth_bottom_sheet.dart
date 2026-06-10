@@ -93,9 +93,11 @@ class AuthBottomSheet {
                       Navigator.pop(context); // Fermer le bottom sheet
                       final result = await Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (_) => const RegisterPage()),
+                        MaterialPageRoute(builder: (_) => const RegisterPage(returnRoute: 'auth_modal')),
                       );
-                      // On peut aussi gérer le retour d'inscription si besoin
+                      if (result == true) {
+                        onSuccess();
+                      }
                     },
                     style: OutlinedButton.styleFrom(
                       foregroundColor: const Color(0xFF2563EB),

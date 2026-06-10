@@ -56,7 +56,7 @@ class PromotionsSection extends StatelessWidget {
 
               // Liste horizontale des promotions
               SizedBox(
-                height: 280, // Hauteur fixe pour la carte de promotion
+                height: 200, // Hauteur réduite pour s'aligner avec les nouvelles cartes plus courtes
                 child: ListView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   scrollDirection: Axis.horizontal,
