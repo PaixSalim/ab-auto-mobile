@@ -93,7 +93,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   }
 
   Future<void> _shareProduct() async {
-    final productUrl = 'http://192.168.1.72:3333/products/${widget.product.id}';
+    final productUrl = 'https://ab-autox.com/products/${widget.product.id}';
     final playStoreLink =
         'https://play.google.com/store/apps/details?id=com.abautoxapp.mobile&pcampaignid=web_share';
     final shareText =

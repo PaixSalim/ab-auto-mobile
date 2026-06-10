@@ -85,7 +85,7 @@ class ProductActionButtons extends StatelessWidget {
   }
 
   Future<void> _shareProduct(BuildContext context) async {
-    final productUrl = 'http://192.168.1.72:3333/products/${product.id}';
+    final productUrl = 'https://ab-autox.com/products/${product.id}';
     
     try {
       await Clipboard.setData(ClipboardData(text: productUrl));
