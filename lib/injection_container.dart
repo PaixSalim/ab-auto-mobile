@@ -95,19 +95,46 @@ Future<void> initializeDependencies() async {
   final cookieJar = PersistCookieJar(
     storage: FileStorage('${appDir.path}/.cookies/'),
   );
-  final dio = Dio(BaseOptions(
-    baseUrl: localAPIBaseUrl,
-    connectTimeout: const Duration(seconds: 60),
-    receiveTimeout: const Duration(seconds: 60),
-  ));
+  final dio = Dio(
+    BaseOptions(
+      baseUrl: localAPIBaseUrl,
+      connectTimeout: const Duration(seconds: 60),
+      receiveTimeout: const Duration(seconds: 60),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+    ),
+  );
+
+  // Ajouter la clé d'API pour sécuriser les requêtes vers le backend
+  dio.interceptors.add(
+    InterceptorsWrapper(
+      onRequest: (options, handler) {
+        options.headers['x-api-key'] =
+            'Kc2pt3ac4sgOEQDAcYhONBdb2XfeEsIHjqhWKvjsy23g9vg6YNSnXK5HzgAg8LIK43bvKWfXMjCMAU9zHLjod3NCA7B8qPh8RaWB9UH1JAdc90VaFaDdXI4qwBm6UEAsIPJwclRfCHCbsNOFm2VnoGWcsphEbTurrPV8KniZZZhVHDeGwfkXjC9Nv0n2CLJUEiFf2U3sIXZdwAje1ZZt6ZGSyCuEvGBrUdTNtXjSqvx1msydJ0vJc0WXnL6OJHpb';
+        return handler.next(options);
+      },
+    ),
+  );
+
   dio.interceptors.add(CookieManager(cookieJar));
+  dio.interceptors.add(
+    LogInterceptor(
+      requestBody: true,
+      responseBody: true,
+      logPrint: (log) => print('🌐 Dio: $log'),
+    ),
+  );
   // Add authentication token to requests
   dio.interceptors.add(
     InterceptorsWrapper(
       onRequest: (options, handler) {
         // Add token from local storage if available
-        if (LocalStorageService.isLoggedIn && LocalStorageService.token != null) {
-          options.headers['Authorization'] = 'Bearer ${LocalStorageService.token}';
+        if (LocalStorageService.isLoggedIn &&
+            LocalStorageService.token != null) {
+          options.headers['Authorization'] =
+              'Bearer ${LocalStorageService.token}';
         }
         return handler.next(options);
       },
@@ -119,10 +146,10 @@ Future<void> initializeDependencies() async {
         return handler.next(options);
       },
       onResponse: (response, handler) {
-                                                return handler.next(response);
+        return handler.next(response);
       },
       onError: (DioException e, handler) async {
-                                                        if (e.response?.statusCode == 401) {
+        if (e.response?.statusCode == 401) {
           await LocalStorageService.clearAuth();
           await cookieJar.deleteAll();
           sl<AuthBloc>().add(const SessionExpired());
@@ -207,9 +234,7 @@ Future<void> initializeDependencies() async {
   );
 
   // 📦 BLoCs
-  sl.registerFactory<RemoteProductsBloc>(
-    () => RemoteProductsBloc(sl()),
-  );
+  sl.registerFactory<RemoteProductsBloc>(() => RemoteProductsBloc(sl()));
   sl.registerFactory<RemoteCategoryBloc>(() => RemoteCategoryBloc(sl()));
   sl.registerFactory<RemoteBannerBloc>(() => RemoteBannerBloc(sl()));
   sl.registerFactory<RemotePromotedProductBloc>(
