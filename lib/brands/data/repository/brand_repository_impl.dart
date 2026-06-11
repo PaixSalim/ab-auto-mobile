@@ -12,7 +12,7 @@ class BrandRepositoryImpl implements BrandRepository {
   @override
   Future<DataState<List<BrandEntity>>> getBrands() async {
     try {
-      var url = Uri.parse('http://192.168.1.72:3333/api/v1/brands');
+      var url = Uri.parse('https://ab-autox.com/api/v1/brands');
       final httpResponse = await http.get(url);
 
       if (httpResponse.statusCode == 200) {

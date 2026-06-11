@@ -127,18 +127,31 @@ class _ActionSearchBarState extends State<ActionSearchBar>
 
     _overlayEntry = OverlayEntry(
       builder:
-          (context) => Positioned(
-            width: widget.width ?? size.width,
-            child: CompositedTransformFollower(
-              link: _layerLink,
-              showWhenUnlinked: false,
-              offset: Offset(0, size.height + 4),
-              child: Material(
-                elevation: 4,
-                color: Colors.transparent,
-                child: _buildSuggestionsList(),
+          (context) => Stack(
+            children: [
+              Positioned.fill(
+                child: GestureDetector(
+                  behavior: HitTestBehavior.translucent,
+                  onTap: () {
+                    _focusNode.unfocus();
+                  },
+                  child: Container(color: Colors.transparent),
+                ),
               ),
-            ),
+              Positioned(
+                width: widget.width ?? size.width,
+                child: CompositedTransformFollower(
+                  link: _layerLink,
+                  showWhenUnlinked: false,
+                  offset: Offset(0, size.height + 4),
+                  child: Material(
+                    elevation: 4,
+                    color: Colors.transparent,
+                    child: _buildSuggestionsList(),
+                  ),
+                ),
+              ),
+            ],
           ),
     );
 
@@ -192,9 +205,10 @@ class _ActionSearchBarState extends State<ActionSearchBar>
                           child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.4,
+                          Container(
+                            constraints: const BoxConstraints(maxHeight: 250),
                             child: ListView.builder(
+                              shrinkWrap: true,
                               padding: EdgeInsets.zero,
                               itemCount: _filteredActions.length,
                               itemBuilder: (context, index) {
@@ -282,7 +296,7 @@ class _ActionSearchBarState extends State<ActionSearchBar>
                                         const SizedBox(width: 8),
 
                                         if (action.price != null &&
-                                            action.cta!.isEmpty)
+                                            (action.cta == null || action.cta!.isEmpty || action.cta == 'none'))
                                           Text(
                                             '${getProductPrice(action.price!, 0)} Fcfa',
                                             style: TextStyle(
@@ -290,7 +304,7 @@ class _ActionSearchBarState extends State<ActionSearchBar>
                                               color: Colors.grey[400],
                                             ),
                                           ),
-                                        if (action.cta!.isNotEmpty)
+                                        if (action.cta != null && action.cta!.isNotEmpty && action.cta != 'none')
                                           Text(
                                             action.cta!,
                                             style: TextStyle(

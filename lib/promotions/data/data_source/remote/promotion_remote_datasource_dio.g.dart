@@ -12,7 +12,7 @@ part of 'promotion_remote_datasource_dio.dart';
 
 class _PromotionRemoteDatasourceDio implements PromotionRemoteDatasourceDio {
   _PromotionRemoteDatasourceDio(this._dio, {this.baseUrl, this.errorLogger}) {
-    baseUrl ??= 'http://192.168.1.72:3333/api/v1';
+    baseUrl ??= 'https://ab-autox.com/api/v1';
   }
 
   final Dio _dio;

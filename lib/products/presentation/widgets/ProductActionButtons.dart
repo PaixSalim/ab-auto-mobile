@@ -20,11 +20,11 @@ class ProductActionButtons extends StatelessWidget {
     final message = Uri.encodeComponent(
       'Bonjour, je suis intéressé(e) par votre produit "${product.name ?? 'ce produit'}". '
       'État: ${selectedState == 'used' ? 'Occasion' : 'Neuf'}, Quantité: $quantity. '
-      'Pourriez-vous me donner plus d\'informations ?'
+      'Pourriez-vous me donner plus d\'informations ?',
     );
-    
+
     final url = 'https://wa.me/$sellerPhone?text=$message';
-    
+
     try {
       if (await canLaunchUrl(Uri.parse(url))) {
         await launchUrl(Uri.parse(url));
@@ -38,7 +38,9 @@ class ProductActionButtons extends StatelessWidget {
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Erreur lors de l\'ouverture de WhatsApp')),
+          const SnackBar(
+            content: Text('Erreur lors de l\'ouverture de WhatsApp'),
+          ),
         );
       }
     }
@@ -55,38 +57,44 @@ class ProductActionButtons extends StatelessWidget {
       return;
     }
 
-    final subject = Uri.encodeComponent('Question concernant: ${product.name ?? 'ce produit'}');
+    final subject = Uri.encodeComponent(
+      'Question concernant: ${product.name ?? 'ce produit'}',
+    );
     final body = Uri.encodeComponent(
       'Bonjour,\n\nJe suis intéressé(e) par votre produit "${product.name ?? 'ce produit'}".\n'
       'État: ${selectedState == 'used' ? 'Occasion' : 'Neuf'}\n'
       'Quantité: $quantity\n\n'
-      'Pourriez-vous me donner plus d\'informations ?\n\nCordialement.'
+      'Pourriez-vous me donner plus d\'informations ?\n\nCordialement.',
     );
-    
+
     final url = 'mailto:$sellerEmail?subject=$subject&body=$body';
-    
+
     try {
       if (await canLaunchUrl(Uri.parse(url))) {
         await launchUrl(Uri.parse(url));
       } else {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Impossible d\'ouvrir l\'application email')),
+            const SnackBar(
+              content: Text('Impossible d\'ouvrir l\'application email'),
+            ),
           );
         }
       }
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Erreur lors de l\'ouverture de l\'email')),
+          const SnackBar(
+            content: Text('Erreur lors de l\'ouverture de l\'email'),
+          ),
         );
       }
     }
   }
 
   Future<void> _shareProduct(BuildContext context) async {
-    final productUrl = 'http://192.168.1.72:3333/products/${product.id}';
-    
+    final productUrl = 'https://ab-autox.com/products/${product.id}';
+
     try {
       await Clipboard.setData(ClipboardData(text: productUrl));
       if (context.mounted) {
@@ -120,7 +128,10 @@ class ProductActionButtons extends StatelessWidget {
                 child: ElevatedButton.icon(
                   onPressed: () => _launchWhatsApp(context),
                   icon: const Icon(Icons.phone_outlined, size: 20),
-                  label: const Text('Contacter le vendeur', style: TextStyle(fontSize: 14)),
+                  label: const Text(
+                    'Contacter le vendeur',
+                    style: TextStyle(fontSize: 14),
+                  ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF3B82F6),
                     foregroundColor: Colors.white,
@@ -132,9 +143,9 @@ class ProductActionButtons extends StatelessWidget {
                   ),
                 ),
               ),
-              
+
               const SizedBox(width: 15),
-              
+
               // Share button
               OutlinedButton.icon(
                 onPressed: () => _shareProduct(context),
@@ -143,7 +154,10 @@ class ProductActionButtons extends StatelessWidget {
                 style: OutlinedButton.styleFrom(
                   foregroundColor: const Color(0xFF6B7280),
                   side: const BorderSide(color: Color(0xFFE5E7EB)),
-                  padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 16,
+                    horizontal: 20,
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -151,9 +165,9 @@ class ProductActionButtons extends StatelessWidget {
               ),
             ],
           ),
-          
+
           // const SizedBox(height: 12),
-          
+
           // // Secondary contact option
           // SizedBox(
           //   width: double.infinity,

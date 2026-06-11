@@ -9,7 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ProductCatalogPage extends StatefulWidget {
-  const ProductCatalogPage({super.key});
+  final bool isStandalone;
+  const ProductCatalogPage({super.key, this.isStandalone = false});
 
   @override
   ProductCatalogPageState createState() => ProductCatalogPageState();
@@ -48,7 +49,8 @@ class ProductCatalogPageState extends State<ProductCatalogPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor:
+          widget.isStandalone ? Colors.grey[50] : Colors.transparent,
       key: _scaffoldKey,
       body: Column(
         children: [
@@ -98,7 +100,8 @@ class ProductCatalogPageState extends State<ProductCatalogPage> {
                             }
                             return ProductGridCard(
                               product: state.displayedProducts![index],
-                              index: index, // Passer l'index pour le tag Hero unique
+                              index:
+                                  index, // Passer l'index pour le tag Hero unique
                               heroTagPrefix: 'catalog-product',
                             );
                           },
@@ -158,6 +161,26 @@ class ProductCatalogPageState extends State<ProductCatalogPage> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Ligne de titre (Catalogue)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                child: Row(
+                  children: [
+                    if (widget.isStandalone)
+                      IconButton(
+                        icon: const Icon(
+                          Icons.arrow_back_ios_new,
+                          size: 20,
+                          color: Colors.black87,
+                        ),
+                        onPressed: () => Navigator.of(context).pop(),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+                  ],
+                ),
+              ),
+
               // Ligne des boutons déroulants (Filtres)
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,

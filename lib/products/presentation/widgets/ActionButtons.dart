@@ -19,26 +19,29 @@ class ActionButtons extends StatelessWidget {
   void _showLoginRequired(BuildContext context) {
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Connexion requise'),
-        content: const Text('Vous devez être connecté pour passer une commande.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Annuler'),
+      builder:
+          (ctx) => AlertDialog(
+            title: const Text('Connexion requise'),
+            content: const Text(
+              'Vous devez être connecté pour passer une commande.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Annuler'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const LoginPage()),
+                  );
+                },
+                child: const Text('Se connecter'),
+              ),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const LoginPage()),
-              );
-            },
-            child: const Text('Se connecter'),
-          ),
-        ],
-      ),
     );
   }
 
@@ -108,7 +111,7 @@ class ActionButtons extends StatelessWidget {
         const SizedBox(height: 10),
         OutlinedButton.icon(
           onPressed: () async {
-            final url = 'http://192.168.1.72:3333/login';
+            final url = 'https://ab-autox.com/login';
             if (await canLaunchUrl(Uri.parse(url))) {
               await launchUrl(Uri.parse(url));
             } else {
