@@ -98,8 +98,8 @@ class ProductCatalogPageState extends State<ProductCatalogPage> {
                             }
                             return ProductGridCard(
                               product: state.displayedProducts![index],
-                              index:
-                                  index, // Passer l'index pour le tag Hero unique
+                              index: index, // Passer l'index pour le tag Hero unique
+                              heroTagPrefix: 'catalog-product',
                             );
                           },
                         ),

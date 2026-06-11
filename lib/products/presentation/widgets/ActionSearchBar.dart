@@ -108,7 +108,7 @@ class _ActionSearchBarState extends State<ActionSearchBar>
     final normalizedQuery = _query.toLowerCase().trim();
     final filtered =
         (widget.products).where((action) {
-          final searchableText = action.name!.toLowerCase();
+          final searchableText = (action.name ?? '').toLowerCase();
           return searchableText.contains(normalizedQuery);
         }).toList();
 
@@ -218,28 +218,31 @@ class _ActionSearchBarState extends State<ActionSearchBar>
                                       crossAxisAlignment:
                                           CrossAxisAlignment.center,
                                       children: [
-                                        CachedNetworkImage(
-                                          width: 18,
-                                          imageUrl: action.medias![0],
-                                          progressIndicatorBuilder:
-                                              (
-                                                context,
-                                                url,
-                                                downloadProgress,
-                                              ) => Lottie.asset(
-                                                'assets/animations/lottie/loading-image.json',
-                                                width: 15,
-                                              ),
-                                          errorWidget:
-                                              (
-                                                context,
-                                                url,
-                                                error,
-                                              ) => Lottie.asset(
-                                                'assets/animations/lottie/error-network.json',
-                                                width: 15,
-                                              ),
-                                        ),
+                                        if (action.medias != null && action.medias!.isNotEmpty)
+                                          CachedNetworkImage(
+                                            width: 18,
+                                            imageUrl: action.medias![0],
+                                            progressIndicatorBuilder:
+                                                (
+                                                  context,
+                                                  url,
+                                                  downloadProgress,
+                                                ) => Lottie.asset(
+                                                  'assets/animations/lottie/loading-image.json',
+                                                  width: 15,
+                                                ),
+                                            errorWidget:
+                                                (
+                                                  context,
+                                                  url,
+                                                  error,
+                                                ) => Lottie.asset(
+                                                  'assets/animations/lottie/error-network.json',
+                                                  width: 15,
+                                                ),
+                                          )
+                                        else
+                                          const SizedBox(width: 18),
                                         const SizedBox(width: 8),
 
                                         /// Partie extensible contenant nom + marque
