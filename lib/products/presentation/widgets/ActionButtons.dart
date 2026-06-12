@@ -98,13 +98,13 @@ class ActionButtons extends StatelessWidget {
               'Découvrez ${product.name} à prix réduit sur AB AUTO : https://www.abauto.pro/catalogue/product/${product.slug}',
             );
           },
-          icon: const Icon(Icons.share, color: Colors.black),
-          label: const Text("Partager", style: TextStyle(color: Colors.black)),
+          icon: Icon(Icons.share, color: Theme.of(context).primaryColor),
+          label: Text("Partager", style: TextStyle(color: Theme.of(context).primaryColor)),
           style: OutlinedButton.styleFrom(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
-            side: BorderSide(color: Colors.grey.shade300),
+            side: BorderSide(color: Theme.of(context).primaryColor),
             minimumSize: const Size(double.infinity, 50),
           ),
         ),
