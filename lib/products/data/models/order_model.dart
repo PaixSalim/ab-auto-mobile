@@ -9,6 +9,7 @@ class OrderModel extends OrderEntity {
     super.phoneNumber,
   );
 
+  @override
   Map<String, dynamic> toJson() {
     return {
       'fullName': fullName,

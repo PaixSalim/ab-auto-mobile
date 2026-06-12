@@ -1,4 +1,3 @@
-import 'package:auto/auth/presentation/pages/login_page.dart';
 import 'package:auto/auth/presentation/widgets/auth_bottom_sheet.dart';
 import 'package:auto/config/theme/customToast.dart';
 import 'package:auto/core/resources/local_storage_service.dart';
@@ -7,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../bloc/comment_bloc.dart';
 import 'CommentItem.dart';

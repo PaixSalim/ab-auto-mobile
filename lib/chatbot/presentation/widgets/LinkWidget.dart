@@ -6,8 +6,7 @@ class LinkWidget extends StatelessWidget {
   final String url;
   final VoidCallback onTap;
 
-  const LinkWidget({Key? key, required this.url, required this.onTap})
-    : super(key: key);
+  const LinkWidget({super.key, required this.url, required this.onTap});
 
   @override
   Widget build(BuildContext context) {

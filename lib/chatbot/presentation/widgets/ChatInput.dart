@@ -7,8 +7,7 @@ class ChatInput extends StatefulWidget {
   final bool isTyping;
   final Function(String) onSend;
 
-  const ChatInput({Key? key, required this.isTyping, required this.onSend})
-    : super(key: key);
+  const ChatInput({super.key, required this.isTyping, required this.onSend});
 
   @override
   State<ChatInput> createState() => _ChatInputState();

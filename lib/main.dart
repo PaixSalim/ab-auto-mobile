@@ -4,7 +4,6 @@ import 'package:auto/banners/presentation/widgets/CarouselWithIndicator.dart';
 import 'package:auto/brands/presentation/bloc/remote/remote_brand_bloc.dart';
 import 'package:auto/categories/presentation/bloc/remote/remote_category_bloc.dart';
 import 'package:auto/chatbot/presentation/bloc/remote/chat_bloc.dart';
-import 'package:auto/chatbot/presentation/widgets/SupportAssistant.dart';
 import 'package:auto/comments/presentation/bloc/comment_bloc.dart';
 import 'package:auto/config/navigation/main_navigation.dart';
 

@@ -148,10 +148,10 @@ class ImageGalleryView extends StatefulWidget {
   final int initialIndex;
 
   const ImageGalleryView({
-    Key? key,
+    super.key,
     required this.images,
     required this.initialIndex,
-  }) : super(key: key);
+  });
 
   @override
   State<ImageGalleryView> createState() => _ImageGalleryViewState();

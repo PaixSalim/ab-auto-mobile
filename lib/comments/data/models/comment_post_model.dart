@@ -5,8 +5,8 @@ class CommentPostModel extends CommentPostEntity {
     super.productId,
     super.user,
     super.comment,
-    String? userId,
-  }) : super(userId: userId);
+    super.userId,
+  });
 
   Map<String, dynamic> toJson() => {
     'productId': productId,

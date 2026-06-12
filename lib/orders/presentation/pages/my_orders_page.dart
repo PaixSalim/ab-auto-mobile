@@ -78,7 +78,7 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
             return ListView.separated(
               padding: const EdgeInsets.all(16),
               itemCount: state.orders.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 12),
+              separatorBuilder: (_, _) => const SizedBox(height: 12),
               itemBuilder: (context, index) {
                 final order = state.orders[index];
                 return Card(
@@ -106,7 +106,7 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
                                   width: 70,
                                   height: 70,
                                   fit: BoxFit.cover,
-                                  errorWidget: (_, __, ___) => Container(
+                                  errorWidget: (_, _, _) => Container(
                                     width: 70,
                                     height: 70,
                                     color: Colors.grey[200],

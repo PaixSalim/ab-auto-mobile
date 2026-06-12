@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ChatFooter extends StatelessWidget {
-  const ChatFooter({Key? key}) : super(key: key);
+  const ChatFooter({super.key});
 
   @override
   Widget build(BuildContext context) {

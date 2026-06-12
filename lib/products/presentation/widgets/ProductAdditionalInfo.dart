@@ -114,7 +114,7 @@ class ProductAdditionalInfo extends StatelessWidget {
                         ),
                       ],
                     ),
-                  )).toList(),
+                  )),
                 ],
                 
                 // State info

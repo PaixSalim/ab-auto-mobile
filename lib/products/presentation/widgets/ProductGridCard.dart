@@ -219,7 +219,7 @@ class ProductGridCard extends StatelessWidget {
                                     Padding(
                                       padding: const EdgeInsets.only(bottom: 1.0),
                                       child: Text(
-                                        "${getProductPrice(double.tryParse(product.price?.toString() ?? '0') ?? 0, 0)}",
+                                        getProductPrice(double.tryParse(product.price?.toString() ?? '0') ?? 0, 0),
                                         style: const TextStyle(
                                           decoration: TextDecoration.lineThrough,
                                           color: Colors.grey,

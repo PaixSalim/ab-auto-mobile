@@ -383,7 +383,7 @@ class ProductCatalogPageState extends State<ProductCatalogPage> {
                   ),
                 ),
               );
-            }).toList(),
+            }),
           ],
         ),
       ),

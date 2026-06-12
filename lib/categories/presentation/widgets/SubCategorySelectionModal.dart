@@ -2,7 +2,6 @@ import 'package:auto/categories/domain/entities/category_entity.dart';
 import 'package:auto/products/presentation/bloc/remote/remote_product_bloc.dart';
 import 'package:auto/products/presentation/bloc/remote/remote_product_event.dart';
 import 'package:auto/config/navigation/main_navigation.dart';
-import 'package:auto/products/presentation/pages/ProductCatalogPage.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
