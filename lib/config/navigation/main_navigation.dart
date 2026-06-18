@@ -8,7 +8,6 @@ import 'package:auto/notifications/presentation/pages/NotificationCenterPage.dar
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import 'package:auto/products/presentation/widgets/search.index.bar.dart';
 // import '../../injection_container.dart';
@@ -17,14 +16,21 @@ import '../../../main.dart';
 import 'dart:ui';
 
 class MainNavigation extends StatefulWidget {
-  const MainNavigation({super.key});
+  final int initialIndex;
+  const MainNavigation({super.key, this.initialIndex = 0});
 
   @override
   State<MainNavigation> createState() => _MainNavigationState();
 }
 
 class _MainNavigationState extends State<MainNavigation> {
-  int _currentIndex = 0;
+  late int _currentIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentIndex = widget.initialIndex;
+  }
 
   void _showLogoutDialog(BuildContext context) {
     showDialog(

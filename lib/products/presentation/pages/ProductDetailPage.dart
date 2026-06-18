@@ -1,7 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:auto/auth/presentation/bloc/auth_bloc.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
@@ -842,7 +841,11 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         widget.product.year?.name ?? 'Non spécifié',
       ),
       if (features.isNotEmpty)
-        _buildSpecItem(Icons.settings_suggest_rounded, 'Spécif.', features.first)
+        _buildSpecItem(
+          Icons.settings_suggest_rounded,
+          'Spécif.',
+          features.first,
+        )
       else
         _buildSpecItem(
           Icons.category_rounded,

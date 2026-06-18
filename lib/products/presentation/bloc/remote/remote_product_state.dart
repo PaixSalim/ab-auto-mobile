@@ -64,13 +64,13 @@ class RemoteProductsDone extends RemoteProductState {
       );
 
   List<String> get availableModels {
-    final models = allProducts?.map((p) => p.model?.name).where((m) => m != null && m!.isNotEmpty).map((m) => m!).toSet().toList() ?? [];
+    final models = allProducts?.map((p) => p.model?.name).where((m) => m != null && m.isNotEmpty).map((m) => m!).toSet().toList() ?? [];
     models.sort();
     return models;
   }
 
   List<String> get availableYears {
-    final years = allProducts?.map((p) => p.year?.name).where((y) => y != null && y!.isNotEmpty).map((y) => y!).toSet().toList() ?? [];
+    final years = allProducts?.map((p) => p.year?.name).where((y) => y != null && y.isNotEmpty).map((y) => y!).toSet().toList() ?? [];
     years.sort((a, b) => b.compareTo(a));
     return years;
   }
@@ -100,7 +100,7 @@ class RemoteProductsDone extends RemoteProductState {
     bool? isLoadingMore,
   }) {
     return RemoteProductsDone(
-      allProduct ?? this.allProducts!,
+      allProduct ?? allProducts!,
       displayedProducts ?? this.displayedProducts!,
       query ?? this.query!,
       selectedCategories ?? this.selectedCategories,

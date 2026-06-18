@@ -23,9 +23,9 @@ class ObjectBoxService {
                 try {
           // Try multiple common database locations
           final possiblePaths = [
-            Directory.current.path + '/objectbox',
-            Directory.systemTemp.path + '/objectbox',
-            Directory.current.path + '/data/objectbox',
+            '${Directory.current.path}/objectbox',
+            '${Directory.systemTemp.path}/objectbox',
+            '${Directory.current.path}/data/objectbox',
           ];
           
           bool deleted = false;

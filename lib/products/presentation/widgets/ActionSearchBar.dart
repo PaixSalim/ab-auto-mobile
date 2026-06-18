@@ -108,7 +108,7 @@ class _ActionSearchBarState extends State<ActionSearchBar>
     final normalizedQuery = _query.toLowerCase().trim();
     final filtered =
         (widget.products).where((action) {
-          final searchableText = action.name!.toLowerCase();
+          final searchableText = (action.name ?? '').toLowerCase();
           return searchableText.contains(normalizedQuery);
         }).toList();
 
@@ -127,18 +127,31 @@ class _ActionSearchBarState extends State<ActionSearchBar>
 
     _overlayEntry = OverlayEntry(
       builder:
-          (context) => Positioned(
-            width: widget.width ?? size.width,
-            child: CompositedTransformFollower(
-              link: _layerLink,
-              showWhenUnlinked: false,
-              offset: Offset(0, size.height + 4),
-              child: Material(
-                elevation: 4,
-                color: Colors.transparent,
-                child: _buildSuggestionsList(),
+          (context) => Stack(
+            children: [
+              Positioned.fill(
+                child: GestureDetector(
+                  behavior: HitTestBehavior.translucent,
+                  onTap: () {
+                    _focusNode.unfocus();
+                  },
+                  child: Container(color: Colors.transparent),
+                ),
               ),
-            ),
+              Positioned(
+                width: widget.width ?? size.width,
+                child: CompositedTransformFollower(
+                  link: _layerLink,
+                  showWhenUnlinked: false,
+                  offset: Offset(0, size.height + 4),
+                  child: Material(
+                    elevation: 4,
+                    color: Colors.transparent,
+                    child: _buildSuggestionsList(),
+                  ),
+                ),
+              ),
+            ],
           ),
     );
 
@@ -192,9 +205,10 @@ class _ActionSearchBarState extends State<ActionSearchBar>
                           child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.4,
+                          Container(
+                            constraints: const BoxConstraints(maxHeight: 250),
                             child: ListView.builder(
+                              shrinkWrap: true,
                               padding: EdgeInsets.zero,
                               itemCount: _filteredActions.length,
                               itemBuilder: (context, index) {
@@ -218,28 +232,31 @@ class _ActionSearchBarState extends State<ActionSearchBar>
                                       crossAxisAlignment:
                                           CrossAxisAlignment.center,
                                       children: [
-                                        CachedNetworkImage(
-                                          width: 18,
-                                          imageUrl: action.medias![0],
-                                          progressIndicatorBuilder:
-                                              (
-                                                context,
-                                                url,
-                                                downloadProgress,
-                                              ) => Lottie.asset(
-                                                'assets/animations/lottie/loading-image.json',
-                                                width: 15,
-                                              ),
-                                          errorWidget:
-                                              (
-                                                context,
-                                                url,
-                                                error,
-                                              ) => Lottie.asset(
-                                                'assets/animations/lottie/error-network.json',
-                                                width: 15,
-                                              ),
-                                        ),
+                                        if (action.medias != null && action.medias!.isNotEmpty)
+                                          CachedNetworkImage(
+                                            width: 18,
+                                            imageUrl: action.medias![0],
+                                            progressIndicatorBuilder:
+                                                (
+                                                  context,
+                                                  url,
+                                                  downloadProgress,
+                                                ) => Lottie.asset(
+                                                  'assets/animations/lottie/loading-image.json',
+                                                  width: 15,
+                                                ),
+                                            errorWidget:
+                                                (
+                                                  context,
+                                                  url,
+                                                  error,
+                                                ) => Lottie.asset(
+                                                  'assets/animations/lottie/error-network.json',
+                                                  width: 15,
+                                                ),
+                                          )
+                                        else
+                                          const SizedBox(width: 18),
                                         const SizedBox(width: 8),
 
                                         /// Partie extensible contenant nom + marque
@@ -279,7 +296,7 @@ class _ActionSearchBarState extends State<ActionSearchBar>
                                         const SizedBox(width: 8),
 
                                         if (action.price != null &&
-                                            action.cta!.isEmpty)
+                                            (action.cta == null || action.cta!.isEmpty || action.cta == 'none'))
                                           Text(
                                             '${getProductPrice(action.price!, 0)} Fcfa',
                                             style: TextStyle(
@@ -287,7 +304,7 @@ class _ActionSearchBarState extends State<ActionSearchBar>
                                               color: Colors.grey[400],
                                             ),
                                           ),
-                                        if (action.cta!.isNotEmpty)
+                                        if (action.cta != null && action.cta!.isNotEmpty && action.cta != 'none')
                                           Text(
                                             action.cta!,
                                             style: TextStyle(

@@ -91,7 +91,7 @@ class OrderDetailPage extends StatelessWidget {
     width: 80,
     height: 80,
     fit: BoxFit.cover,
-    placeholder: (_, __) => Container(
+    placeholder: (_, _) => Container(
       width: 80,
       height: 80,
       color: Colors.grey[200],
@@ -103,7 +103,7 @@ class OrderDetailPage extends StatelessWidget {
         ),
       ),
     ),
-    errorWidget: (_, __, ___) => _buildImagePlaceholder(),
+    errorWidget: (_, _, _) => _buildImagePlaceholder(),
   );
 }
 

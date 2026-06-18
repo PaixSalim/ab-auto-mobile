@@ -34,10 +34,10 @@ class AuthBottomSheet {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFEFF6FF),
+                    color: Theme.of(context).primaryColor.withOpacity(0.1),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.lock_person_rounded, size: 40, color: Color(0xFF3B82F6)),
+                  child: Icon(Icons.lock_person_rounded, size: 40, color: Theme.of(context).primaryColor),
                 ),
                 const SizedBox(height: 24),
                 const Text(
@@ -74,7 +74,7 @@ class AuthBottomSheet {
                       }
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF2563EB),
+                      backgroundColor: Theme.of(context).primaryColor,
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
@@ -100,8 +100,8 @@ class AuthBottomSheet {
                       }
                     },
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFF2563EB),
-                      side: const BorderSide(color: Color(0xFFBFDBFE), width: 2),
+                      foregroundColor: Theme.of(context).primaryColor,
+                      side: BorderSide(color: Theme.of(context).primaryColor.withOpacity(0.3), width: 2),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),

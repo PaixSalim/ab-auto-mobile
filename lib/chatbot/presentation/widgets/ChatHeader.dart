@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class ChatHeader extends StatelessWidget {
   final VoidCallback onClose;
 
-  const ChatHeader({Key? key, required this.onClose}) : super(key: key);
+  const ChatHeader({super.key, required this.onClose});
 
   @override
   Widget build(BuildContext context) {

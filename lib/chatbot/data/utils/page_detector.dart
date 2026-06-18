@@ -2,7 +2,7 @@ import 'package:auto/config/routes/custom_navigation.dart';
 import 'package:auto/products/domain/entities/product_entity.dart';
 import 'package:auto/products/presentation/bloc/remote/remote_product_bloc.dart';
 import 'package:auto/products/presentation/bloc/remote/remote_product_event.dart';
-import 'package:auto/products/presentation/pages/ProductCatalogPage.dart';
+import 'package:auto/config/navigation/main_navigation.dart';
 import 'package:auto/products/presentation/pages/ProductDetailPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -56,7 +56,12 @@ class UrlHandler {
         break;
       case PageType.productCatalogue:
         context.read<RemoteProductsBloc>().add(ResetProductFilter());
-        goTo(context, ProductCatalogPage(), AnimationType.slide);
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (context) => const MainNavigation(initialIndex: 1),
+          ),
+          (route) => false,
+        );
         break;
       case PageType.unknown:
         break;

@@ -19,26 +19,29 @@ class ActionButtons extends StatelessWidget {
   void _showLoginRequired(BuildContext context) {
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Connexion requise'),
-        content: const Text('Vous devez être connecté pour passer une commande.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Annuler'),
+      builder:
+          (ctx) => AlertDialog(
+            title: const Text('Connexion requise'),
+            content: const Text(
+              'Vous devez être connecté pour passer une commande.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Annuler'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const LoginPage()),
+                  );
+                },
+                child: const Text('Se connecter'),
+              ),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const LoginPage()),
-              );
-            },
-            child: const Text('Se connecter'),
-          ),
-        ],
-      ),
     );
   }
 
@@ -95,13 +98,13 @@ class ActionButtons extends StatelessWidget {
               'Découvrez ${product.name} à prix réduit sur AB AUTO : https://www.abauto.pro/catalogue/product/${product.slug}',
             );
           },
-          icon: const Icon(Icons.share, color: Colors.black),
-          label: const Text("Partager", style: TextStyle(color: Colors.black)),
+          icon: Icon(Icons.share, color: Theme.of(context).primaryColor),
+          label: Text("Partager", style: TextStyle(color: Theme.of(context).primaryColor)),
           style: OutlinedButton.styleFrom(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
-            side: BorderSide(color: Colors.grey.shade300),
+            side: BorderSide(color: Theme.of(context).primaryColor),
             minimumSize: const Size(double.infinity, 50),
           ),
         ),

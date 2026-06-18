@@ -5,7 +5,7 @@ import 'package:auto/comments/domain/entities/comment_post_entity.dart';
 import '../models/comment_model.dart';
 
 class CommentDto {
-  static postToModel(CommentPostEntity entity) {
+  static CommentPostModel postToModel(CommentPostEntity entity) {
     return CommentPostModel(
       user: entity.user,
       comment: entity.comment,
@@ -13,7 +13,7 @@ class CommentDto {
     );
   }
 
-  static getToModel(CommentEntity entity) {
+  static CommentModel getToModel(CommentEntity entity) {
     return CommentModel(
       id: entity.id,
       userId: entity.userId,

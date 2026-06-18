@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
 class TypingIndicator extends StatelessWidget {
-  const TypingIndicator({Key? key}) : super(key: key);
+  const TypingIndicator({super.key});
 
   @override
   Widget build(BuildContext context) {

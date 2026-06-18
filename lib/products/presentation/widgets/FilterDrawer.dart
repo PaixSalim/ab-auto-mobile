@@ -10,6 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class FilterDrawer extends StatefulWidget {
+  const FilterDrawer({super.key});
+
   @override
   _FilterDrawerState createState() => _FilterDrawerState();
 }

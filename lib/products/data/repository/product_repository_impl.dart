@@ -73,7 +73,8 @@ class ProductRepositoryImpl implements ProductRepository {
         }
       } on DioException catch (e) {
         print('❌ getProducts: DioException: ${e.message}');
-        return DataFailed(e);
+        print('⚠️ getProducts: Fetching from local cache as fallback.');
+        return DataSuccess(await _local.getProducts());
       }
     } else {
       print('⚠️ getProducts: No internet connection. Fetching from local cache.');
@@ -170,17 +171,30 @@ class ProductRepositoryImpl implements ProductRepository {
         }
       } on DioException catch (e) {
         print('❌ getProductsPaginated: DioException: ${e.message}');
-        return DataFailed(e);
+        print('⚠️ getProductsPaginated: Fetching from local cache as fallback.');
+        final localProducts = await _local.getProducts();
+        return DataSuccess({
+          'products': localProducts,
+          'total': localProducts.length,
+          'page': page,
+          'limit': limit,
+          'totalPages': 1,
+          'hasNextPage': false,
+          'hasPreviousPage': false,
+        });
       }
     } else {
-      print('⚠️ getProductsPaginated: No internet connection.');
-      return DataFailed(
-        DioException(
-          error: 'No internet connection',
-          type: DioExceptionType.unknown,
-          requestOptions: RequestOptions(path: '/products'),
-        ),
-      );
+      print('⚠️ getProductsPaginated: No internet connection. Fetching from local cache.');
+      final localProducts = await _local.getProducts();
+      return DataSuccess({
+        'products': localProducts,
+        'total': localProducts.length,
+        'page': page,
+        'limit': limit,
+        'totalPages': 1,
+        'hasNextPage': false,
+        'hasPreviousPage': false,
+      });
     }
   }
 

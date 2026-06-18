@@ -8,6 +8,7 @@ class BrandModel extends BrandEntity {
     return BrandModel(id: json['id'], name: json['name'], url: resolveUrl(json['url']));
   }
 
+  @override
   Map<String, dynamic> toJson() {
     return {'id': id, 'name': name, 'url': url};
   }
